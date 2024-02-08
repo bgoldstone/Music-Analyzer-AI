@@ -4,6 +4,7 @@ import dotenv
 from typing import Dict, List
 import csv
 import math
+import time
 
 
 def main():
@@ -77,8 +78,8 @@ def get_track_details(tracks: List[str], sp: spotipy.Spotify) -> Dict[str, Dict[
             track['track_name'] = track_subset[index][1]
             track['artist_name'] = track_subset[index][2]
             track['album_name'] = track_subset[index][3].replace('\\n', '')
-            track_details[f'{tracks["track_name"]} - {tracks["artist_name"]} - {tracks["album_name"]}'] = tracks
-
+            track_details[f'{track_subset[index][1]} - {track_subset[index][2]} - {track_subsets[index][3]}'] = tracks
+        time.sleep(10)  # wait 10 seconds before continuing
     return track_details
 
 
