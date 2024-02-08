@@ -8,6 +8,10 @@ import time
 
 
 def main():
+    """
+    This function sets up the Spotify API credentials and calls the other functions to get the playlist tracks and track details.
+    """
+    # load the .env file
     dotenv.load_dotenv('.env')
 
     # Set up Spotify API credentials
@@ -16,6 +20,7 @@ def main():
     client_credentials_manager = SpotifyClientCredentials(
         client_id=client_id, client_secret=client_secret)
     sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+
     # get playlist tracks
     # get_playlist_tracks(
     #     'https://open.spotify.com/playlist/1fjmiwCMmiwm8Shk38mzu2?si=a3e0e6d188094923', sp, 16)
@@ -26,11 +31,12 @@ def main():
         for line in f:
             song_list.append(line.split(','))
     track_details = get_track_details(song_list, sp)
-    to_csv('track_details.csv', track_details[1:])
+    to_csv('track_details.csv', track_details)
 
 
 def get_playlist_tracks(playlist_url: str, sp: spotipy.Spotify, offset: int = 0) -> None:
-    """gets playlist tracks and writes to a file
+    """
+    gets playlist tracks and writes to a file
 
     Args:
         playlist_url (str): URL to the playlist.
@@ -50,14 +56,15 @@ def get_playlist_tracks(playlist_url: str, sp: spotipy.Spotify, offset: int = 0)
 
 
 def get_track_details(tracks: List[str], sp: spotipy.Spotify) -> Dict[str, Dict[str, str]]:
-    """gets track details and returns a dictionary
+    """
+    gets track details and returns a dictionary
 
     Args:
         track_id (str): Track ID to get details for
         sp (spotipy.Spotify): Spotify object to use, must be authenticated.
-
     Returns:
-        Dict[str, Dict[str,str]]: Dictionary with track details containing title-artist as key, and a value of audio features dictionary.
+        Dict[str, Dict[str,str]]: A dictionary with track details, where the key is a string of the form
+        '{track name} - {artist name} - {album name}', and the value is a dictionary of audio features.
     """
     track_details = {}
     i = 0
@@ -71,21 +78,37 @@ def get_track_details(tracks: List[str], sp: spotipy.Spotify) -> Dict[str, Dict[
         print(i)
         i += 1
         ids = [id[0] for id in track_subset]
-        tracks = sp.audio_features(ids)
-        #
+        try:
+            tracks = sp.audio_features(ids)
+        except Exception as e:
+            print(e)
+            break
+
         for index, track in enumerate(tracks):
+            track_subset[index][3] = track_subset[index][3].replace("\\n", "")
             track['track_id'] = track_subset[index][0]
             track['track_name'] = track_subset[index][1]
             track['artist_name'] = track_subset[index][2]
-            track['album_name'] = track_subset[index][3].replace('\\n', '')
-            track_details[f'{track_subset[index][1]} - {track_subset[index][2]} - {track_subsets[index][3]}'] = tracks
+            track['album_name'] = track_subset[index][3]
+            track_details[f'{track_subset[index][1]} - {track_subset[index][2]} - {track_subset[index][3]}'] = tracks
         time.sleep(10)  # wait 10 seconds before continuing
     return track_details
 
 
 def to_csv(file_name: str, track_details: Dict[str, Dict[str, str]]) -> None:
-    csv.DictWriter(file_name, track_details.keys(),
-                   delimiter=',').writeheader(track_details.values())
+    """
+    Writes a dictionary of track details to a CSV file.
+
+    Args:
+        file_name (str): The name of the CSV file to write to.
+        track_details (Dict[str, Dict[str, str]]): A dictionary of track details, where the key is a string of the form
+            '{track name} - {artist name} - {album name}', and the value is a dictionary of audio features.
+    """
+    with open(file_name, 'w') as csv_file:
+        writer = csv.DictWriter(
+            csv_file, fieldnames=track_details.keys(), delimiter=',')
+        writer.writeheader()
+        writer.writerows(track_details.values())
 
 
 if __name__ == '__main__':
