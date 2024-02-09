@@ -33,8 +33,7 @@ def main():
     # Set up Spotify API credentials
     client_id = dotenv.dotenv_values().get('SPOTIFY_CLIENT_ID')
     client_secret = dotenv.dotenv_values().get('SPOTIFY_CLIENT_SECRET')
-    client_credentials_manager = SpotifyClientCredentials(
-        client_id=client_id, client_secret=client_secret)
+    client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
     sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
     # get playlist tracks
