@@ -15,7 +15,7 @@ PLAYLIST_URL = 'https://open.spotify.com/playlist/1fjmiwCMmiwm8Shk38mzu2?si=a3e0
 PLAYLIST_NAME = 'all_songs'
 
 # CONSTANTS
-IDS_FILE_PATH = os.path.join(OUTPUT_DIRECTORY, f'{PLAYLIST_NAME}_ids.csv')
+PLAYLIST_FILE_PATH = os.path.join(OUTPUT_DIRECTORY, f'{PLAYLIST_NAME}_ids.csv')
 TRACK_DETAILS_FILE_PATH = os.path.join(
     OUTPUT_DIRECTORY, f'{PLAYLIST_NAME}_track_details.csv')
 
@@ -37,10 +37,14 @@ def main():
         client_id=client_id, client_secret=client_secret)
     sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
+    # create output directory
+    if not os.path.exists(OUTPUT_DIRECTORY):
+        os.makedirs(OUTPUT_DIRECTORY)
+
     # get playlist tracks
-    get_playlist_tracks(PLAYLIST_URL, sp, IDS_FILE_PATH, 16)
+    get_playlist_tracks(PLAYLIST_URL, sp, PLAYLIST_FILE_PATH, 16)
     # get song list and ids
-    song_list = read_csv(IDS_FILE_PATH)
+    song_list = read_csv(PLAYLIST_FILE_PATH)
     # get track details
     track_details = get_track_details(song_list, sp)
     to_csv(TRACK_DETAILS_FILE_PATH, track_details)
@@ -58,37 +62,42 @@ def read_csv(file_name: str,) -> List[Dict[str, str]]:
     song_list: List[Dict[str, str]] = []
     with open(file_name, 'r') as csv_file:
         file = csv.DictReader(csv_file)
-        for row in file:
-            song_list.append(row)
+        for track in file:
+            song_list.append(track)
     return song_list
 
 
-def get_playlist_tracks(playlist_url: str, sp: spotipy.Spotify, ids_file_path: str, offset: int = 0) -> None:
+def get_playlist_tracks(playlist_url: str, sp: spotipy.Spotify, playlist_file_path: str, offset: int = 0) -> None:
     """
     gets playlist tracks and writes to a file
 
     Args:
         playlist_url (str): URL to the playlist.
         sp (spotipy.Spotify): Spotify object to use, must be authenticated.
+        playlist_file_path (str): File path to write to.
         offset (int, optional): # of songs to get in 100s. Defaults to 0.
         playlist_name (str, optional): Name of the playlist.
     """
-    write = []
 
+    tracks: List[Dict[str, str]] = []
+
+    # Get playlist tracks in 100s
     for i in range(0, offset):
         all_songs = sp.playlist_tracks(playlist_url, offset=i*100)
-        for item in all_songs['items']:
-            write.append(
-                {'track_id': item['track']['id'],
-                 'track_name': item['track']['name'],
-                 'artist_name': item['track']['artists'][0]['name'],
-                 'album_name': item['track']['album']['name']})
+        for track in all_songs['items']:
+            tracks.append(
+                {'track_id': track['track']['id'],
+                 'track_name': track['track']['name'],
+                 'artist_name': track['track']['artists'][0]['name'],
+                 'album_name': track['track']['album']['name']})
+        time.sleep(2.5)  # sleep for 2.5 seconds to not overload spotify api
 
-        with open(ids_file_path, 'w') as csv_file:
+        # Write tracks to CSV file
+        with open(playlist_file_path, 'w') as csv_file:
             writer = csv.DictWriter(
-                csv_file, fieldnames=write[0].keys(), delimiter=',')
+                csv_file, fieldnames=tracks[0].keys(), delimiter=',')
             writer.writeheader()
-            for track in write:
+            for track in tracks:
                 writer.writerow(track)
 
 
@@ -107,14 +116,19 @@ def get_track_details(tracks: List[Dict[str, str]], sp: spotipy.Spotify) -> List
     i = 0
     len_tracks = math.ceil(len(tracks))
     track_subsets = []
+
+    # Subset tracks into smaller chunks for spotify api to process (caps aroung 100 tracks/request)
     for j in range(0, len_tracks-1):
         track_subsets.append(tracks[j*100:(j+1)*100])
     track_subsets.append(tracks[len_tracks*100:])
+
+    # For each track subset call spotify api
     for track_subset in track_subsets:
         ids = [track_id['track_id'] for track_id in track_subset]
         tracks = sp.audio_features(ids)
 
         try:
+            # for each track get audio features
             for index, track in enumerate(tracks):
                 track['track_id'] = track_subset[index]['track_id']
                 track['track_name'] = track_subset[index]['track_name']
