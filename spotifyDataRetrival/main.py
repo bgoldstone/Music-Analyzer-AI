@@ -25,6 +25,9 @@ def main():
     This function sets up the Spotify API credentials and calls the other functions to get the playlist tracks and track details.
     """
     # load the .env file with the Spotify API credentials
+    # create '.env' file in spotifyDataRetrival directory
+    # add SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET to .env file
+    # Ex. SPOTIFY_CLIENT_ID={your client id}
     dotenv.load_dotenv('.env')
 
     # Set up Spotify API credentials
