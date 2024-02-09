@@ -1,5 +1,5 @@
 # This action works with pull requests and pushes
-name: Autopeop8 formatter
+name: Autopep8 formatter
 
 on:
   pull_request:
