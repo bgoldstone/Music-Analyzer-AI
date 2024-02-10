@@ -1,3 +1,7 @@
 python-dotenv
 spotipy
 requests
+pandas
+torch
+ipython
+ipykernel
