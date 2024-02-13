@@ -8,7 +8,7 @@ import time
 import os
 
 # output directory (change this to song_data/{your name})
-OUTPUT_DIRECTORY = 'song_data/YOUR_NAME_HERE'
+OUTPUT_DIRECTORY = 'song_data/ben'
 # Spotify playlist URL
 PLAYLIST_URL = 'PLAYLIST_URL_HERE'
 # put the name of the playlist here in snake(_) case
@@ -82,12 +82,12 @@ def get_playlist_tracks(playlist_url: str, sp: spotipy.Spotify, playlist_file_pa
     limit = 100
     if (offset > 100):
         limit = offset
-    offset = offset / 100
+    offset = int(offset / 100)
     tracks: List[Dict[str, str]] = []
 
     # Get playlist tracks in 100s
     for i in range(0, offset):
-        all_songs = sp.playlist_tracks(playlist_url, offset=i*100, limit=limit)
+        all_songs = sp.playlist_tracks(playlist_url, offset=i*100)
         for track in all_songs['items']:
             tracks.append(
                 {'track_id': track['track']['id'],
