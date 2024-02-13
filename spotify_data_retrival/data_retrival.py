@@ -8,9 +8,13 @@ import time
 import os
 
 # output directory (change this to song_data/{your name})
-OUTPUT_DIRECTORY = 'song_data/YOUR_NAME_HERE'
+OUTPUT_DIRECTORY: str = 'YOUR_NAME_HERE'
+OUTPUT_DIRECTORY: str = os.path.join('song_data', OUTPUT_DIRECTORY)
+# put playlsit url below
+PLAYLIST_URL: str = 'PLAYLIST_URL_HERE'
 # put the name of the playlist here in snake(_) case
-PLAYLIST_NAME = 'PLAYLIST_NAME_HERE'
+PLAYLIST_NAME: str = 'PLAYLIST_NAME_HERE'
+PLAYLIST_NUMBER_OF_SONGS: int = 'PLAYLIST_NUMBER_OF_SONGS_HERE'
 
 # CONSTANTS
 PLAYLIST_FILE_PATH = os.path.join(OUTPUT_DIRECTORY, f'{PLAYLIST_NAME}_ids.csv')
@@ -41,7 +45,7 @@ def main():
 
     # get playlist tracks
     get_playlist_tracks(
-        PLAYLIST_URL, sp, PLAYLIST_FILE_PATH, NUMBER_OF_SONGS_HERE)
+        PLAYLIST_URL, sp, PLAYLIST_FILE_PATH, PLAYLIST_NUMBER_OF_SONGS)
     # get song list and ids
     song_list = read_csv(PLAYLIST_FILE_PATH)
     # get track details
@@ -59,7 +63,7 @@ def read_csv(file_name: str,) -> List[Dict[str, str]]:
         List[Dict[str, str]]: List of Songs in dictionary format.
     """
     song_list: List[Dict[str, str]] = []
-    with open(file_name, 'r') as csv_file:
+    with open(os.path.join(os.getcwd(), file_name), 'r') as csv_file:
         file = csv.DictReader(csv_file)
         for track in file:
             song_list.append(track)
@@ -80,7 +84,10 @@ def get_playlist_tracks(playlist_url: str, sp: spotipy.Spotify, playlist_file_pa
     limit = 100
     if (offset > 100):
         limit = offset
-    offset = int(offset / 100)
+    if (offset < 100):
+        offset = 1
+    else:
+        offset = int(offset / 100)
     tracks: List[Dict[str, str]] = []
 
     # Get playlist tracks in 100s
@@ -95,7 +102,7 @@ def get_playlist_tracks(playlist_url: str, sp: spotipy.Spotify, playlist_file_pa
         time.sleep(2.5)  # sleep for 2.5 seconds to not overload spotify api
 
         # Write tracks to CSV file
-        with open(playlist_file_path, 'w') as csv_file:
+        with open(os.path.join(os.getcwd(), playlist_file_path), 'w') as csv_file:
             writer = csv.DictWriter(
                 csv_file, fieldnames=tracks[0].keys(), delimiter=',')
             writer.writeheader()
@@ -155,7 +162,7 @@ def to_csv(file_name: str, track_details: List[Dict[str, str]]) -> None:
         track_details (Dict[str, Dict[str, str]]): A dictionary of track details, where the key is a string of the form
             '{track name} - {artist name} - {album name}', and the value is a dictionary of audio features.
     """
-    with open(file_name, 'w') as csv_file:
+    with open(os.path.join(os.getcwd(), file_name), 'w') as csv_file:
         writer = csv.DictWriter(
             csv_file, fieldnames=track_details[0].keys(), delimiter=',')
         writer.writeheader()
