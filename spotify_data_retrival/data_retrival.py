@@ -8,11 +8,11 @@ import time
 import os
 
 # output directory (change this to song_data/{your name})
-OUTPUT_DIRECTORY = 'song_data/ben'
+OUTPUT_DIRECTORY = 'song_data/YOUR_NAME_HERE'
 # Spotify playlist URL
-PLAYLIST_URL = 'https://open.spotify.com/playlist/1fjmiwCMmiwm8Shk38mzu2?si=a3e0e6d188094923'
+PLAYLIST_URL = 'PLAYLIST_URL_HERE'
 # put the name of the playlist here in snake(_) case
-PLAYLIST_NAME = 'all_songs'
+PLAYLIST_NAME = 'PLAYLIST_NAME_HERE'
 
 # CONSTANTS
 PLAYLIST_FILE_PATH = os.path.join(OUTPUT_DIRECTORY, f'{PLAYLIST_NAME}_ids.csv')
@@ -42,7 +42,8 @@ def main():
         os.makedirs(OUTPUT_DIRECTORY)
 
     # get playlist tracks
-    get_playlist_tracks(PLAYLIST_URL, sp, PLAYLIST_FILE_PATH, 16)
+    get_playlist_tracks(
+        PLAYLIST_URL, sp, PLAYLIST_FILE_PATH, NUMBER_OF_SONGS_HERE)
     # get song list and ids
     song_list = read_csv(PLAYLIST_FILE_PATH)
     # get track details
@@ -75,15 +76,18 @@ def get_playlist_tracks(playlist_url: str, sp: spotipy.Spotify, playlist_file_pa
         playlist_url (str): URL to the playlist.
         sp (spotipy.Spotify): Spotify object to use, must be authenticated.
         playlist_file_path (str): File path to write to.
-        offset (int, optional): # of songs to get in 100s. Defaults to 0.
+        offset (int, optional): # of songs to get.
         playlist_name (str, optional): Name of the playlist.
     """
-
+    limit = 100
+    if (offset > 100):
+        limit = offset
+    offset = offset / 100
     tracks: List[Dict[str, str]] = []
 
     # Get playlist tracks in 100s
     for i in range(0, offset):
-        all_songs = sp.playlist_tracks(playlist_url, offset=i*100)
+        all_songs = sp.playlist_tracks(playlist_url, offset=i*100, limit=limit)
         for track in all_songs['items']:
             tracks.append(
                 {'track_id': track['track']['id'],
