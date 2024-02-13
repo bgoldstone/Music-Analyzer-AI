@@ -8,9 +8,7 @@ import time
 import os
 
 # output directory (change this to song_data/{your name})
-OUTPUT_DIRECTORY = 'song_data/ben'
-# Spotify playlist URL
-PLAYLIST_URL = 'PLAYLIST_URL_HERE'
+OUTPUT_DIRECTORY = 'song_data/YOUR_NAME_HERE'
 # put the name of the playlist here in snake(_) case
 PLAYLIST_NAME = 'PLAYLIST_NAME_HERE'
 
