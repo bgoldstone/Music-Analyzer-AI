@@ -13,7 +13,8 @@ OUTPUT_DIRECTORY: str = os.path.join('song_data', OUTPUT_DIRECTORY)
 # put playlsit url below
 PLAYLIST_URL: str = 'PLAYLIST_URL_HERE'
 # put the name of the playlist here in snake(_) case
-PLAYLIST_NAME: str = 'PLAYLIST_NAME_HERE'
+PLAYLIST_NAME: str = 'YOUR_PLAYLIST_NAME_HERE'
+# default number of songs, will change.
 PLAYLIST_NUMBER_OF_SONGS: int = 0
 
 # CONSTANTS
@@ -45,7 +46,7 @@ def main():
 
     # get playlist tracks
     get_playlist_tracks(
-        PLAYLIST_URL, sp, PLAYLIST_FILE_PATH, PLAYLIST_NUMBER_OF_SONGS)
+        PLAYLIST_URL, sp, PLAYLIST_FILE_PATH)
     # get song list and ids
     song_list = read_csv(PLAYLIST_FILE_PATH)
     # get track details
@@ -70,7 +71,7 @@ def read_csv(file_name: str,) -> List[Dict[str, str]]:
     return song_list
 
 
-def get_playlist_tracks(playlist_url: str, sp: spotipy.Spotify, playlist_file_path: str, offset: int = 0) -> None:
+def get_playlist_tracks(playlist_url: str, sp: spotipy.Spotify, playlist_file_path: str) -> None:
     """
     gets playlist tracks and writes to a file
 
@@ -78,16 +79,14 @@ def get_playlist_tracks(playlist_url: str, sp: spotipy.Spotify, playlist_file_pa
         playlist_url (str): URL to the playlist.
         sp (spotipy.Spotify): Spotify object to use, must be authenticated.
         playlist_file_path (str): File path to write to.
-        offset (int, optional): # of songs to get.
         playlist_name (str, optional): Name of the playlist.
     """
-    limit = 100
-    if (offset > 100):
-        limit = offset
-    if (offset < 100):
+    playlist = sp.playlist_tracks(playlist_url)
+    PLAYLIST_NUMBER_OF_SONGS = playlist['total']
+    if (PLAYLIST_NUMBER_OF_SONGS < 100):
         offset = 1
     else:
-        offset = int(offset / 100)
+        offset = math.ceil(PLAYLIST_NUMBER_OF_SONGS/100)
     tracks: List[Dict[str, str]] = []
 
     # Get playlist tracks in 100s
@@ -124,7 +123,7 @@ def get_track_details(tracks: List[Dict[str, str]], sp: spotipy.Spotify) -> List
     """
     track_details = []
     i = 0
-    len_tracks = math.ceil(len(tracks))
+    len_tracks = len(tracks)
     track_subsets = []
 
     # Subset tracks into smaller chunks for spotify api to process (caps aroung 100 tracks/request)
