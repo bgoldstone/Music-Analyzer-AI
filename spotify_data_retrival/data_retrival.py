@@ -64,7 +64,7 @@ def read_csv(file_name: str,) -> List[Dict[str, str]]:
         List[Dict[str, str]]: List of Songs in dictionary format.
     """
     song_list: List[Dict[str, str]] = []
-    with open(os.path.join(os.getcwd(), file_name), 'r') as csv_file:
+    with open(os.path.join(os.getcwd(), file_name), 'r', encoding="utf-8") as csv_file:
         file = csv.DictReader(csv_file)
         for track in file:
             song_list.append(track)
@@ -102,7 +102,7 @@ def get_playlist_tracks(playlist_url: str, sp: spotipy.Spotify, playlist_file_pa
         time.sleep(2.5)  # sleep for 2.5 seconds to not overload spotify api
 
         # Write tracks to CSV file
-        with open(os.path.join(os.getcwd(), playlist_file_path), 'w') as csv_file:
+        with open(os.path.join(os.getcwd(), playlist_file_path), 'w', encoding="utf-8") as csv_file:
             writer = csv.DictWriter(
                 csv_file, fieldnames=tracks[0].keys(), delimiter=',')
             writer.writeheader()
@@ -162,7 +162,7 @@ def to_csv(file_name: str, track_details: List[Dict[str, str]]) -> None:
         track_details (Dict[str, Dict[str, str]]): A dictionary of track details, where the key is a string of the form
             '{track name} - {artist name} - {album name}', and the value is a dictionary of audio features.
     """
-    with open(os.path.join(os.getcwd(), file_name), 'w') as csv_file:
+    with open(os.path.join(os.getcwd(), file_name), 'w', encoding="utf-8") as csv_file:
         writer = csv.DictWriter(
             csv_file, fieldnames=track_details[0].keys(), delimiter=',')
         writer.writeheader()
