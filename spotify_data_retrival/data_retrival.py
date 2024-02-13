@@ -14,7 +14,7 @@ OUTPUT_DIRECTORY: str = os.path.join('song_data', OUTPUT_DIRECTORY)
 PLAYLIST_URL: str = 'PLAYLIST_URL_HERE'
 # put the name of the playlist here in snake(_) case
 PLAYLIST_NAME: str = 'PLAYLIST_NAME_HERE'
-PLAYLIST_NUMBER_OF_SONGS: int = 'PLAYLIST_NUMBER_OF_SONGS_HERE'
+PLAYLIST_NUMBER_OF_SONGS: int = 0
 
 # CONSTANTS
 PLAYLIST_FILE_PATH = os.path.join(OUTPUT_DIRECTORY, f'{PLAYLIST_NAME}_ids.csv')
@@ -93,6 +93,7 @@ def get_playlist_tracks(playlist_url: str, sp: spotipy.Spotify, playlist_file_pa
     # Get playlist tracks in 100s
     for i in range(0, offset):
         all_songs = sp.playlist_tracks(playlist_url, offset=i*100)
+        PLAYLIST_NUMBER_OF_SONGS = all_songs['total']
         for track in all_songs['items']:
             tracks.append(
                 {'track_id': track['track']['id'],
