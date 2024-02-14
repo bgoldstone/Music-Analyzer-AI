@@ -7,3 +7,5 @@ ipython
 ipykernel
 pandas
 SQLAlchemy
+re
+beautifulsoup4
