@@ -6,3 +6,5 @@ torch
 ipython
 ipykernel
 pandas
+re
+beautifulsoup4
