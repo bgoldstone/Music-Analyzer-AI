@@ -3,7 +3,7 @@ from io import TextIOWrapper
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
-from ddl import Playlist, Track, TrackDetails
+from database.models import Playlist, Track, TrackDetails
 from dml import create_track, create_track_details, create_playlist, get_playlist_by_name, get_track_by_id, get_track_details_by_track_id, is_track_in_playlist
 
 

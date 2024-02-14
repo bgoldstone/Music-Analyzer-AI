@@ -1,6 +1,6 @@
 from typing import List
 from sqlalchemy.orm import sessionmaker, Session
-from ddl import Track, Lyrics, Playlist, TrackDetails, playlist_track
+from database.models import Track, Lyrics, Playlist, TrackDetails, playlist_track
 
 
 def create_track(session: Session, track: Track):
