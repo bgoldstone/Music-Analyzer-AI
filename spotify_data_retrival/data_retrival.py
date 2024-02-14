@@ -83,7 +83,7 @@ def get_playlist_tracks(playlist_url: str, sp: spotipy.Spotify, playlist_file_pa
     """
     playlist = sp.playlist_tracks(playlist_url)
     PLAYLIST_NUMBER_OF_SONGS = playlist['total']
-    if (PLAYLIST_NUMBER_OF_SONGS < 100):
+    if PLAYLIST_NUMBER_OF_SONGS < 100:
         offset = 1
     else:
         offset = math.ceil(PLAYLIST_NUMBER_OF_SONGS/100)

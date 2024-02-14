@@ -1,11 +1,10 @@
 import csv
 from io import TextIOWrapper
 import os
-from re import L
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from ddl import Playlist, Track, TrackDetails
-from dml import create_track, create_track_details, create_playlist, get_playlist_by_name, get_track_by_id, get_track_details_by_track_id
+from dml import create_track, create_track_details, create_playlist, get_playlist_by_name, get_track_by_id, get_track_details_by_track_id, is_track_in_playlist
 
 
 DB_NAME: str = 'project_sound.db'
@@ -46,14 +45,16 @@ def load_playlist_track_details(session: Session):
     Args:
         session (Session): Session Object.
     """
+    # for each folder in the song_data directory
     for folder in os.listdir(SONG_DATA_DIRECTORY):
+        # for each playlist in the folder
         for playlist in os.listdir(SONG_DATA_DIRECTORY + '/' + folder):
             playlist_file = open(
                 f'{SONG_DATA_DIRECTORY}/{folder}/{playlist}', 'r', encoding="utf-8")
 
-            print(playlist.replace(".csv", ""))
             # if playlist file
-            if (playlist.endswith("_ids.csv")):
+            if playlist.endswith("_ids.csv"):
+                # generate playlist name
                 playlist_name = playlist.replace(
                     "_ids.csv", "").replace("_", " ")
                 read_playlist(session, playlist_file, playlist_name)
@@ -70,22 +71,33 @@ def read_playlist(session: Session, file: TextIOWrapper, playlist_name: str):
         file (TextIOWrapper): Playlist File.
         playlist_name (str): Playlist Name.
     """
+    # Read CSV file as a dictionary.
     playlist = csv.DictReader(file, delimiter=',')
+    # Create a new Playlist object.
     playlist_obj = Playlist()
+    # Set Playlist attributes.
     playlist_obj.name = playlist_name
     playlist_obj.tracks = []
+
+    # Check if playlist exists
     search_for_playlist = get_playlist_by_name(session, playlist_name)
-    if (search_for_playlist != None):
+    if search_for_playlist != None:
         return
     for item in playlist:
+        # Check if track exists
         track = get_track_by_id(session, item['track_id'])
-        if (track == None):
+
+        # if track already in playlist, skip
+        if is_track_in_playlist(session, search_for_playlist.id, track.id):
+            continue
+        if track == None:
             track = Track()
             track.spotify_id = item['track_id']
             track.name = item['track_name']
             track.artist = item['artist_name']
             track.album = item['album_name']
             create_track(session, track)
+        # add track to playlist
         playlist_obj.tracks.append(track)
 
     create_playlist(session, playlist_obj)
@@ -102,7 +114,7 @@ def read_track_details(session: Session, file: TextIOWrapper):
 
     for item in track_details:
         track = get_track_details_by_track_id(session, item['track_id'])
-        if (track == None):
+        if track == None:
             track_detail = TrackDetails()
             track_detail.spotify_track_id = item['track_id']
             track_detail.acousticness = float(item['acousticness'])

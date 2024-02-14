@@ -1,6 +1,6 @@
 from typing import List
 from sqlalchemy.orm import sessionmaker, Session
-from ddl import Track, Lyrics, Playlist, TrackDetails
+from ddl import Track, Lyrics, Playlist, TrackDetails, playlist_track
 
 
 def create_track(session: Session, track: Track):
@@ -277,3 +277,22 @@ def get_spotify_id_by_track_name(session: Session, track_name: str) -> TrackDeta
     if track is None:
         return None
     return track.spotify_id
+
+
+def is_track_in_playlist(session: Session, playlist_id: int, track_id: str) -> bool:
+    """Checks if a track is in a playlist.
+
+    Args:
+        session (Session): Session Object.
+        playlist_id (int): Playlist Table ID.
+        track_id (str): Track Table ID.
+
+    Returns:
+        bool: True if track is in playlist, False otherwise.
+    """
+    playlist: Playlist = get_playlist_by_id(session, playlist_id)
+    # if playlist doesn't exist
+    if playlist is None:
+        return False
+    # if track exists
+    return session.query(playlist_track).filter(playlist.id == playlist_id, playlist_track.song_id == track_id).first() != None

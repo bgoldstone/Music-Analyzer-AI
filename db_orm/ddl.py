@@ -16,9 +16,8 @@ playlist_track = Table(
            ForeignKey('tracks.id'))
 )
 
+
 # Define models
-
-
 class Track(Base):
     """Tracks ORM Model"""
     __tablename__ = 'tracks'
@@ -27,6 +26,7 @@ class Track(Base):
     name = Column(String)
     artist = Column(String)
     album = Column(String)
+    # Track relationship to playlists
     playlists = relationship(
         'Playlist', secondary=playlist_track, back_populates='tracks')
 
@@ -56,6 +56,7 @@ class Playlist(Base):
     __tablename__ = 'playlists'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
+    # Playlist relationship to tracks
     tracks = relationship(
         'Track', secondary=playlist_track, back_populates='playlists')
 
