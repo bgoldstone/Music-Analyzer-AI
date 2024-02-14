@@ -6,5 +6,4 @@ torch
 ipython
 ipykernel
 pandas
-sqalchemy
-pysqlite
+SQLAlchemy
