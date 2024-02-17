@@ -54,7 +54,18 @@ def calc_mood_from_details(name, track_href, tempo, valance):
         feelings["Tension"] += 2
         feelings["Expressiveness"] += 1
 
-    print(name, feelings)
+    # print(name, feelings)
+    if (valance > .5):
+        if (max(emotions, key=emotions.get) == "Happiness"):
+            print(name + ": Expressive")
+        else:
+            print(name + "Relaxing")
+    else:
+        if (max(emotions, key=emotions.get) == "Happiness"):
+            print(name + ": Stressing")
+        else:
+            print(name + "Boring")
+
 
 if os.path.exists(file_path):
     def read_csv(file_name):
