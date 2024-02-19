@@ -3,7 +3,7 @@ from io import TextIOWrapper
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
-from database.models import Playlist, Track, TrackDetails
+from models import Playlist, Track, TrackDetails
 from dml import create_track, create_track_details, create_playlist, get_playlist_by_name, get_track_by_id, get_track_details_by_track_id, is_track_in_playlist
 
 
@@ -81,19 +81,28 @@ def read_playlist(session: Session, file: TextIOWrapper, playlist_name: str):
 
     # Check if playlist exists
     search_for_playlist = get_playlist_by_name(session, playlist_name)
-    if search_for_playlist != None:
-        return
+    if not search_for_playlist:
+        create_playlist(session, playlist_obj)
+        search_for_playlist = get_playlist_by_name(session, playlist_name)
+    # Add tracks to playlist
     for item in playlist:
         # Check if track exists
         track = get_track_by_id(session, item['track_id'])
-
+        if (track == None):
+            track = Track()
+            track.spotify_id = item['track_id']
+            track.title = item['track_name']
+            track.artist = item['artist_name']
+            track.album = item['album_name']
+            create_track(session, track)
+            track = get_track_by_id(session, item['track_id'])
         # if track already in playlist, skip
         if is_track_in_playlist(session, search_for_playlist.id, track.id):
             continue
         if track == None:
             track = Track()
             track.spotify_id = item['track_id']
-            track.name = item['track_name']
+            track.title = item['track_name']
             track.artist = item['artist_name']
             track.album = item['album_name']
             create_track(session, track)
