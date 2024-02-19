@@ -5,6 +5,5 @@ pandas
 torch
 ipython
 ipykernel
-pandas
 SQLAlchemy
 beautifulsoup4
