@@ -1,19 +1,17 @@
-name: Add Task Label
-
+name: Label new issues
 on:
   issues:
-    types: [opened]
-
+    types:
+      - opened
 jobs:
-  add_label:
+  label_issues:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
-      - uses: actions/github-script@v6
-        with:
-          script: |
-            github.issues.addLabels({
-              owner: github.context.repo.owner,
-              repo: github.context.repo.repo,
-              issue_number: github.context.issue.number,
-              labels: ['Task']
-            })
+      - run: gh issue edit "$NUMBER" --add-label "$LABELS"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number }}
+          LABELS: Task
