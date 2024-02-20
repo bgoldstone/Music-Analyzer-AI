@@ -2,7 +2,7 @@ name: Add Task Label
 
 on:
   issues:
-    types: [created]
+    types: [opened]
 
 jobs:
   add_label:
