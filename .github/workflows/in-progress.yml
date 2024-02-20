@@ -30,8 +30,7 @@ jobs:
       - uses: alex-page/github-project-automation-plus@v0.8.3
         with:
           project: Project-Sound SDLC # Replace with your project name
-          issue-number: ${{ github.event.issue.number }}
-          target-column: "In Progress" # Replace with "In Progress" or your column name
-          source-column: "Todo" # Replace with "To Do" or your column name
-          token: ${{ secrets.GITHUB_TOKEN }}
+          #issue-number: ${{ github.event.issue.number }}
+          column: "Todo" # Replace with "To Do" or your column name
+          repo-token: ${{ secrets.GHPROJECT_TOKEN }}
 
