@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: alex-page/github-project-automation-plus@v3
+      - uses: alex-page/github-project-automation-plus@v0.8.3
         with:
           project: Project-Sound SDLC # Replace with your project name
           issue-number: ${{ github.event.issue.number }}
