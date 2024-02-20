@@ -4,7 +4,7 @@ on:
     types: [edited]
 jobs:
   add-comment:
-    if: github.event.column_name.name == 'Done'
+    if: github.event.issue.column_name == 'Done'
     runs-on: ubuntu-latest
     permissions:
       issues: write
