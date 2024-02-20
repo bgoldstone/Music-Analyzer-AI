@@ -1,10 +1,10 @@
 name: Close Done Issues
 on:
-  project:
+  issues:
     types: [edited]
 jobs:
   add-comment:
-    if: github.event.status.name == 'Done'
+    if: github.event.column_name.name == 'Done'
     runs-on: ubuntu-latest
     permissions:
       issues: write
