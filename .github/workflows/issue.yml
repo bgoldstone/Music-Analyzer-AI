@@ -1,0 +1,19 @@
+name: Add Task Label
+
+on:
+  issues:
+    types: [created]
+
+jobs:
+  add_label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            github.issues.addLabels({
+              owner: github.context.repo.owner,
+              repo: github.context.repo.repo,
+              issue_number: github.context.issue.number,
+              labels: ['Task']
+            })
