@@ -219,7 +219,7 @@ def get_track_details_by_track_id(session: Session, track_id: str) -> TrackDetai
     Returns:
         TrackDetails: TrackDetails Object or None if not found.
     """
-    return session.query(TrackDetails).filter(TrackDetails.spotify_track_id == track_id).first()
+    return session.query(TrackDetails).filter(TrackDetails.track_id == track_id).first()
 
 
 def get_track_details_by_track_name(session: Session, track_name: str) -> TrackDetails | None:

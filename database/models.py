@@ -32,8 +32,8 @@ class TrackDetails(Base):
     """Playlist ORM Model"""
     __tablename__ = 'track_details'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    spotify_track_id = Column(String, ForeignKey(
-        'tracks.spotify_id'), nullable=False, index=True)
+    track_id = Column(String, ForeignKey(
+        'tracks.id'), nullable=False, index=True)
     acousticness = Column(Double)
     danceability = Column(Double)
     duration = Column(Integer)

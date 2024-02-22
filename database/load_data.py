@@ -125,7 +125,7 @@ def read_track_details(session: Session, file: TextIOWrapper):
         track = get_track_details_by_track_id(session, item['track_id'])
         if track == None:
             track_detail = TrackDetails()
-            track_detail.spotify_track_id = item['track_id']
+            track_detail.track_id = item['track_id']
             track_detail.acousticness = float(item['acousticness'])
             track_detail.danceability = float(item['danceability'])
             track_detail.duration = int(item['duration_ms'])
