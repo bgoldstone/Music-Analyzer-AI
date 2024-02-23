@@ -1,6 +1,7 @@
 import jwt
 
-JWT_SECRET = 'abde82e305ac33e0142f34738bf0cc45'
+# FOR DEVELOPMENT USE ONLY
+JWT_SECRET = 'asdjqwee4yrhi8o234ry7fhikuhfgyuwiegbfeyiwkebvryuqgsbdhj@#!!#!$RDSIUEHOIJE'
 JWT_ALGORITHM = 'HS256'
 
 
