@@ -1,3 +1,4 @@
+from sqlite3 import Binary, Blob
 from sqlalchemy import Boolean, ForeignKey, Numeric, Table, create_engine, Column, Integer, String, Double, Text
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from sympy import true
@@ -90,7 +91,7 @@ class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, unique=True)
-    password = Column(String)
+    password = Column(Blob)
     playlists = relationship('Playlist', back_populates='user')
 
 

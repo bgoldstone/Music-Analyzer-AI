@@ -1,7 +1,7 @@
 from typing import List
 from sqlalchemy import exists
 from sqlalchemy.orm import Session
-from models import Track, Lyrics, Playlist, TrackDetails, PlaylistTrack
+from models import Track, Lyrics, Playlist, TrackDetails, PlaylistTrack, User
 
 
 def create_track(session: Session, track: Track):
@@ -297,3 +297,51 @@ def is_track_in_playlist(session: Session, playlist_id: int, track_id: str) -> b
         return False
     # if track exists
     return session.query(PlaylistTrack).filter(PlaylistTrack.playlist_id == playlist_id, PlaylistTrack.track_id == track_id).first() is not None
+
+
+def get_user_by_id(session: Session, user_id: int) -> User | None:
+    """Searches database for User with User ID.
+
+    Args:
+        session (Session): Session Object.
+        user_id (int): User ID.
+
+    Returns:
+        User: User Object or None if not found.
+    """
+    return session.query(User).filter(User.id == user_id).first()
+
+
+def get_user_by_name(session: Session, username: str) -> User | None:
+    """Searches database for User with User Name.
+
+    Args:
+        session (Session): Session Object.
+        user_name (str): User Name.
+
+    Returns:
+        User: User Object or None if not found.
+    """
+    return session.query(User).filter(User.username == username).first()
+
+
+def create_user(session: Session, user: User):
+    """Creates User in the database
+
+    Args:
+        session (Session): Session Object.
+        user (User): User Object.
+    """
+    session.add(user)
+    session.commit()
+
+
+def update_user_password(session: Session, user: User):
+    """Updates User in the database.
+
+    Args:
+        session (Session): Session Object.
+        user (User): User Object.
+    """
+    session.merge(user)
+    session.commit()
