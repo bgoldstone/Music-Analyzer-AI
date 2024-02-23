@@ -8,3 +8,4 @@ ipykernel
 pandas
 SQLAlchemy
 beautifulsoup4
+bcrypt
