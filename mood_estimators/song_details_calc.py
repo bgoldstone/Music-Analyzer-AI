@@ -2,8 +2,8 @@ import pandas as pd
 import os
 # import os.path as paths
 
-DIRECTORY = 'trevor'  # Ex: "Daeshaun"
-filename = 'post_workout_chill_track_details.csv' # "Anime_lofi_track_details.csv"
+DIRECTORY = 'Insert Name'  # Ex: "Daeshaun"
+filename = 'Insert_playlist_details' # "Anime_lofi_track_details.csv"
 file_path = os.path.join('song_data', DIRECTORY, filename)
 # Uncomment next two lines to adjust pandas display options to show all columns and rows
 # pd.set_option('display.max_columns', None)
@@ -111,7 +111,7 @@ def calc_mood_from_details(name, track_href, tempo, valance, energy):
         else:
             print(name + ": Boring")
 
-    # print(emotions, "\n")
+    print(emotions, "\n")
     
 
 
