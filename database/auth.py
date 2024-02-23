@@ -1,7 +1,7 @@
 import bcrypt
 
 
-def password_hash(password: str) -> bytes:
+def hash_password(password: str) -> bytes:
     """Hashes a password using bcrypt.
 
     Args:
