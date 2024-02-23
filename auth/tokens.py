@@ -5,8 +5,8 @@ JWT_SECRET = 'asdjqwee4yrhi8o234ry7fhikuhfgyuwiegbfeyiwkebvryuqgsbdhj@#!!#!$RDSI
 JWT_ALGORITHM = 'HS256'
 
 
-def create_token(user_id: int) -> str:
-    return jwt.encode({'user_id': user_id}, JWT_SECRET, algorithm=JWT_ALGORITHM)
+def create_token(username: str) -> str:
+    return jwt.encode({'username': username}, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
 def decode_token(token: str) -> dict:
