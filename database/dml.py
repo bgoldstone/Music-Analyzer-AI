@@ -1,6 +1,7 @@
 from typing import List
-from sqlalchemy.orm import sessionmaker, Session
-from database.models import Track, Lyrics, Playlist, TrackDetails, playlist_track
+from sqlalchemy import exists
+from sqlalchemy.orm import Session
+from models import Track, Lyrics, Playlist, TrackDetails, PlaylistTrack
 
 
 def create_track(session: Session, track: Track):
@@ -218,7 +219,7 @@ def get_track_details_by_track_id(session: Session, track_id: str) -> TrackDetai
     Returns:
         TrackDetails: TrackDetails Object or None if not found.
     """
-    return session.query(TrackDetails).filter(TrackDetails.spotify_track_id == track_id).first()
+    return session.query(TrackDetails).filter(TrackDetails.track_id == track_id).first()
 
 
 def get_track_details_by_track_name(session: Session, track_name: str) -> TrackDetails | None:
@@ -295,4 +296,4 @@ def is_track_in_playlist(session: Session, playlist_id: int, track_id: str) -> b
     if playlist is None:
         return False
     # if track exists
-    return session.query(playlist_track).filter(playlist.id == playlist_id, playlist_track.song_id == track_id).first() != None
+    return session.query(PlaylistTrack).filter(PlaylistTrack.playlist_id == playlist_id, PlaylistTrack.track_id == track_id).first() is not None
