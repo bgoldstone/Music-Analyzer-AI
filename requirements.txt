@@ -9,3 +9,4 @@ pandas
 SQLAlchemy
 beautifulsoup4
 bcrypt
+PyJWT

@@ -2,7 +2,7 @@ from typing import List
 from sqlalchemy import exists
 from sqlalchemy.orm import Session
 from models import Track, Lyrics, Playlist, TrackDetails, PlaylistTrack, User
-from auth import hash_password, verify_password
+from auth.hasher import hash_password, verify_password
 
 
 def create_track(session: Session, track: Track):
