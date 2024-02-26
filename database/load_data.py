@@ -4,7 +4,7 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from models import Analysis, EmotionalQuantitation, Playlist, Track, TrackDetails
-from dml import create_track, create_track_details, create_playlist, get_emotional_quantitation, get_playlist_by_name, get_track_by_id, get_track_details_by_track_id, is_track_in_playlist
+from dml import create_analysis, create_track, create_track_details, create_playlist, get_emotional_quantitation, get_playlist_by_name, get_track_by_id, get_track_details_by_track_id, is_track_in_playlist
 
 
 DB_NAME: str = 'project_sound.db'
@@ -111,6 +111,7 @@ def read_playlist(session: Session, file: TextIOWrapper, playlist_name: str):
             # Analysis creation
             # analysis = Analysis()
             # analysis.track_id = track.id
+            # create_analysis(session,analysis)
         # add track to playlist
         playlist_obj.tracks.append(track)
 

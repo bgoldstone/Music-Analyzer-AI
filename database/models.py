@@ -91,8 +91,7 @@ class Analysis(Base):
 
 class EmotionalQuantitation(Base):
     __tablename__ = 'emotional_quantitation'
-    track_id = Column(Integer, ForeignKey(
-        'tracks.id'), primary_key=True, nullable=False, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     emotional_attribute = Column(String)
     arousal_level = Column(Numeric(3, 2))
     valence_level = Column(Numeric(3, 2))
