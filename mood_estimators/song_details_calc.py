@@ -31,44 +31,46 @@ def scale_energy(energy):
 def calc_mood_from_details(name, track_href, tempo, valance, energy):
     # Energy level based on `tempo` and `energy` params
 
-    energy_level = {
-    "high_arousal": 0,
-    "low_arousal": 0,
-    }
+    # energy_level = {
+    # "high_arousal": 0,
+    # "low_arousal": 0,
+    # }
+
+    arousal = 0
 
     # Check how tempo should affect arousal level
     if (tempo > 120):
-        energy_level["high_arousal"] += scale_tempo(tempo)
-        energy_level["low_arousal"] -= scale_tempo(tempo)
+        arousal += scale_tempo(tempo)
+        arousal -= scale_tempo(tempo)
 
     elif (tempo >= 90 and tempo <= 120):
-        energy_level["high_arousal"] += scale_tempo(tempo)
-        energy_level["low_arousal"] -= scale_tempo(tempo)
+        arousal += scale_tempo(tempo)
+        arousal -= scale_tempo(tempo)
 
     # 70-90 bpm is the range where it is unclear that a song is happy or sad based on tempo
     elif (tempo < 90 and tempo > 70):
-        energy_level["high_arousal"] -= scale_tempo(tempo)
-        energy_level["low_arousal"] -= scale_tempo(tempo)
+        arousal -= scale_tempo(tempo)
+        arousal -= scale_tempo(tempo)
     
     else: 
-        energy_level["high_arousal"] -= scale_tempo(tempo)
-        energy_level["low_arousal"] += scale_tempo(tempo)
+        arousal -= scale_tempo(tempo)
+        arousal += scale_tempo(tempo)
     
     # Check how energy should affect arousal level
     if (energy > .75):
-        energy_level["high_arousal"] += scale_energy(energy)
-        energy_level["low_arousal"] -= scale_energy(energy)
+        arousal += scale_energy(energy)
+        arousal -= scale_energy(energy)
 
     elif (energy > .50):
-        energy_level["high_arousal"] -= scale_energy(energy)
-        energy_level["low_arousal"] += scale_energy(energy)
+        arousal -= scale_energy(energy)
+        arousal += scale_energy(energy)
 
     elif (energy > .25):
-        energy_level["high_arousal"] -= scale_energy(energy)
-        energy_level["low_arousal"] += scale_energy(energy)
+        arousal -= scale_energy(energy)
+        arousal += scale_energy(energy)
     else:
-        energy_level["high_arousal"] -= scale_energy(energy)
-        energy_level["low_arousal"] += scale_energy(energy)
+        arousal -= scale_energy(energy)
+        arousal += scale_energy(energy)
 
     # Now check the valence level:
     # A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. 
@@ -77,13 +79,13 @@ def calc_mood_from_details(name, track_href, tempo, valance, energy):
 
     # if valance is positive, check arousal level
     if (valance > 0.5):
-        if (max(energy_level, key=energy_level.get) == "high_arousal"):
+        if (arousal > 0):
             print(name + ": Upbeat, cheery")
         else:
             print(name + ": Relaxing, happy")
     # valance is negative, check arousal level
     else:
-        if (max(energy_level, key=energy_level.get) == "high_arousal"):
+        if (arousal < 0):
             print(name + ": Stressing/Urgent")
         else:
             print(name + ": Relaxing, sad")
