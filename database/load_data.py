@@ -3,13 +3,14 @@ from io import TextIOWrapper
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
-from models import Playlist, Track, TrackDetails
-from dml import create_track, create_track_details, create_playlist, get_playlist_by_name, get_track_by_id, get_track_details_by_track_id, is_track_in_playlist
+from models import Analysis, EmotionalQuantitation, Playlist, Track, TrackDetails
+from dml import create_track, create_track_details, create_playlist, get_emotional_quantitation, get_playlist_by_name, get_track_by_id, get_track_details_by_track_id, is_track_in_playlist
 
 
 DB_NAME: str = 'project_sound.db'
 
 SONG_DATA_DIRECTORY: str = os.path.join(os.getcwd(), 'song_data')
+EMOTIONAL_QUANTITATION = {}
 
 
 def main():
@@ -17,6 +18,7 @@ def main():
     session = get_db_connection()
     load_playlist_track_details(session)
     close_db_connection(session)
+    EMOTIONAL_QUANTITATION = get_emotional_quantitation(session)
 
 
 def get_db_connection() -> sessionmaker[Session]:
@@ -106,6 +108,9 @@ def read_playlist(session: Session, file: TextIOWrapper, playlist_name: str):
             track.artist = item['artist_name']
             track.album = item['album_name']
             create_track(session, track)
+            # Analysis creation
+            # analysis = Analysis()
+            # analysis.track_id = track.id
         # add track to playlist
         playlist_obj.tracks.append(track)
 

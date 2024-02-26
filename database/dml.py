@@ -453,6 +453,15 @@ def get_emotional_quantitation(session: Session, track_id: str) -> EmotionalQuan
     return session.query(EmotionalQuantitation).filter(EmotionalQuantitation.track_id == track_id).first()
 
 
+def get_emotional_quantitation(session: Session) -> List[EmotionalQuantitation]:
+    """ Gets all the Quantitations in the database
+    Args:
+        session (Session): Session Object.
+    Returns:
+        List[Quantitation]: List of Quantitation Objects."""
+    return session.query(EmotionalQuantitation).all()
+
+
 def delete_emotional_quantitation(session: Session, quantitation: EmotionalQuantitation) -> None:
     """Deletes Quantitation in the database
     Args:

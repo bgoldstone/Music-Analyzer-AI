@@ -33,7 +33,7 @@ class TrackDetails(Base):
     """Playlist ORM Model"""
     __tablename__ = 'track_details'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    track_id = Column(String, ForeignKey(
+    track_id = Column(Integer, ForeignKey(
         'tracks.id'), nullable=False, index=True)
     acousticness = Column(Double)
     danceability = Column(Double)
@@ -65,7 +65,7 @@ class Lyrics(Base):
     """Lyrics ORM model"""
     __tablename__ = 'lyrics'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    track_id = Column(String, ForeignKey(
+    track_id = Column(Integer, ForeignKey(
         'tracks.id'), nullable=False, index=True)
     lyrics = Column(Text)
 
@@ -73,7 +73,7 @@ class Lyrics(Base):
 class Analysis(Base):
     """Analysis ORM model"""
     __tablename__ = 'analysis'
-    track_id = Column(String, ForeignKey(
+    track_id = Column(Integer, ForeignKey(
         'tracks.id'), primary_key=True, nullable=False, index=True)
     # Emotional Analysis
     surprise = Column(Numeric(3, 2))
@@ -91,7 +91,8 @@ class Analysis(Base):
 
 class EmotionalQuantitation(Base):
     __tablename__ = 'emotional_quantitation'
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    track_id = Column(Integer, ForeignKey(
+        'tracks.id'), primary_key=True, nullable=False, index=True)
     emotional_attribute = Column(String)
     arousal_level = Column(Numeric(3, 2))
     valence_level = Column(Numeric(3, 2))
