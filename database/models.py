@@ -1,5 +1,4 @@
-from sqlite3 import Binary, Blob
-from sqlalchemy import Boolean, ForeignKey, Numeric, Table, create_engine, Column, Integer, String, Double, Text
+from sqlalchemy import Boolean, ForeignKey, Numeric, Table, create_engine, Column, Integer, String, Double, Text, BLOB
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from sympy import true
 
@@ -77,21 +76,32 @@ class Analysis(Base):
     track_id = Column(String, ForeignKey(
         'tracks.id'), primary_key=True, nullable=False, index=True)
     # Emotional Analysis
-    happiness = Column(Numeric(10, 2))
-    surprise = Column(Numeric(10, 2))
-    sadness = Column(Numeric(10, 2))
-    # Feelings Analysis
-    tension = Column(Numeric(10, 2))
-    expressiveness = Column(Numeric(10, 2))
-    amusement = Column(Numeric(10, 2))
-    attractiveness = Column(Numeric(10, 2))
+    surprise = Column(Numeric(3, 2))
+    stressing = Column(Numeric(3, 2))
+    expressive = Column(Numeric(3, 2))
+    amusing = Column(Numeric(3, 2))
+    happiness = Column(Numeric(3, 2))
+    unpleasant = Column(Numeric(3, 2))
+    pleasant = Column(Numeric(3, 2))
+    sadness = Column(Numeric(3, 2))
+    boring = Column(Numeric(3, 2))
+    expressionless = Column(Numeric(3, 2))
+    relaxing = Column(Numeric(3, 2))
+
+
+class EmotionalQuantitation(Base):
+    __tablename__ = 'emotional_quantitation'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    emotional_attribute = Column(String)
+    arousal_level = Column(Numeric(3, 2))
+    valence_level = Column(Numeric(3, 2))
 
 
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, unique=True)
-    password = Column(Blob)
+    password = Column(BLOB)
     playlists = relationship('Playlist', back_populates='user')
 
 

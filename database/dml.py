@@ -1,7 +1,7 @@
 from typing import List
 from sqlalchemy import exists
 from sqlalchemy.orm import Session
-from models import Track, Lyrics, Playlist, TrackDetails, PlaylistTrack, User
+from models import Analysis, EmotionalQuantitation, Track, Lyrics, Playlist, TrackDetails, PlaylistTrack, User
 from auth.hasher import hash_password, verify_password
 
 
@@ -77,6 +77,8 @@ def update_track(session: Session, track: Track):
         session (Session): Session Object.
         track (Track): Track Object.
     """
+    if get_track_by_spotify_id(session, track.spotify_id) is None:
+        return create_track(session, track)
     session.merge(track)
     session.commit()
 
@@ -88,6 +90,8 @@ def delete_track(session: Session, track: Track):
         session (Session): Session Object.
         track (Track): Track Object.
     """
+    if get_track_by_spotify_id(session, track.spotify_id) is None:
+        return
     session.delete(track)
     session.commit()
 
@@ -139,6 +143,8 @@ def update_playlist(session: Session, playlist: Playlist):
         session (Session): Session Object.
         playlist (Playlist): Playlist Object.
     """
+    if get_playlist_by_id(session, playlist.id) is None:
+        return create_playlist(session, playlist)
     session.merge(playlist)
     session.commit()
 
@@ -150,6 +156,8 @@ def delete_playlist(session: Session, playlist: Playlist):
         session (Session): Session Object.
         playlist (Playlist): Playlist Object.
     """
+    if get_playlist_by_id(session, playlist.id) is None:
+        return
     session.delete(playlist)
     session.commit()
 
@@ -349,6 +357,114 @@ def verify_user(session: Session, username: str, password: str) -> bool:
     if user is None:
         return False
     return verify_password(password, user.password)
+
+
+def create_analysis(session: Session, analysis: Analysis) -> None:
+    """Creates Analysis in the database
+    Args:
+        session (Session): Session Object.
+        analysis (Analysis): Analysis Object.
+
+    Returns:
+        None
+    """
+    if get_analysis(session, analysis.track_id) is not None:
+        return
+    session.add(analysis)
+    session.commit()
+
+
+def update_analysis(session: Session, analysis: Analysis) -> None:
+    """Updates Analysis in the database
+    Args:
+        session (Session): Session Object.
+        analysis (Analysis): Analysis Object.
+    Returns:
+        None
+    """
+    if get_analysis(session, analysis.track_id) is None:
+        return
+    session.merge(analysis)
+    session.commit()
+
+
+def get_analysis(session: Session, track_id: str) -> Analysis | None:
+    """Searches database for Analysis with Track ID.
+    Args:
+        session (Session): Session Object.
+        track_id (str): Track ID.
+    Returns:
+        Analysis: Analysis Object or None if not found.
+    """
+    return session.query(Analysis).filter(Analysis.track_id == track_id).first()
+
+
+def delete_analysis(session: Session, analysis: Analysis) -> None:
+    """Deletes Analysis in the database
+    Args:
+        session (Session): Session Object.
+        analysis (Analysis): Analysis Object.
+    Returns:
+        None
+    """
+    if get_analysis(session, analysis.track_id) is None:
+        return
+    session.delete(analysis)
+    session.commit()
+
+
+def create_emotional_quantitation(session: Session, quantitation: EmotionalQuantitation) -> None:
+    """Creates Emotional Quantitation in the database
+    Args:
+        session (Session): Session Object.
+        quantitation (Quantitation): Quantitation Object.
+    Returns:
+        None
+    """
+    if get_emotional_quantitation(session, quantitation.track_id) is not None:
+        return
+    session.add(quantitation)
+    session.commit()
+
+
+def update_emotional_quantitation(session: Session, quantitation: EmotionalQuantitation) -> None:
+    """Updates Quantitation in the database
+    Args:
+        session (Session): Session Object.
+        quantitation (Quantitation): Quantitation Object.
+    Returns:
+        None
+    """
+    if get_emotional_quantitation(session, quantitation.track_id) is None:
+        create_analysis(session, quantitation)
+        return
+    session.merge(quantitation)
+    session.commit()
+
+
+def get_emotional_quantitation(session: Session, track_id: str) -> EmotionalQuantitation | None:
+    """Searches database for Quantitation with Track ID.
+    Args:
+        session (Session): Session Object.
+        track_id (str): Track ID.
+    Returns:
+        Quantitation: Quantitation Object or None if not found.
+    """
+    return session.query(EmotionalQuantitation).filter(EmotionalQuantitation.track_id == track_id).first()
+
+
+def delete_emotional_quantitation(session: Session, quantitation: EmotionalQuantitation) -> None:
+    """Deletes Quantitation in the database
+    Args:
+        session (Session): Session Object.
+        quantitation (Quantitation): Quantitation Object.
+    Returns:
+        None
+    """
+    if get_emotional_quantitation(session, quantitation.track_id) is None:
+        return
+    session.delete(quantitation)
+    session.commit()
 
 
 # HELPER FUNCTIONS
