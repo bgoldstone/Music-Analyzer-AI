@@ -1,7 +1,8 @@
 from typing import List
 from sqlalchemy import exists
 from sqlalchemy.orm import Session
-from models import Track, Lyrics, Playlist, TrackDetails, PlaylistTrack
+from models import Track, Lyrics, Playlist, TrackDetails, PlaylistTrack, User
+from auth.hasher import hash_password, verify_password
 
 
 def create_track(session: Session, track: Track):
@@ -11,8 +12,23 @@ def create_track(session: Session, track: Track):
         session (Session): Session Object.
         track (Track): Track Object.
     """
+    if get_track_by_spotify_id(session, track.spotify_id) is not None:
+        return
     session.add(track)
     session.commit()
+
+
+def get_track_by_spotify_id(session: Session, spotify_id: str) -> Track | None:
+    """Searches database for Track with Spotify ID.
+
+    Args:
+        session (Session): Session Object.
+        spotify_id (str): Spotify ID.
+
+    Returns:
+        Track: Track Object or None if not found.
+    """
+    return session.query(Track).filter(Track.spotify_id == spotify_id).first()
 
 
 def get_track_by_id(session: Session, track_id: str) -> Track | None:
@@ -20,12 +36,12 @@ def get_track_by_id(session: Session, track_id: str) -> Track | None:
 
     Args:
         session (Session): Session Object.
-        track_id (str): Spotify Track ID.
+        track_id (str): track id.
 
     Returns:
         Track: Track Object or None if not found.
     """
-    return session.query(Track).filter(Track.spotify_id == track_id).first()
+    return session.query(Track).filter(Track.id == track_id).first()
 
 
 def get_first_track(session: Session, track_name: str) -> Track | None:
@@ -83,6 +99,8 @@ def create_playlist(session: Session, playlist: Playlist):
         session (Session): Session Object.
         playlist (Playlist): Playlist Object.
     """
+    if get_playlist_by_name(session, playlist.name, playlist.owner) is not None:
+        return
     session.add(playlist)
     session.commit()
 
@@ -100,17 +118,18 @@ def get_playlist_by_id(session: Session, playlist_id: int) -> Playlist | None:
     return session.query(Playlist).filter(Playlist.id == playlist_id).first()
 
 
-def get_playlist_by_name(session: Session, playlist_name: str) -> Playlist | None:
+def get_playlist_by_name(session: Session, playlist_name: str, user_id: int) -> Playlist | None:
     """Searches database for Playlist with Playlist Name.
 
     Args:
         session (Session): Session Object.
         playlist_name (str): Playlist Name.
+        user_id (int): User ID.
 
     Returns:
         Playlist: Playlist Object or None if not found.
     """
-    return session.query(Playlist).filter(Playlist.name == playlist_name).first()
+    return session.query(Playlist).filter(Playlist.name == playlist_name, Playlist.user_id == user_id).first()
 
 
 def update_playlist(session: Session, playlist: Playlist):
@@ -142,6 +161,8 @@ def create_lyrics(session: Session, lyrics: Lyrics):
         session (Session): Session Object.
         lyrics (Lyrics): Lyrics Object.
     """
+    if get_lyrics_by_track_id(session, lyrics.track_id) is not None:
+        return
     session.add(lyrics)
     session.commit()
 
@@ -205,6 +226,10 @@ def create_track_details(session: Session, track_details: TrackDetails):
         session (Session): Session Object.
         track_details (TrackDetails): TrackDetails Object.
     """
+    if get_track_details_by_track_id(session, track_details.track_id) is not None:
+        return
+    if get_track_by_id(session, track_details.track_id) is not None:
+        return
     session.add(track_details)
     session.commit()
 
@@ -259,6 +284,71 @@ def delete_track_details(session: Session, track_details: TrackDetails):
     """
     session.delete(track_details)
     session.commit()
+
+
+def create_user(session: Session, user: User) -> bool:
+    """Creates User in the database
+
+    Args:
+        session (Session): Session Object.
+        user (User): User Object.
+
+    Returns:
+        bool: True if successful, False if user already exists.
+    """
+    if session.query(User).filter(
+            User.username == user.username).first() is not None:
+        return False
+    session.add(user)
+    session.commit()
+    return True
+
+
+def get_user_by_id(session: Session, user_id: int) -> User | None:
+    """Searches database for User with User ID.
+
+    Args:
+        session (Session): Session Object.
+        user_id (int): User ID.
+
+    Returns:
+        User: User Object or None if not found.
+    """
+    return session.query(User).filter(User.id == user_id).first()
+
+
+def get_user_by_name(session: Session, username: str) -> User | None:
+    """Searches database for User with User Name.
+
+    Args:
+        session (Session): Session Object.
+        user_name (str): User Name.
+
+    Returns:
+        User: User Object or None if not found.
+    """
+    return session.query(User).filter(User.username == username).first()
+
+
+def update_user_password(session: Session, password: str, username: str):
+    """Updates User Password in the database.
+
+    Args:
+        session (Session): Session Object.
+        password (str): Password.
+        user (User): User Object.
+    """
+    user = get_user_by_name(session, username)
+    user.password = hash_password(password)
+    session.merge(user)
+    session.commit()
+
+
+def verify_user(session: Session, username: str, password: str) -> bool:
+    user = get_user_by_name(session, username)
+    if user is None:
+        return False
+    return verify_password(password, user.password)
 
 
 # HELPER FUNCTIONS

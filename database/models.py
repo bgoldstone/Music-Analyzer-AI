@@ -1,5 +1,7 @@
-from sqlalchemy import ForeignKey, Numeric, Table, create_engine, Column, Integer, String, Double, Text
+from sqlite3 import Binary, Blob
+from sqlalchemy import Boolean, ForeignKey, Numeric, Table, create_engine, Column, Integer, String, Double, Text
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
+from sympy import true
 
 
 DB_NAME = 'project_sound.db'
@@ -56,6 +58,8 @@ class Playlist(Base):
     # Playlist relationship to tracks
     tracks = relationship(
         'Track', secondary="playlist_tracks", back_populates='playlists')
+    is_public = Column(Boolean, default=True)
+    owner = Column(Integer, ForeignKey('users.id'), nullable=True)
 
 
 class Lyrics(Base):
@@ -81,6 +85,14 @@ class Analysis(Base):
     expressiveness = Column(Numeric(10, 2))
     amusement = Column(Numeric(10, 2))
     attractiveness = Column(Numeric(10, 2))
+
+
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String, unique=True)
+    password = Column(Blob)
+    playlists = relationship('Playlist', back_populates='user')
 
 
 def main():
