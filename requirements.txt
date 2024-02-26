@@ -10,3 +10,4 @@ SQLAlchemy
 beautifulsoup4
 bcrypt
 PyJWT
+nltk
