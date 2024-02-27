@@ -1,0 +1,17 @@
+name: Close Done Issues
+on:
+  issues:
+    types: [edited]
+jobs:
+  add-comment:
+    if: github.event.issue.column_name == 'Done'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Add comment
+        run: gh issue close "$NUMBER" --reason "completed" --comment "Closing issue as status is in Done"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number }}

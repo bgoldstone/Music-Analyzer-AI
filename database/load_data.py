@@ -3,13 +3,14 @@ from io import TextIOWrapper
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
-from ddl import Playlist, Track, TrackDetails
-from dml import create_track, create_track_details, create_playlist, get_playlist_by_name, get_track_by_id, get_track_details_by_track_id, is_track_in_playlist
+from models import Analysis, EmotionalQuantitation, Playlist, Track, TrackDetails
+from dml import create_analysis, create_track, create_track_details, create_playlist, get_emotional_quantitation, get_playlist_by_name, get_track_by_id, get_track_details_by_track_id, is_track_in_playlist
 
 
 DB_NAME: str = 'project_sound.db'
 
 SONG_DATA_DIRECTORY: str = os.path.join(os.getcwd(), 'song_data')
+EMOTIONAL_QUANTITATION = {}
 
 
 def main():
@@ -17,6 +18,7 @@ def main():
     session = get_db_connection()
     load_playlist_track_details(session)
     close_db_connection(session)
+    EMOTIONAL_QUANTITATION = get_emotional_quantitation(session)
 
 
 def get_db_connection() -> sessionmaker[Session]:
@@ -81,22 +83,35 @@ def read_playlist(session: Session, file: TextIOWrapper, playlist_name: str):
 
     # Check if playlist exists
     search_for_playlist = get_playlist_by_name(session, playlist_name)
-    if search_for_playlist != None:
-        return
+    if not search_for_playlist:
+        create_playlist(session, playlist_obj)
+        search_for_playlist = get_playlist_by_name(session, playlist_name)
+    # Add tracks to playlist
     for item in playlist:
         # Check if track exists
         track = get_track_by_id(session, item['track_id'])
-
+        if (track == None):
+            track = Track()
+            track.spotify_id = item['track_id']
+            track.title = item['track_name']
+            track.artist = item['artist_name']
+            track.album = item['album_name']
+            create_track(session, track)
+            track = get_track_by_id(session, item['track_id'])
         # if track already in playlist, skip
         if is_track_in_playlist(session, search_for_playlist.id, track.id):
             continue
         if track == None:
             track = Track()
             track.spotify_id = item['track_id']
-            track.name = item['track_name']
+            track.title = item['track_name']
             track.artist = item['artist_name']
             track.album = item['album_name']
             create_track(session, track)
+            # Analysis creation
+            # analysis = Analysis()
+            # analysis.track_id = track.id
+            # create_analysis(session,analysis)
         # add track to playlist
         playlist_obj.tracks.append(track)
 
@@ -116,7 +131,7 @@ def read_track_details(session: Session, file: TextIOWrapper):
         track = get_track_details_by_track_id(session, item['track_id'])
         if track == None:
             track_detail = TrackDetails()
-            track_detail.spotify_track_id = item['track_id']
+            track_detail.track_id = item['track_id']
             track_detail.acousticness = float(item['acousticness'])
             track_detail.danceability = float(item['danceability'])
             track_detail.duration = int(item['duration_ms'])

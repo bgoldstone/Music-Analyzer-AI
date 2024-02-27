@@ -1,17 +1,22 @@
 import re
 import os
 import csv
+import requests
+import time
 from bs4 import BeautifulSoup
 from typing import Dict, List
-#pip install beautifulsoup4 requests
 
-def clean_text(text):
+valid_links = 0
+invalid_links = 0
+total_links = 0
+
+def clean_text(text: str,) -> str:
     text = text.lower()
     
-    # removes remaster from text
+    # removes remaster / remastered from text
     if(' remaster' in text):
-        text_split = text.split(" - ",1)
-        text = text_split[0] # just the part before the remaster
+        text_split = text.split(' - ',1)
+        text = text_split[0] # keep the part before the remaster
     
     # removes spaces
     text = text.replace(' ','')
@@ -27,7 +32,7 @@ def clean_text(text):
 
     return text
 
-def grab_songs_from_csv():
+def grab_songs_from_csv() -> dict[str]:
     # current project folder joined with \song_data
     path = os.path.join(os.getcwd(),'song_data')
 
@@ -71,7 +76,7 @@ def grab_songs_from_csv():
                 reader = csv.reader(csv_file)
 
                 for row in reader:
-                    # skips first row
+                    # skips empty rows and first row
                     if(row != [])and(not first):
                         artist = clean_text(row[2])
                         song_title = clean_text(row[1])
@@ -86,7 +91,7 @@ def grab_songs_from_csv():
     return songs_dict
 
 # creates links to parse, from azlyrics.com
-def create_links(songs_dict):
+def create_links(songs_dict: dict,) -> set[str]:
     # start of each link
     start_url = "https://www.azlyrics.com/lyrics/"
     
@@ -97,8 +102,45 @@ def create_links(songs_dict):
             url = start_url + artist + '/' + song + '.html'
             links.add(url)
     
+    return links
+
+def store_lyrics(links: set):
+
+    global valid_links
+    global invalid_links
+    global total_links
+
+    already_parsed = []
+
+    i =0
+
     for link in links:
-        print(link)
-                
+        if(i<1):
+            total_links += 1
+            try:
+                response = requests.get(link)
+
+                if(response.status_code == 200): #if response was successful
+                    print('valid:',link)
+                    soup = BeautifulSoup(response.content, 'html.parser')
+                    print(soup)
+                    already_parsed.append(response)
+                    valid_links += 1
+                else:
+                    #print('invalid:',link)
+                    invalid_links += 1
+
+            except Exception as e:
+                pass
+            i += 1
+        else:
+            break
+
+print()
 songs_dict = grab_songs_from_csv()
-create_links(songs_dict)
+song_links = create_links(songs_dict)
+store_lyrics(song_links)
+
+print("\nInvalid links:",invalid_links)
+print("Valid links:",valid_links)
+print("Total links:",total_links)
