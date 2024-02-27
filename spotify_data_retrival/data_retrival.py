@@ -8,12 +8,12 @@ import time
 import os
 
 # output directory (change this to song_data/{your name})
-OUTPUT_DIRECTORY: str = 'YOUR_NAME_HERE'
+OUTPUT_DIRECTORY: str = 'DAL'
 OUTPUT_DIRECTORY: str = os.path.join('song_data', OUTPUT_DIRECTORY)
 # put playlsit url below
-PLAYLIST_URL: str = 'PLAYLIST_URL_HERE'
+PLAYLIST_URL: str = 'https://open.spotify.com/playlist/37i9dQZF1E35x0HjtUMCJG?si=8091a75cf4284111E'
 # put the name of the playlist here in snake(_) case
-PLAYLIST_NAME: str = 'YOUR_PLAYLIST_NAME_HERE'
+PLAYLIST_NAME: str = 'Daily-Mix'
 # default number of songs, will change.
 PLAYLIST_NUMBER_OF_SONGS: int = 0
 
