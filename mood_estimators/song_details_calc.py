@@ -33,12 +33,6 @@ def scale_energy(energy):
 
 def calc_mood_from_details(name, track_href, tempo, valance, energy):
     # Energy level based on `tempo` and `energy` params
-
-    # energy_level = {
-    # "high_arousal": 0,
-    # "low_arousal": 0,
-    # }
-
     arousal = 0
 
     # Check how tempo should affect arousal level
@@ -93,7 +87,7 @@ def calc_mood_from_details(name, track_href, tempo, valance, energy):
         else:
             print(name + ": Relaxing, sad")
 
-    # print(energy_level, "\n")
+    return (arousal, valance)
 
 
 # Get the data(audio features from spotify) from the csv
