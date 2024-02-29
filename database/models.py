@@ -93,8 +93,8 @@ class EmotionalQuantitation(Base):
     __tablename__ = 'emotional_quantitation'
     id = Column(Integer, primary_key=True, autoincrement=True)
     emotional_attribute = Column(String)
-    arousal_level = Column(Numeric(3, 2))
-    valence_level = Column(Numeric(3, 2))
+    arousal_level = Column(Numeric(6, 2))
+    valence_level = Column(Numeric(6, 2))
 
 
 class User(Base):

@@ -2,25 +2,26 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import dotenv
 from typing import Dict, List
-import csv
+import json
 import math
 import time
 import os
 
 # output directory (change this to song_data/{your name})
-OUTPUT_DIRECTORY: str = 'DAL'
+OUTPUT_DIRECTORY: str = 'ben'
 OUTPUT_DIRECTORY: str = os.path.join('song_data', OUTPUT_DIRECTORY)
 # put playlsit url below
-PLAYLIST_URL: str = 'https://open.spotify.com/playlist/37i9dQZF1E35x0HjtUMCJG?si=8091a75cf4284111E'
+PLAYLIST_URL: str = 'https://open.spotify.com/playlist/6f93Udu4SPm1ljoOOnydMr?si=81b0a8b23a024b6b'
 # put the name of the playlist here in snake(_) case
-PLAYLIST_NAME: str = 'Daily-Mix'
+PLAYLIST_NAME: str = 'songs-for-events'
 # default number of songs, will change.
 PLAYLIST_NUMBER_OF_SONGS: int = 0
 
 # CONSTANTS
-PLAYLIST_FILE_PATH = os.path.join(OUTPUT_DIRECTORY, f'{PLAYLIST_NAME}_ids.csv')
+PLAYLIST_FILE_PATH = os.path.join(
+    OUTPUT_DIRECTORY, f'{PLAYLIST_NAME}_ids.json')
 TRACK_DETAILS_FILE_PATH = os.path.join(
-    OUTPUT_DIRECTORY, f'{PLAYLIST_NAME}_track_details.csv')
+    OUTPUT_DIRECTORY, f'{PLAYLIST_NAME}_track_details.json')
 
 
 def main():
@@ -48,13 +49,13 @@ def main():
     get_playlist_tracks(
         PLAYLIST_URL, sp, PLAYLIST_FILE_PATH)
     # get song list and ids
-    song_list = read_csv(PLAYLIST_FILE_PATH)
+    song_list = read_json(PLAYLIST_FILE_PATH)
     # get track details
     track_details = get_track_details(song_list, sp)
-    to_csv(TRACK_DETAILS_FILE_PATH, track_details)
+    write_json(TRACK_DETAILS_FILE_PATH, track_details)
 
 
-def read_csv(file_name: str,) -> List[Dict[str, str]]:
+def read_json(file_name: str,) -> List[Dict[str, str]]:
     """read CSV file as a dictionary
 
     Args:
@@ -64,10 +65,8 @@ def read_csv(file_name: str,) -> List[Dict[str, str]]:
         List[Dict[str, str]]: List of Songs in dictionary format.
     """
     song_list: List[Dict[str, str]] = []
-    with open(os.path.join(os.getcwd(), file_name), 'r', encoding="utf-8") as csv_file:
-        file = csv.DictReader(csv_file)
-        for track in file:
-            song_list.append(track)
+    with open(os.path.join(os.getcwd(), file_name), 'r', encoding="utf-8") as file:
+        song_list = json.load(file)
     return song_list
 
 
@@ -102,12 +101,9 @@ def get_playlist_tracks(playlist_url: str, sp: spotipy.Spotify, playlist_file_pa
         time.sleep(2.5)  # sleep for 2.5 seconds to not overload spotify api
 
         # Write tracks to CSV file
-        with open(os.path.join(os.getcwd(), playlist_file_path), 'w', encoding="utf-8") as csv_file:
-            writer = csv.DictWriter(
-                csv_file, fieldnames=tracks[0].keys(), delimiter=',')
-            writer.writeheader()
-            for track in tracks:
-                writer.writerow(track)
+        with open(os.path.join(os.getcwd(), playlist_file_path), 'w', encoding="utf-8") as file:
+            writer = json.dumps(tracks)
+            file.write(writer)
 
 
 def get_track_details(tracks: List[Dict[str, str]], sp: spotipy.Spotify) -> List[Dict[str, str]]:
@@ -153,7 +149,7 @@ def get_track_details(tracks: List[Dict[str, str]], sp: spotipy.Spotify) -> List
     return track_details
 
 
-def to_csv(file_name: str, track_details: List[Dict[str, str]]) -> None:
+def write_json(file_name: str, track_details: List[Dict[str, str]]) -> None:
     """
     Writes a dictionary of track details to a CSV file.
 
@@ -162,12 +158,9 @@ def to_csv(file_name: str, track_details: List[Dict[str, str]]) -> None:
         track_details (Dict[str, Dict[str, str]]): A dictionary of track details, where the key is a string of the form
             '{track name} - {artist name} - {album name}', and the value is a dictionary of audio features.
     """
-    with open(os.path.join(os.getcwd(), file_name), 'w', encoding="utf-8") as csv_file:
-        writer = csv.DictWriter(
-            csv_file, fieldnames=track_details[0].keys(), delimiter=',')
-        writer.writeheader()
-        for track in track_details:
-            writer.writerow(track)
+    with open(os.path.join(os.getcwd(), file_name), 'w', encoding="utf-8") as file:
+        writer = json.dumps(track_details)
+        file.write(writer)
 
 
 if __name__ == '__main__':
