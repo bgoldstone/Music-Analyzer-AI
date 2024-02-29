@@ -10,36 +10,41 @@ file_path = os.path.join('song_data', DIRECTORY, filename)
 # pd.set_option('display.max_columns', None)
 # pd.set_option('display.max_rows', None)
 
+# Coordinates for all vectors in graph
 
+labeled_songs = {}
 
 emotionCords = {
-    "Stressing": ( 120, 0.30),
-    "Boring": ( -130, 0.25),
-    "Expressionless": (-130, 0.30),
-    "Expressive": (130 ,0.70),
-    "Amusing": (90, 0.80),
-    "Relaxing": (-130, 0.70)
+    "Stressing": (0.30, 120),
+    "Boring": (0.25, -130),
+    "Expressionless": (0.30, -130),
+    "Expressive": (0.70, 130),
+    "Amusing": (0.80, 90),
+    "Relaxing": (0.70, -130)
 }
 
 # Compute Euclidean Distance in Python
-def calc_Euc_Distance(arousal, valance):
-    P1 = np.array((arousal, valance))
-
+def calc_Euc_Distance(valance, arousal):
+    # `P1` is the vector with the song's valance and arousal 
+    P1 = np.array((valance, arousal))
+    # Set shortestDict to nearest vector to nothing
     shortestDist = float('inf')
     nearestVector = ""
-
+    # Check the Euclidean Distance from song to all labels
+    # Find the shortest distance
     for emotion in emotionCords:
         P2 = np.array(emotionCords[emotion])
         temp = P1 - P2
 
-        euclid_dist = np.sqrt(np.dot(temp.T, temp))
-        print(euclid_dist)
+        euclid_dist = np.sqrt(np.dot(temp, temp))
+        # print(euclid_dist)
 
         if euclid_dist < shortestDist:
             shortestDist = euclid_dist
             nearestVector = emotion
 
     print("Nearest emotion is ",  nearestVector, ". Distance: ",  shortestDist)
+    return(nearestVector, shortestDist)
 
 def process_dataframe(df):
     # Process each DataFrame, `df.values` represent all rows in the csv file.
@@ -48,7 +53,10 @@ def process_dataframe(df):
     
     for song in song_info:
         print("Name: ", song[2])
-        calc_Euc_Distance(song[0], song[1])
+        # calc_Euc_Distance(song[0], song[1])
+        labeled_songs[song[2]] = calc_Euc_Distance(song[0], song[1])
+
+
 
 def scale_tempo(tempo):
     # 70-90 bpm is the range where it is unclear that a song is happy or sad based on tempo
@@ -91,7 +99,7 @@ def calc_mood_from_details(name, track_id, tempo, valance, energy):
     elif (energy > .50):
         arousal += scale_energy(energy)
 
-    elif (energy > .25):
+    elif (energy > .40):
         arousal -= (scale_energy(energy))
     else:
         arousal -= 2 * scale_energy(energy)
@@ -117,7 +125,7 @@ def calc_mood_from_details(name, track_id, tempo, valance, energy):
             else:
                 print(name + ": Relaxing, sad", str(arousal), str(valance))
 
-    return (arousal, valance, name)
+    return (valance, arousal, name)
 
 
 # Get the data(audio features from spotify) from the csv
