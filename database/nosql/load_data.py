@@ -61,11 +61,36 @@ def load_playlists(db: MongoClient) -> None:
                 if (track is not None):
                     song_ids.append(track.get('_id'))
                     continue
+                song = clean_song(song)
                 song_id = db.tracks.insert_one(song).inserted_id
                 song_ids.append(song_id)
             db.playlists.update_one(
                 playlist_query, {'$set': {'songs': songs, "time": datetime.now()}}, upsert=True
             )
+
+
+def clean_song(song: dict) -> dict:
+    new_song = {}
+    # Move analsis to separate field
+    new_song['analysis'] = song
+    # Remove unnecessary fields
+    del new_song['analysis']['type']
+    del new_song['analysis']['']
+    # move track attributes outside of analysis
+    new_song['track_name'] = new_song['analysis']['track_name']
+    del new_song['analysis']['track_name']
+    new_song['artist_name'] = new_song['analysis']['artist_name']
+    del new_song['analysis']['artist_name']
+    new_song['album_name'] = new_song['analysis']['album_name']
+    del new_song['analysis']['album_name']
+    # move spotify_specific attributes to own field
+    new_song['spotify'] = {}
+    new_song['spotify']['track_id'] = new_song['analysis']['id']
+    del new_song['analysis']['track_id']
+    new_song['spotify']['uri'] = new_song['analysis']['uri']
+    del new_song['analysis']['uri']
+    new_song['spotify']['track_href'] = new_song['analysis']['track_href']
+    del new_song['analysis']['track_href']
 
 
 if __name__ == '__main__':
