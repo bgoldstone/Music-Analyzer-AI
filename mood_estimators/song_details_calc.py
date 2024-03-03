@@ -7,14 +7,12 @@ DIRECTORY = 'Daeshaun'  # Ex: "Daeshaun"
 filename = 'Lofi_Anime_Openings_track_details.json'  # "Lofi Anime Openings_track_details.json"
 file_path = os.path.join('song_data', DIRECTORY, filename)
 
-# Uncomment next two lines to adjust pandas display options to show all columns and rows
-# pd.set_option('display.max_columns', None)
-# pd.set_option('display.max_rows', None)
-
-# Coordinates for all vectors in graph
-
+# Dictionary format:
+# string(key) = tuple(value)
+# "name of song" = (valence, arousal)
 labeled_songs = {}
 
+# Coordinates for all vectors in graph
 emotionCords = {
     "Stressing": (0.30, 120),
     "Boring": (0.25, -130),
@@ -44,7 +42,7 @@ def calc_Euc_Distance(valence, arousal):
             shortestDist = euclid_dist
             nearestVector = emotion
 
-    print("Nearest emotion is ",  nearestVector, ". Distance: ",  shortestDist)
+    # print("Nearest emotion is ",  nearestVector, ". Distance: ",  shortestDist)
     return(nearestVector, shortestDist)
 
 def process_data(df):
@@ -58,9 +56,7 @@ def process_data(df):
     song_info = [calc_mood_from_details(track_name, track_id, int(tempo), int(valence), int(energy))]
     
     for song in song_info:
-        print("Name: ", song[2])
-        calc_Euc_Distance(song[0], song[1])
-        labeled_songs[song[2]] = calc_Euc_Distance(song[0], song[1])
+        labeled_songs[song[1]] = (song[0], song[1]) + calc_Euc_Distance(song[0], int(valence))
 
 def scale_tempo(tempo):
     # 70-90 bpm is the range where it is unclear that a song is happy or sad based on tempo
@@ -129,20 +125,27 @@ def calc_mood_from_details(name, track_id, tempo, valence, energy):
             else:
                 print(name + ": Relaxing, sad", str(arousal), str(valence))
 
-    return (valence, arousal, name)
+    return (arousal, name)
 
+def main():
+    # Get the data(audio features from spotify) from the json
+    if os.path.exists(file_path):
+        # Open the JSON file
+        with open(file_path, 'r') as file:
+            # Parse the JSON objects one by one
+            parser = ijson.items(file, 'item')
+            
+            # Iterate over the JSON objects
+            for item in parser:
+                process_data(item)
 
-# Get the data(audio features from spotify) from the csv
-if os.path.exists(file_path):
-    # Open the JSON file
-    with open(file_path, 'r') as file:
-        # Parse the JSON objects one by one
-        parser = ijson.items(file, 'item')
-        
-        # Iterate over the JSON objects
-        for item in parser:
-            print(item)
-            process_data(item)
+        # arousal, name of song, label, distance from nearest label
+        # print([(value[0], key, value[2], value[3] ) for key, value in labeled_songs.items()])
+        return([(value[0], key, value[2], value[3] ) for key, value in labeled_songs.items()])
 
-else:
-    print("File not found:", file_path)
+    else:
+        print("File not found:", file_path)
+        return(0)
+
+if __name__ == '__main__':
+    main()
