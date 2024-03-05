@@ -3,7 +3,7 @@ import ssl
 from nltk.sentiment import SentimentIntensityAnalyzer
 
 # Download NLTK resources (run once)
-nltk.download('vader_lexicon')
+nltk.download("vader_lexicon")
 
 # Initialize Sentiment Analyzer
 sid = SentimentIntensityAnalyzer()
@@ -20,7 +20,7 @@ Put your loving hand out darlin'
 
 # Split lyrics into lines
 lines = []
-for line in lyrics.split('\n'):
+for line in lyrics.split("\n"):
     line = line.strip()
     if line:
         lines.append(line)
@@ -30,12 +30,12 @@ mood_per_line = []
 
 for line in lines:
     sentiment_scores = sid.polarity_scores(line)
-    if sentiment_scores['compound'] >= 0.10:
-        mood = 'Positive'
-    elif sentiment_scores['compound'] <= -0.10:
-        mood = 'Negative'
+    if sentiment_scores["compound"] >= 0.10:
+        mood = "Positive"
+    elif sentiment_scores["compound"] <= -0.10:
+        mood = "Negative"
     else:
-        mood = 'Neutral'
+        mood = "Neutral"
     mood_per_line.append((line, mood))
 
 # Print sentiment analysis for each line

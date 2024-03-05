@@ -1,7 +1,16 @@
 from typing import List
 from sqlalchemy import exists
 from sqlalchemy.orm import Session
-from models import Analysis, EmotionalQuantitation, Track, Lyrics, Playlist, TrackDetails, PlaylistTrack, User
+from models import (
+    Analysis,
+    EmotionalQuantitation,
+    Track,
+    Lyrics,
+    Playlist,
+    TrackDetails,
+    PlaylistTrack,
+    User,
+)
 from auth.hasher import hash_password, verify_password
 
 
@@ -122,7 +131,9 @@ def get_playlist_by_id(session: Session, playlist_id: int) -> Playlist | None:
     return session.query(Playlist).filter(Playlist.id == playlist_id).first()
 
 
-def get_playlist_by_name(session: Session, playlist_name: str, user_id: int) -> Playlist | None:
+def get_playlist_by_name(
+    session: Session, playlist_name: str, user_id: int
+) -> Playlist | None:
     """Searches database for Playlist with Playlist Name.
 
     Args:
@@ -133,7 +144,11 @@ def get_playlist_by_name(session: Session, playlist_name: str, user_id: int) -> 
     Returns:
         Playlist: Playlist Object or None if not found.
     """
-    return session.query(Playlist).filter(Playlist.name == playlist_name, Playlist.user_id == user_id).first()
+    return (
+        session.query(Playlist)
+        .filter(Playlist.name == playlist_name, Playlist.user_id == user_id)
+        .first()
+    )
 
 
 def update_playlist(session: Session, playlist: Playlist):
@@ -242,7 +257,9 @@ def create_track_details(session: Session, track_details: TrackDetails):
     session.commit()
 
 
-def get_track_details_by_track_id(session: Session, track_id: str) -> TrackDetails | None:
+def get_track_details_by_track_id(
+    session: Session, track_id: str
+) -> TrackDetails | None:
     """Searches database for TrackDetails with Track ID.
 
     Args:
@@ -255,7 +272,9 @@ def get_track_details_by_track_id(session: Session, track_id: str) -> TrackDetai
     return session.query(TrackDetails).filter(TrackDetails.track_id == track_id).first()
 
 
-def get_track_details_by_track_name(session: Session, track_name: str) -> TrackDetails | None:
+def get_track_details_by_track_name(
+    session: Session, track_name: str
+) -> TrackDetails | None:
     """Searches database for TrackDetails with Track Name.
 
     Args:
@@ -269,7 +288,11 @@ def get_track_details_by_track_name(session: Session, track_name: str) -> TrackD
     track_id = get_spotify_id_by_track_name(session, track_name)
     if not track_id:
         return None
-    return session.query(TrackDetails).filter(TrackDetails.spotify_track_id == track_id).first()
+    return (
+        session.query(TrackDetails)
+        .filter(TrackDetails.spotify_track_id == track_id)
+        .first()
+    )
 
 
 def update_track_details(session: Session, track_details: TrackDetails):
@@ -304,8 +327,7 @@ def create_user(session: Session, user: User) -> bool:
     Returns:
         bool: True if successful, False if user already exists.
     """
-    if session.query(User).filter(
-            User.username == user.username).first() is not None:
+    if session.query(User).filter(User.username == user.username).first() is not None:
         return False
     session.add(user)
     session.commit()
@@ -413,7 +435,9 @@ def delete_analysis(session: Session, analysis: Analysis) -> None:
     session.commit()
 
 
-def create_emotional_quantitation(session: Session, quantitation: EmotionalQuantitation) -> None:
+def create_emotional_quantitation(
+    session: Session, quantitation: EmotionalQuantitation
+) -> None:
     """Creates Emotional Quantitation in the database
     Args:
         session (Session): Session Object.
@@ -427,7 +451,9 @@ def create_emotional_quantitation(session: Session, quantitation: EmotionalQuant
     session.commit()
 
 
-def update_emotional_quantitation(session: Session, quantitation: EmotionalQuantitation) -> None:
+def update_emotional_quantitation(
+    session: Session, quantitation: EmotionalQuantitation
+) -> None:
     """Updates Quantitation in the database
     Args:
         session (Session): Session Object.
@@ -442,7 +468,9 @@ def update_emotional_quantitation(session: Session, quantitation: EmotionalQuant
     session.commit()
 
 
-def get_emotional_quantitation(session: Session, track_id: str) -> EmotionalQuantitation | None:
+def get_emotional_quantitation(
+    session: Session, track_id: str
+) -> EmotionalQuantitation | None:
     """Searches database for Quantitation with Track ID.
     Args:
         session (Session): Session Object.
@@ -450,11 +478,15 @@ def get_emotional_quantitation(session: Session, track_id: str) -> EmotionalQuan
     Returns:
         Quantitation: Quantitation Object or None if not found.
     """
-    return session.query(EmotionalQuantitation).filter(EmotionalQuantitation.track_id == track_id).first()
+    return (
+        session.query(EmotionalQuantitation)
+        .filter(EmotionalQuantitation.track_id == track_id)
+        .first()
+    )
 
 
 def get_emotional_quantitation(session: Session) -> List[EmotionalQuantitation]:
-    """ Gets all the Quantitations in the database
+    """Gets all the Quantitations in the database
     Args:
         session (Session): Session Object.
     Returns:
@@ -462,7 +494,9 @@ def get_emotional_quantitation(session: Session) -> List[EmotionalQuantitation]:
     return session.query(EmotionalQuantitation).all()
 
 
-def delete_emotional_quantitation(session: Session, quantitation: EmotionalQuantitation) -> None:
+def delete_emotional_quantitation(
+    session: Session, quantitation: EmotionalQuantitation
+) -> None:
     """Deletes Quantitation in the database
     Args:
         session (Session): Session Object.
@@ -477,7 +511,9 @@ def delete_emotional_quantitation(session: Session, quantitation: EmotionalQuant
 
 
 # HELPER FUNCTIONS
-def get_spotify_id_by_track_name(session: Session, track_name: str) -> TrackDetails | None:
+def get_spotify_id_by_track_name(
+    session: Session, track_name: str
+) -> TrackDetails | None:
     """Searches database for TrackDetails with Track Name.
 
     Args:
@@ -488,8 +524,7 @@ def get_spotify_id_by_track_name(session: Session, track_name: str) -> TrackDeta
         TrackDetails: TrackDetails Object or None if not found.
     """
     # gets first matching track id from Tracks table.
-    track: Track = session.query(Track).filter(
-        Track.name == track_name).first()
+    track: Track = session.query(Track).filter(Track.name == track_name).first()
     if track is None:
         return None
     return track.spotify_id
@@ -511,4 +546,11 @@ def is_track_in_playlist(session: Session, playlist_id: int, track_id: str) -> b
     if playlist is None:
         return False
     # if track exists
-    return session.query(PlaylistTrack).filter(PlaylistTrack.playlist_id == playlist_id, PlaylistTrack.track_id == track_id).first() is not None
+    return (
+        session.query(PlaylistTrack)
+        .filter(
+            PlaylistTrack.playlist_id == playlist_id, PlaylistTrack.track_id == track_id
+        )
+        .first()
+        is not None
+    )
