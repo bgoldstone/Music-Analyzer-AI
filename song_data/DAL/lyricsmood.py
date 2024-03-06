@@ -3,7 +3,7 @@ import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 
 # Download NLTK resources (run once)
-nltk.download('vader_lexicon')
+nltk.download("vader_lexicon")
 
 # Initialize Sentiment Analyzer
 sid = SentimentIntensityAnalyzer()
@@ -20,11 +20,11 @@ Put your loving hand out darlin'"
 sentiment_scores = sid.polarity_scores(lyrics)
 
 # Determine mood based on sentiment score
-if sentiment_scores['compound'] >= 0.05:
-    mood = 'Positive'
-elif sentiment_scores['compound'] <= -0.05:
-    mood = 'Negative'
+if sentiment_scores["compound"] >= 0.05:
+    mood = "Positive"
+elif sentiment_scores["compound"] <= -0.05:
+    mood = "Negative"
 else:
-    mood = 'Neutral'
+    mood = "Neutral"
 
 print("Mood of the song:", mood)
