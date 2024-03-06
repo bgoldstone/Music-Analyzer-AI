@@ -12,3 +12,4 @@ bcrypt
 PyJWT
 nltk
 pymongo
+matplotlib

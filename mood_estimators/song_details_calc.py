@@ -2,6 +2,10 @@ import pandas as pd
 import os
 import numpy as np
 import ijson
+import sys
+import matplotlib
+import matplotlib.pyplot as plt
+
 
 DIRECTORY = 'Daeshaun'  # Ex: "Daeshaun"
 filename = 'Lofi_Anime_Openings_track_details.json'  # "Lofi Anime Openings_track_details.json"
@@ -11,6 +15,7 @@ file_path = os.path.join('song_data', DIRECTORY, filename)
 # string(key) = tuple(value)
 # "name of song" = (valence, arousal)
 labeled_songs = {}
+song_info = []
 
 # Coordinates for all vectors in graph
 emotionCords = {
@@ -53,10 +58,12 @@ def process_data(df):
     tempo = df["tempo"]
     valence = df["valence"]
     energy = df["energy"]
-    song_info = [calc_mood_from_details(track_name, track_id, int(tempo), int(valence), int(energy))]
+
+    song_info.append(calc_mood_from_details(track_name, track_id, float(tempo), float(valence), float(energy)))
+    # print(song_info)
     
     for song in song_info:
-        labeled_songs[song[1]] = (song[0], song[1]) + calc_Euc_Distance(song[0], int(valence))
+        labeled_songs[song[2]] =  calc_Euc_Distance(song[0], song[1])
 
 def scale_tempo(tempo):
     # 70-90 bpm is the range where it is unclear that a song is happy or sad based on tempo
@@ -125,7 +132,20 @@ def calc_mood_from_details(name, track_id, tempo, valence, energy):
             else:
                 print(name + ": Relaxing, sad", str(arousal), str(valence))
 
-    return (arousal, name)
+    return (valence, round(arousal, 2), name)
+
+def showPlot(show_plot):
+    if show_plot:
+        x_points = np.array([ x[0] for x in song_info])
+        y_points = np.array([ y[1] for y in song_info])
+        # print(y_points)
+        plt.scatter(x_points, y_points)
+        plt.show()
+        #Two  lines to make our compiler able to draw:
+        plt.savefig(sys.stdout.buffer)
+        sys.stdout.flush()
+    else:
+        pass
 
 def main():
     # Get the data(audio features from spotify) from the json
@@ -141,7 +161,8 @@ def main():
 
         # arousal, name of song, label, distance from nearest label
         # print([(value[0], key, value[2], value[3] ) for key, value in labeled_songs.items()])
-        return([(value[0], key, value[2], value[3] ) for key, value in labeled_songs.items()])
+        showPlot(True)
+        return([(value[0], value[1], key ) for key, value in labeled_songs.items()])
 
     else:
         print("File not found:", file_path)
