@@ -1,9 +1,6 @@
-import asyncio
 import dotenv
 from datetime import datetime
 import json
-from motor.motor_asyncio import AsyncIOMotorClient
-from motor.core import AgnosticClient
 import os
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
@@ -28,26 +25,6 @@ def get_db_connection() -> MongoClient | None:
     mongo_password = dotenv.dotenv_values().get("MONGO_PASSWORD")
     mongo_uri = f"mongodb+srv://{mongo_user}:{mongo_password}@{MONGO_URL}/"
     client = MongoClient(mongo_uri)
-    db = client.soundsmith
-    try:
-        db.command("ping")
-        print("Pinged your deployment. You successfully connected to MongoDB!")
-    except Exception as e:
-        print(e)
-        return
-    return db
-
-
-def get_async_db_connection() -> AgnosticClient | None:
-    """Creates and returns asyncronus db connection.
-    Returns:
-        MongoClient | None: MongoClient object, or None if connection fails.
-    """
-    dotenv.load_dotenv(os.path.join(__file__, ".env"))
-    mongo_user = dotenv.dotenv_values().get("MONGO_USER")
-    mongo_password = dotenv.dotenv_values().get("MONGO_PASSWORD")
-    mongo_uri = f"mongodb+srv://{mongo_user}:{mongo_password}@{MONGO_URL}/"
-    client = AsyncIOMotorClient(mongo_uri)
     db = client.soundsmith
     try:
         db.command("ping")
@@ -91,7 +68,7 @@ def load_playlists(db: MongoClient) -> None:
             # Get track ids to put in playlist
             track_ids = []
             for track in tracks:
-                track_query = {"track_id": track["track_id"]}
+                track_query = {"spotify.track_id": track["track_id"]}
                 # Find or create track
                 mongo_track = db.tracks.find_one_and_update(
                     track_query,
@@ -126,12 +103,11 @@ def clean_track(track: dict) -> dict:
     del new_track["analysis"]["type"]
     del new_track["analysis"]["id"]
     # move track attributes to track field
-    new_track["track"] = {}
-    new_track["track"]["track_name"] = new_track["analysis"]["track_name"]
+    new_track["track_name"] = new_track["analysis"]["track_name"]
     del new_track["analysis"]["track_name"]
-    new_track["track"]["artist_name"] = new_track["analysis"]["artist_name"]
+    new_track["artist_name"] = new_track["analysis"]["artist_name"]
     del new_track["analysis"]["artist_name"]
-    new_track["track"]["album_name"] = new_track["analysis"]["album_name"]
+    new_track["album_name"] = new_track["analysis"]["album_name"]
     del new_track["analysis"]["album_name"]
     # move spotify_specific attributes to own field
     new_track["spotify"] = {}
