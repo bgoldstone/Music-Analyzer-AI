@@ -9,24 +9,17 @@ import matplotlib.pyplot as plt
 
 DIRECTORY = "Daeshaun"  # Ex: "Daeshaun"
 filename = (
-    "Lofi_Anime_Openings_track_details.json"  # "Lofi Anime Openings_track_details.json"
+    "R&B_track_details.json"  # "Lofi Anime Openings_track_details.json"
 )
 file_path = os.path.join("song_data", DIRECTORY, filename)
 
-# Dictionary format:
-# string(key) = tuple(value)
-# "name of song" = (valence, arousal)
-labeled_songs = {}
 song_info = []
 
-# Coordinates for all vectors in graph
-emotionCords = {
-    "Stressing": (0.30, 120),
-    "Boring": (0.25, -130),
-    "Expressionless": (0.30, -130),
-    "Expressive": (0.70, 130),
-    "Amusing": (0.80, 90),
-    "Relaxing": (0.70, -130),
+emotionVectors = {
+    "happy": 0,
+    "sad": 0,
+    "intense": 0,
+    "mild": 0,
 }
 
 # Compute Euclidean Distance in Python
@@ -62,80 +55,57 @@ def process_data(df):
     valence = df["valence"]
     energy = df["energy"]
 
-    song_info.append(calc_mood_from_details(track_name, track_id, float(tempo), float(valence), float(energy)))
-    # print(song_info)
-    
-    for song in song_info:
-        labeled_songs[song[2]] =  calc_Euc_Distance(song[0], song[1])
+    emotionVectors = {
+    "happy": 0,
+    "sad": 0,
+    "intense": 0,
+    "mild": 0,
+    }
+
+    song_info.append(calc_mood_from_details(track_name, track_id, emotionVectors, float(tempo), float(valence), float(energy)))
 
 def scale_tempo(tempo):
     # 70-90 bpm is the range where it is unclear that a song is happy or sad based on tempo
     # Therefore, equation  output smaller values between that range
     # Outliners(60bpm or 120bpm) have exponentially higher outputs
-    return ((0.0004 * (tempo - 80) ** 2) * 30) + 1
+    return 0.0004 * (tempo - 90) ** 3
 
 
 def scale_energy(energy):
     # 0.40 - 0.60 energy level is the range where it is unclear that a song is happy or sad
     # Therefore, equation  output smaller values between that range
     # Outliners(0.10 or 0.9) have exponentially higher outputs
-    return ((5 * (energy * - 0.50) ** 2) * 5) + 1
+    return (5 * (energy - 0.50) ** 3) * 40
+
+def scale_valence(valence):
+    # 0.40 - 0.60 energy level is the range where it is unclear that a song is happy or sad
+    # Therefore, equation  output smaller values between that range
+    # Outliners(0.10 or 0.9) have exponentially higher outputs
+    return (5 * (valence - 0.50) ** 3) * 40
 
 
-def calc_mood_from_details(name, track_id, tempo, valence, energy):
-    # Energy level based on `tempo` and `energy` params
-    arousal = 0
+def calc_mood_from_details(name, track_id, vectors, tempo, valence, energy):
 
-    # Check how tempo should affect arousal level
-    if tempo > 120:
-        arousal += scale_tempo(tempo)
-
-    elif tempo >= 90 and tempo <= 120:
-        arousal += scale_tempo(tempo)
-
-    # 70-90 bpm is the range where it is unclear that a song is happy or sad based on tempo
-    elif tempo < 90 and tempo > 70:
-        arousal += scale_tempo(tempo)
-        arousal -= scale_tempo(tempo)
+    vectors["happy"] += scale_valence(valence)
+    vectors["sad"] -= scale_valence(valence)
+    #
+    vectors["intense"] += scale_energy(energy) 
+    vectors["mild"] -= scale_energy(energy) 
+    #
+    vectors["intense"] += scale_tempo(tempo) 
+    vectors["mild"] -= scale_tempo(tempo)
     
-    else: 
-        arousal -= scale_tempo(tempo)
-
-    
-    # Check how energy should affect arousal level
-    if energy > 0.75:
-        arousal += scale_energy(energy)
-
-    elif energy > 0.50:
-        arousal += scale_energy(energy)
-
-    elif energy > 0.40:
-        arousal -= scale_energy(energy)
-    else:
-        arousal -= 2 * scale_energy(energy)
-
+    return(vectors, name, track_id)
     # Now check the valence level:
     # A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track.
     # Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric),
     # while tracks with low valence sound more negative (e.g. sad, depressed, angry).
 
-    # if valence is positive, check arousal level
-    printVal = False
-    if valence > 0.5:
-        if printVal == True:
-            if arousal > 0:
-                print(name + ": Upbeat, cheery", str(arousal), str(valence))
-            else:
-                print(name + ": Relaxing, happy", str(arousal), str(valence))
-    # valence is negative, check arousal level
-    else:
-        if printVal == True:
-            if arousal < 0:
-                print(name + ": Stressing/Urgent", str(arousal), str(valence))
-            else:
-                print(name + ": Relaxing, sad", str(arousal), str(valence))
-
-    return (valence, round(arousal, 2), name)
+def cosine_similarity(vector1, vector2):
+    dot_product = np.dot(vector1, vector2)
+    magnitude_vector1 = np.linalg.norm(vector1)
+    magnitude_vector2 = np.linalg.norm(vector2)
+    return dot_product / (magnitude_vector1 * magnitude_vector2)
 
 def showPlot(show_plot):
     if show_plot:
@@ -147,8 +117,6 @@ def showPlot(show_plot):
         #Two  lines to make our compiler able to draw:
         plt.savefig(sys.stdout.buffer)
         sys.stdout.flush()
-    else:
-        pass
 
 def main():
     # Get the data(audio features from spotify) from the json
@@ -161,11 +129,22 @@ def main():
             # Iterate over the JSON objects
             for item in parser:
                 process_data(item)
+        for song in song_info:
+            # print(song)
+            pass
+
+        
+        P1 = np.array(list(song_info[0][0].values()))
+
+        for value in song_info:
+            P2 = np.array(list(value[0].values()))
+            print(value[1])
+            print(cosine_similarity(P1, P2))
 
         # arousal, name of song, label, distance from nearest label
         # print([(value[0], key, value[2], value[3] ) for key, value in labeled_songs.items()])
-        showPlot(True)
-        return([(value[0], value[1], key ) for key, value in labeled_songs.items()])
+        showPlot(False)
+        # return([(value[0], value[1], key ) for key, value in labeled_songs.items()])
 
     else:
         print("File not found:", file_path)
