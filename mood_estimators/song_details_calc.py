@@ -6,7 +6,6 @@ import sys
 import matplotlib
 import matplotlib.pyplot as plt
 
-
 DIRECTORY = "Daeshaun"  # Ex: "Daeshaun"
 filename = (
     "R&B_track_details.json"  # "Lofi Anime Openings_track_details.json"
@@ -21,30 +20,6 @@ emotionVectors = {
     "intense": 0,
     "mild": 0,
 }
-
-# Compute Euclidean Distance in Python
-def calc_Euc_Distance(valence, arousal):
-    # `P1` is the vector with the song's valence and arousal 
-    P1 = np.array((valence, arousal))
-    # Set shortestDict to nearest vector to nothing
-    shortestDist = float("inf")
-    nearestVector = ""
-    # Check the Euclidean Distance from song to all labels
-    # Find the shortest distance
-    for emotion in emotionCords:
-        P2 = np.array(emotionCords[emotion])
-        temp = P1 - P2
-
-        euclid_dist = np.sqrt(np.dot(temp, temp))
-        # print(euclid_dist)
-
-        if euclid_dist < shortestDist:
-            shortestDist = euclid_dist
-            nearestVector = emotion
-
-    # print("Nearest emotion is ",  nearestVector, ". Distance: ",  shortestDist)
-    return (nearestVector, shortestDist)
-
 
 def process_data(df):
     # Process each DataFrame, `df.values` represent all rows in the csv file.
@@ -85,7 +60,10 @@ def scale_valence(valence):
 
 
 def calc_mood_from_details(name, track_id, vectors, tempo, valence, energy):
-
+    # Now check the valence level:
+    # A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track.
+    # Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric),
+    # while tracks with low valence sound more negative (e.g. sad, depressed, angry).
     vectors["happy"] += scale_valence(valence)
     vectors["sad"] -= scale_valence(valence)
     #
@@ -96,10 +74,6 @@ def calc_mood_from_details(name, track_id, vectors, tempo, valence, energy):
     vectors["mild"] -= scale_tempo(tempo)
     
     return(vectors, name, track_id)
-    # Now check the valence level:
-    # A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track.
-    # Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric),
-    # while tracks with low valence sound more negative (e.g. sad, depressed, angry).
 
 def cosine_similarity(vector1, vector2):
     dot_product = np.dot(vector1, vector2)
@@ -132,7 +106,6 @@ def main():
         for song in song_info:
             # print(song)
             pass
-
         
         P1 = np.array(list(song_info[0][0].values()))
 
@@ -141,10 +114,7 @@ def main():
             print(value[1])
             print(cosine_similarity(P1, P2))
 
-        # arousal, name of song, label, distance from nearest label
-        # print([(value[0], key, value[2], value[3] ) for key, value in labeled_songs.items()])
         showPlot(False)
-        # return([(value[0], value[1], key ) for key, value in labeled_songs.items()])
 
     else:
         print("File not found:", file_path)
