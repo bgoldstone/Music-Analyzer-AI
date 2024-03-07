@@ -91,7 +91,7 @@ def load_playlists(db: MongoClient) -> None:
             # Get track ids to put in playlist
             track_ids = []
             for track in tracks:
-                track_query = {"track_id": track["track_id"]}
+                track_query = {"spotify.track_id": track["track_id"]}
                 # Find or create track
                 mongo_track = db.tracks.find_one_and_update(
                     track_query,
@@ -126,12 +126,11 @@ def clean_track(track: dict) -> dict:
     del new_track["analysis"]["type"]
     del new_track["analysis"]["id"]
     # move track attributes to track field
-    new_track["track"] = {}
-    new_track["track"]["track_name"] = new_track["analysis"]["track_name"]
+    new_track["track_name"] = new_track["analysis"]["track_name"]
     del new_track["analysis"]["track_name"]
-    new_track["track"]["artist_name"] = new_track["analysis"]["artist_name"]
+    new_track["artist_name"] = new_track["analysis"]["artist_name"]
     del new_track["analysis"]["artist_name"]
-    new_track["track"]["album_name"] = new_track["analysis"]["album_name"]
+    new_track["album_name"] = new_track["analysis"]["album_name"]
     del new_track["analysis"]["album_name"]
     # move spotify_specific attributes to own field
     new_track["spotify"] = {}
