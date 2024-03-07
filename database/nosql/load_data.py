@@ -1,9 +1,6 @@
-import asyncio
 import dotenv
 from datetime import datetime
 import json
-from motor.motor_asyncio import AsyncIOMotorClient
-from motor.core import AgnosticClient
 import os
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
@@ -28,26 +25,6 @@ def get_db_connection() -> MongoClient | None:
     mongo_password = dotenv.dotenv_values().get("MONGO_PASSWORD")
     mongo_uri = f"mongodb+srv://{mongo_user}:{mongo_password}@{MONGO_URL}/"
     client = MongoClient(mongo_uri)
-    db = client.soundsmith
-    try:
-        db.command("ping")
-        print("Pinged your deployment. You successfully connected to MongoDB!")
-    except Exception as e:
-        print(e)
-        return
-    return db
-
-
-def get_async_db_connection() -> AgnosticClient | None:
-    """Creates and returns asyncronus db connection.
-    Returns:
-        MongoClient | None: MongoClient object, or None if connection fails.
-    """
-    dotenv.load_dotenv(os.path.join(__file__, ".env"))
-    mongo_user = dotenv.dotenv_values().get("MONGO_USER")
-    mongo_password = dotenv.dotenv_values().get("MONGO_PASSWORD")
-    mongo_uri = f"mongodb+srv://{mongo_user}:{mongo_password}@{MONGO_URL}/"
-    client = AsyncIOMotorClient(mongo_uri)
     db = client.soundsmith
     try:
         db.command("ping")
