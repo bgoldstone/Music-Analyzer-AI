@@ -27,7 +27,7 @@ def create_token(username: str) -> Dict[str, str]:
     return {"jwt": token}
 
 
-def decode_token(token: Dict[str, str]) -> dict:
+def decode_token(token: str) -> dict:
     """Decode a token.
     Args:
         token (Dict[str, str]): The token to decode.
@@ -35,19 +35,19 @@ def decode_token(token: Dict[str, str]) -> dict:
     Returns:
         dict: The decoded token.
     """
-    return jwt.decode(token["token"], JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
 
 
-def validate_token(token: Dict[str, str]) -> bool:
+def validate_token(token: str) -> bool:
     """Validate a token and return True if it is valid and not expired.
     Args:
-        token (Dict[str, str]): The token to validate.
+        token (str): The token to validate.
 
     Returns:
         bool: True if the token is valid and not expired, False otherwise.
     """
     try:
-        jwt = decode_token(token["token"])
+        jwt = decode_token(token)
         # if token is not expired, return true
         if jwt["expiration"] >= time.time():
             return True

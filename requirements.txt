@@ -13,3 +13,5 @@ PyJWT
 nltk
 pymongo
 matplotlib
+fastapi
+uvicorn

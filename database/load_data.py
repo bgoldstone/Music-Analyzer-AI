@@ -17,6 +17,7 @@ def main():
 
 def get_db_connection() -> MongoClient | None:
     """Creates and returns db connection.
+
     Returns:
         MongoClient | None: MongoClient object, or None if connection fails.
     """
