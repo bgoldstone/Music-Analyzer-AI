@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict
 from fastapi import APIRouter, Request, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 import sys
@@ -8,7 +8,6 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from database.crud import (
     create_playlist,
     delete_playlist,
-    get_playlist_by_name,
     get_playlist_with_tracks,
     update_playlist_by_id,
 )

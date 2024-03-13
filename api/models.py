@@ -7,21 +7,27 @@ from bson import ObjectId
 
 class User(BaseModel):
     id: str = Field(default_factory=ObjectId, alias="_id")
-    user_id: str
+    username: str
     time: datetime
 
     class Config:
         allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "username": "ObjectId('test')",
+                "time": datetime.now(),
+            }
+        }
 
 
 class UserUpdate(BaseModel):
-    user_id: Optional[str] = None
+    username: Optional[str] = None
 
 
 class Playlist(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: str = Field(default_factory=ObjectId, alias="_id")
     playlist_name: str
-    user_id: uuid.UUID
+    user_id: ObjectId
     time: datetime
     tracks: List[str]
 
@@ -30,9 +36,9 @@ class Playlist(BaseModel):
         schema_extra = {
             "example": {
                 "playlist_name": "test",
-                "user_id": "test",
+                "user_id": "ObjectId('test')",
                 "time": datetime.now(),
-                "tracks": ["test"],
+                "tracks": ["ObjectId('test')", "ObjectId('test2')"],
             }
         }
 

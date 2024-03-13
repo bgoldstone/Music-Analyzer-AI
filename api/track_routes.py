@@ -36,12 +36,12 @@ def get_track_by_id(track_id: str, request: Request) -> Dict:
     "/",
     response_description="Create a new track",
 )
-def create_new_track(track: Track, request: Request):
+def create_new_track(track: Track, request: Request) -> Dict:
     track = create_track(jsonable_encoder(track), request.app.database)
     if track is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Track could not be created",
+            detail="Track could not be created",
         )
     return {"track_id": track}
 
