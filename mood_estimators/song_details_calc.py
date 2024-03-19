@@ -1,78 +1,125 @@
 import pandas as pd
 import os
-# import os.path as paths
+import numpy as np
+import ijson
+import sys
+import matplotlib
+import matplotlib.pyplot as plt
 
-DIRECTORY = 'Daeshaun'  # Ex: "Daeshaun"
-filename = 'Anime_lofi_track_details.csv' # "Anime_lofi_track_details.csv"
-file_path = os.path.join('song_data', DIRECTORY, filename)
-# Uncomment next two lines to adjust pandas display options to show all columns and rows
-# pd.set_option('display.max_columns', None)
-# pd.set_option('display.max_rows', None)
+DIRECTORY = "Daeshaun"  # Ex: "Daeshaun"
+filename = (
+    "R&B_track_details.json"  # "Lofi Anime Openings_track_details.json"
+)
+file_path = os.path.join("song_data", DIRECTORY, filename)
 
-# Set of dictionaries
-all_songs = []
+song_info = []
 
-def process_dataframe(df):
-    # Process each DataFrame, for example, print its head
-    # for row in df.values:
-        # song_info = [ for name, track_href, tempo, valance in ]
-    # 19, 14, 10, 9
-    song_info = [calc_mood_from_details( row[19],row[14],row[10],row[9]) for row in df.values]
+emotionVectors = {
+    "happy": 0,
+    "sad": 0,
+    "intense": 0,
+    "mild": 0,
+}
 
-def calc_mood_from_details(name, track_href, tempo, valance):
-    emotions = {
-    "Happiness": 0,
-    "Suprise": 0,
-    "Sadness": 0,
+def process_data(df):
+    # Process each DataFrame, `df.values` represent all rows in the csv file.
+    # For loop is used to access each row of data in pandas dataframe
+    track_name = df["track_name"]
+    track_id = df["track_id"]
+    tempo = df["tempo"]
+    valence = df["valence"]
+    energy = df["energy"]
+
+    emotionVectors = {
+    "happy": 0,
+    "sad": 0,
+    "intense": 0,
+    "mild": 0,
     }
+
+    song_info.append(calc_mood_from_details(track_name, track_id, emotionVectors, float(tempo), float(valence), float(energy)))
+
+def scale_tempo(tempo):
+    # 70-90 bpm is the range where it is unclear that a song is happy or sad based on tempo
+    # Therefore, equation  output smaller values between that range
+    # Outliners(60bpm or 120bpm) have exponentially higher outputs
+    return 0.0004 * (tempo - 90) ** 3
+
+
+def scale_energy(energy):
+    # 0.40 - 0.60 energy level is the range where it is unclear that a song is happy or sad
+    # Therefore, equation  output smaller values between that range
+    # Outliners(0.10 or 0.9) have exponentially higher outputs
+    return (5 * (energy - 0.50) ** 3) * 40
+
+def scale_valence(valence):
+    # 0.40 - 0.60 energy level is the range where it is unclear that a song is happy or sad
+    # Therefore, equation  output smaller values between that range
+    # Outliners(0.10 or 0.9) have exponentially higher outputs
+    return (5 * (valence - 0.50) ** 3) * 40
+
+
+def calc_mood_from_details(name, track_id, vectors, tempo, valence, energy):
+    # Now check the valence level:
+    # A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track.
+    # Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric),
+    # while tracks with low valence sound more negative (e.g. sad, depressed, angry).
+    vectors["happy"] += scale_valence(valence)
+    vectors["sad"] -= scale_valence(valence)
+    #
+    vectors["intense"] += scale_energy(energy) 
+    vectors["mild"] -= scale_energy(energy) 
+    #
+    vectors["intense"] += scale_tempo(tempo) 
+    vectors["mild"] -= scale_tempo(tempo)
     
-    feelings = {
-    "Tension": 0,
-    "Expressiveness": 0,
-    "Amusement": 0,
-    "Attractiveness": 0,
-    }
+    return(vectors, name, track_id)
 
-    if (tempo > 120):
-        emotions["Happiness"] += 5
-        emotions["Suprise"] += 5
-        emotions["Sadness"] -= 5
-        feelings["Tension"] += 5
-        feelings["Expressiveness"] += 4
+def cosine_similarity(vector1, vector2):
+    dot_product = np.dot(vector1, vector2)
+    magnitude_vector1 = np.linalg.norm(vector1)
+    magnitude_vector2 = np.linalg.norm(vector2)
+    return dot_product / (magnitude_vector1 * magnitude_vector2)
 
-    elif (tempo >= 90 and tempo <= 120):
-        emotions["Happiness"] += 3
-        emotions["Suprise"] += 3
-        emotions["Sadness"] -= 3
-        feelings["Tension"] += 3
-        feelings["Expressiveness"] += 2
+def showPlot(show_plot):
+    if show_plot:
+        x_points = np.array([ x[0] for x in song_info])
+        y_points = np.array([ y[1] for y in song_info])
+        # print(y_points)
+        plt.scatter(x_points, y_points)
+        plt.show()
+        #Two  lines to make our compiler able to draw:
+        plt.savefig(sys.stdout.buffer)
+        sys.stdout.flush()
 
-    elif (tempo < 90 and tempo > 60):
-        emotions["Happiness"] -= 3
-        emotions["Suprise"] += 2
-        emotions["Sadness"] += 3
-        feelings["Tension"] += 2
-        feelings["Expressiveness"] += 1
+def main():
+    # Get the data(audio features from spotify) from the json
+    if os.path.exists(file_path):
+        # Open the JSON file
+        with open(file_path, "r") as file:
+            # Parse the JSON objects one by one
+            parser = ijson.items(file, "item")
 
-    # print(name, feelings)
-    if (valance > .5):
-        if (max(emotions, key=emotions.get) == "Happiness"):
-            print(name + ": Expressive")
-        else:
-            print(name + "Relaxing")
+            # Iterate over the JSON objects
+            for item in parser:
+                process_data(item)
+        for song in song_info:
+            # print(song)
+            pass
+        
+        P1 = np.array(list(song_info[0][0].values()))
+
+        for value in song_info:
+            P2 = np.array(list(value[0].values()))
+            print(value[1])
+            print(cosine_similarity(P1, P2))
+
+        showPlot(False)
+
     else:
-        if (max(emotions, key=emotions.get) == "Happiness"):
-            print(name + ": Stressing")
-        else:
-            print(name + "Boring")
+        print("File not found:", file_path)
+        return 0
 
 
-if os.path.exists(file_path):
-    def read_csv(file_name):
-        for chunk in pd.read_csv(file_name, chunksize=10000):
-            yield chunk
-
-    for df in read_csv(file_path):
-        process_dataframe(df)
-else:
-    print("File not found:", file_path)
+if __name__ == "__main__":
+    main()

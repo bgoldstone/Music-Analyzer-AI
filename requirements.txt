@@ -7,3 +7,10 @@ ipython
 ipykernel
 SQLAlchemy
 beautifulsoup4
+bcrypt
+PyJWT
+nltk
+pymongo
+matplotlib
+fastapi
+uvicorn

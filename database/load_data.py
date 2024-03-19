@@ -1,138 +1,125 @@
-import csv
-from io import TextIOWrapper
+import dotenv
+from datetime import datetime
+import json
 import os
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
-from database.models import Playlist, Track, TrackDetails
-from dml import create_track, create_track_details, create_playlist, get_playlist_by_name, get_track_by_id, get_track_details_by_track_id, is_track_in_playlist
+from pymongo import MongoClient
 
-
-DB_NAME: str = 'project_sound.db'
-
-SONG_DATA_DIRECTORY: str = os.path.join(os.getcwd(), 'song_data')
+MONGO_URL = "soundsmith.x5y65kb.mongodb.net"
+SONG_DATA_DIRECTORY = "song_data"
+SONG_DATA_DIRECTORY_PATH = os.path.join(os.getcwd(), SONG_DATA_DIRECTORY)
 
 
 def main():
-
-    session = get_db_connection()
-    load_playlist_track_details(session)
-    close_db_connection(session)
+    client = get_db_connection()
+    load_playlists(client)
 
 
-def get_db_connection() -> sessionmaker[Session]:
+def get_db_connection() -> MongoClient | None:
     """Creates and returns db connection.
 
     Returns:
-        sessionmaker[Session]: Session object
+        MongoClient | None: MongoClient object, or None if connection fails.
     """
-    engine = create_engine(f'sqlite:///{DB_NAME}')
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    return session
-
-
-def close_db_connection(session: sessionmaker[Session]):
-    """Closes the database connection
-
-    Args:
-        session (sessionmaker[Session]): Session object
-    """
-    session.close()
-
-
-def load_playlist_track_details(session: Session):
-    """Loads the song data into the database.
-    Args:
-        session (Session): Session Object.
-    """
-    # for each folder in the song_data directory
-    for folder in os.listdir(SONG_DATA_DIRECTORY):
-        # for each playlist in the folder
-        for playlist in os.listdir(SONG_DATA_DIRECTORY + '/' + folder):
-            playlist_file = open(
-                f'{SONG_DATA_DIRECTORY}/{folder}/{playlist}', 'r', encoding="utf-8")
-
-            # if playlist file
-            if playlist.endswith("_ids.csv"):
-                # generate playlist name
-                playlist_name = playlist.replace(
-                    "_ids.csv", "").replace("_", " ")
-                read_playlist(session, playlist_file, playlist_name)
-
-            # else song details
-            else:
-                read_track_details(session, playlist_file)
-
-
-def read_playlist(session: Session, file: TextIOWrapper, playlist_name: str):
-    """Reads a playlist file and creates a playlist object if it does not already exist.
-    Args:
-        session (Session): Session Object.
-        file (TextIOWrapper): Playlist File.
-        playlist_name (str): Playlist Name.
-    """
-    # Read CSV file as a dictionary.
-    playlist = csv.DictReader(file, delimiter=',')
-    # Create a new Playlist object.
-    playlist_obj = Playlist()
-    # Set Playlist attributes.
-    playlist_obj.name = playlist_name
-    playlist_obj.tracks = []
-
-    # Check if playlist exists
-    search_for_playlist = get_playlist_by_name(session, playlist_name)
-    if search_for_playlist != None:
+    dotenv.load_dotenv(os.path.join(__file__, ".env"))
+    mongo_user = dotenv.dotenv_values().get("MONGO_USER")
+    mongo_password = dotenv.dotenv_values().get("MONGO_PASSWORD")
+    mongo_uri = f"mongodb+srv://{mongo_user}:{mongo_password}@{MONGO_URL}/"
+    client = MongoClient(mongo_uri)
+    db = client.soundsmith
+    try:
+        db.command("ping")
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
         return
-    for item in playlist:
-        # Check if track exists
-        track = get_track_by_id(session, item['track_id'])
-
-        # if track already in playlist, skip
-        if is_track_in_playlist(session, search_for_playlist.id, track.id):
-            continue
-        if track == None:
-            track = Track()
-            track.spotify_id = item['track_id']
-            track.name = item['track_name']
-            track.artist = item['artist_name']
-            track.album = item['album_name']
-            create_track(session, track)
-        # add track to playlist
-        playlist_obj.tracks.append(track)
-
-    create_playlist(session, playlist_obj)
+    return db
 
 
-def read_track_details(session: Session, file: TextIOWrapper):
-    """Reads a track details file and creates a track details object if it does not already exist.
+def load_playlists(db: MongoClient) -> None:
+    # for each user
+    for user_folder in os.listdir(SONG_DATA_DIRECTORY_PATH):
+        user_query = {"username": user_folder}
+        # Find or create user
+        mongo_user = db["users"].find_one_and_update(
+            user_query,
+            {"$set": {"username": user_folder, "time": datetime.now()}},
+            upsert=True,
+            return_document=True,
+        )
+
+        # For each playlist
+        for playlist_file in os.listdir(
+            os.path.join(SONG_DATA_DIRECTORY_PATH, user_folder)
+        ):
+            # if not track_details file, skip it.
+            if not playlist_file.endswith("_track_details.json"):
+                continue
+            # Get playlist name
+            playlist_name = playlist_file.replace("_track_details.json", "")
+            # Get tracks
+            with open(
+                os.path.join(SONG_DATA_DIRECTORY_PATH, user_folder, playlist_file), "r"
+            ) as f:
+                tracks = json.load(f)
+            playlist_query = {
+                "playlist_name": playlist_name,
+                "user_id": mongo_user.get("_id"),
+            }
+            # Get track ids to put in playlist
+            track_ids = []
+            for track in tracks:
+                track_query = {"spotify.track_id": track["track_id"]}
+                # Find or create track
+                mongo_track = db.tracks.find_one_and_update(
+                    track_query,
+                    {"$set": clean_track(track)},
+                    upsert=True,
+                    return_document=True,
+                )
+                track_ids.append(mongo_track.get("_id"))
+            # Update playlist
+            db.playlists.update_one(
+                playlist_query,
+                {"$set": {"tracks": track_ids, "time": datetime.now()}},
+                upsert=True,
+            )
+
+
+def clean_track(track: dict) -> dict:
+    """
+    Function to clean up the given track dictionary by reorganizing and removing unnecessary fields.
+    Takes a dictionary representing a track and returns a new cleaned-up dictionary.
 
     Args:
-        session (Session): Session Object.
-        file (TextIOWrapper): Track Details File.
+        track (dict): A dictionary representing a track.
+
+    Returns:
+        dict: A cleaned-up dictionary representing a track.
     """
-    track_details = csv.DictReader(file, delimiter=',')
+    new_track = {}
+    # Move analsis to separate field
+    new_track["analysis"] = track
+    # Remove unnecessary fields
+    del new_track["analysis"]["type"]
+    del new_track["analysis"]["id"]
+    # move track attributes to track field
+    new_track["track_name"] = new_track["analysis"]["track_name"]
+    del new_track["analysis"]["track_name"]
+    new_track["artist_name"] = new_track["analysis"]["artist_name"]
+    del new_track["analysis"]["artist_name"]
+    new_track["album_name"] = new_track["analysis"]["album_name"]
+    del new_track["analysis"]["album_name"]
+    # move spotify_specific attributes to own field
+    new_track["spotify"] = {}
+    new_track["spotify"]["track_id"] = new_track["analysis"]["track_id"]
+    del new_track["analysis"]["track_id"]
+    new_track["spotify"]["uri"] = new_track["analysis"]["uri"]
+    del new_track["analysis"]["uri"]
+    new_track["spotify"]["track_href"] = new_track["analysis"]["track_href"]
+    del new_track["analysis"]["track_href"]
 
-    for item in track_details:
-        track = get_track_details_by_track_id(session, item['track_id'])
-        if track == None:
-            track_detail = TrackDetails()
-            track_detail.spotify_track_id = item['track_id']
-            track_detail.acousticness = float(item['acousticness'])
-            track_detail.danceability = float(item['danceability'])
-            track_detail.duration = int(item['duration_ms'])
-            track_detail.energy = item['energy']
-            track_detail.instrumentalness = float(item['instrumentalness'])
-            track_detail.key = int(item['key'])
-            track_detail.liveness = float(item['liveness'])
-            track_detail.loudness = float(item['loudness'])
-            track_detail.mode = int(item['mode'])
-            track_detail.speechiness = float(item['speechiness'])
-            track_detail.tempo = float(item['tempo'])
-            track_detail.time_signature = int(item['time_signature'])
-            track_detail.valence = float(item['valence'])
-
-            create_track_details(session, track_detail)
+    return new_track
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
