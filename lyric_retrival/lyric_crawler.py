@@ -90,7 +90,7 @@ def grab_songs_from_csv() -> dict[str]:
     # key is artist
     # value is list of songs
     songs_dict ={}
-
+    
     # for each key
     for user in csv_files:
         # for each item in value list
@@ -105,19 +105,22 @@ def grab_songs_from_csv() -> dict[str]:
                 for row in reader:
                     # skips empty rows and first row
                     if(row != [])and(not first):
-                        artist = clean_text(row[2])
-                        song_title = clean_text(row[1])
+                        artist = row[2]
+                        song_title = row[1]
+                        artist_link = clean_text(row[2])
+                        song_title_link = clean_text(row[1])
 
-                        #print(song_title)
-                        if artist not in songs_dict:
-                            # set() to disregard duplicates
-                            songs_dict[artist] = set([song_title])
-                        else:
-                            songs_dict[artist].add(song_title)
-                    first = False
+                        key = (artist, artist_link)
+                        value = (song_title, song_title_link)
+
+                        if key not in songs_dict:
+                            songs_dict[key] = set()
+                        
+                        songs_dict[key].add(value)
+
+                    first = False  
     return songs_dict
 
-# creates links to parse, from azlyrics.com
 def create_links(songs_dict: dict,) -> set[str]:
     """
     Creates a set of URLs for lyrics based on a dictionary of songs and artists.
@@ -141,51 +144,60 @@ def create_links(songs_dict: dict,) -> set[str]:
     # initialize empty set to store URLs
     links = set()
 
-    for artist, songs in songs_dict.items():
-        for song in songs:
+    for artist_tuple, songs_set in songs_dict.items():
+        artist, artist_link = artist_tuple
+        for song_tuple in songs_set:
             # create links and too set
-            url = start_url + artist + '/' + song + '.html'
-            links.add(url)
-    
+            song_title, song_title_link = song_tuple
+
+            # creates url to grab lyrics from
+            url = start_url + artist_link + '/' + song_title_link + '.html'
+            
+            # tuple with all song information
+            song_info = (url,artist,song_title)
+
+            links.add(song_info)
     return links
 
 def store_lyrics(links: set):
     """
-    Retrieves lyrics from a set of links and stores them in a JSON file.
+    Retrieves lyrics from a set of links and stores them in a JSON file along with artist and song information.
 
     Args:
-        links (set): A set of URLs containing links to azlyrics.com.
+        links (set): A set of tuples containing (URL, artist, song_title).
 
     Returns:
         None
 
     Comments:
-        This function iterates over the provided set of links, retrieving lyrics from each link and storing them in a JSON file.
-        It limits the number of links processed to a maximum of MAX_LINKS to avoid overloading the system.
-        The function keeps track of the number of valid and invalid links processed.
-        It utilizes BeautifulSoup to parse the HTML content of each link and extract the lyrics.
-        The lyrics are stored in a dictionary where the link serves as the key and the lyrics as the value.
-        Finally, the lyrics dictionary is converted to JSON format and saved to a file named 'lyrics.json'.
+        This function iterates through a set of links, each containing a tuple (URL, artist, song_title).
+        It retrieves the lyrics from each URL and stores them along with the artist and song title in a dictionary.
+        The lyrics, artist, and song title are then stored in a JSON file named 'lyrics.json'.
+        The function limits the number of links processed to a maximum of MAX_LINKS to avoid overloading the system.
+        It keeps track of the number of valid and invalid links processed.
+        BeautifulSoup is used to parse the HTML content of each link and extract the lyrics.
     """
-
     global valid_links
     global invalid_links
     global total_links
     
-    MAX_LINKS = 5
+    MAX_LINKS = 20
     already_parsed = []
     lyrics_dict = {}
 
     i = 0
-    for link in links:
+    for song_tuple in links:
         if(i<MAX_LINKS):
             total_links += 1
+
+            link, artist, song_title = song_tuple
+
             try:
-                time.sleep(3)
+                time.sleep(1)
                 response = requests.get(link)
 
                 if(response.status_code == 200): #if response was successful
-                    print('valid:',link)
+                    #print('valid:',link)
                     valid_links += 1
                     soup = BeautifulSoup(response.content, 'html.parser')
                     
@@ -196,24 +208,29 @@ def store_lyrics(links: set):
                     lyrics_div = br2.find_next_sibling('div')
 
                     if lyrics_div:
-                        # extract lyrics and store them in database
+                        # extract lyrics
                         lyrics_text = lyrics_div.text.strip()
-                        lyrics_dict[link] = lyrics_text
-                        print(lyrics_text)
+
+                        # store data in lyrics_dict
+                        lyrics_dict[link] = {
+                            'artist': artist,
+                            'song_title': song_title,
+                            'lyrics': lyrics_text
+                        }
 
                     already_parsed.append(response)
                 else:
-                    print('invalid:',link)
+                    #print('invalid:',link)
                     invalid_links += 1
 
             except Exception as e:
-                pass
+                print("Error:",e)
             i += 1
         else:
             break
     
     # stores lyrics_dict in json file
-    json_object = json.dumps(lyrics_dict, indent=1)
+    json_object = json.dumps(lyrics_dict, indent=2)
 
     with open("lyric_retrival\\lyrics.json", "w") as outfile:
         outfile.write(json_object)
