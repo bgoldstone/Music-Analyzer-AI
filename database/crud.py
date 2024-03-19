@@ -1,12 +1,15 @@
 from datetime import datetime
 from typing import Dict, List, Optional
-from load_data import get_async_db_connection, get_db_connection
+import sys
+import pathlib
+
+from pymongo import MongoClient
+
+sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from auth import hasher
 
-db = get_db_connection()
 
-
-def get_user(username: str) -> str | None:
+def get_user(username: str, db: MongoClient) -> str | None:
     """Get user from database from username asyncrously
 
     Args:
@@ -15,10 +18,10 @@ def get_user(username: str) -> str | None:
     Returns:
         str: User ID
     """
-    return db["users"].find_one({"username": username}).get("_id")
+    return db["users"].find_one({"username": username})
 
 
-def create_user(username: str, password: str) -> str:
+def create_user(username: str, password: str, db: MongoClient) -> str:
     """Create user in database
 
     Args:
@@ -34,7 +37,10 @@ def create_user(username: str, password: str) -> str:
 
 
 def update_user(
-    user_id: str, username: Optional[str] = None, password: Optional[str] = None
+    user_id: str,
+    db: MongoClient,
+    username: Optional[str] = None,
+    password: Optional[str] = None,
 ) -> None:
     """Update user in database
 
@@ -69,7 +75,7 @@ def update_user(
     )
 
 
-def delete_user(username: str) -> None:
+def delete_user(username: str, db: MongoClient) -> None:
     """Delete user in database
 
     Args:
@@ -79,7 +85,9 @@ def delete_user(username: str) -> None:
     db["users"].delete_one({"username": username})
 
 
-def get_playlist_by_name(playlist_name: str, user_id: str) -> Dict | None:
+def get_playlist_by_name(
+    playlist_name: str, db: MongoClient, user_id: Optional[str] = None
+) -> Dict | None:
     """Searches database for Playlist with Playlist Name.
 
     Args:
@@ -89,12 +97,14 @@ def get_playlist_by_name(playlist_name: str, user_id: str) -> Dict | None:
     Returns:
         Dict: Playlist Object or None if not found.
     """
+    if user_id is None:
+        return db["playlists"].find_one({"playlist_name": playlist_name})
     return db["playlists"].find_one(
         {"playlist_name": playlist_name, "user_id": user_id}
     )
 
 
-def get_playlist_by_id(playlist_id: str) -> Dict | None:
+def get_playlist_by_id(playlist_id: str, db: MongoClient) -> Dict | None:
     """Searches database for Playlist with Playlist ID.
 
     Args:
@@ -106,7 +116,9 @@ def get_playlist_by_id(playlist_id: str) -> Dict | None:
     return db["playlists"].find_one({"_id": playlist_id})
 
 
-def create_playlist(user_id: str, playlist_name: str, tracks: List[str]) -> str:
+def create_playlist(
+    user_id: str, playlist_name: str, tracks: List[str], db: MongoClient
+) -> str:
     """Create playlist in database
 
     Args:
@@ -122,7 +134,7 @@ def create_playlist(user_id: str, playlist_name: str, tracks: List[str]) -> str:
     return db["playlists"].insert_one(playlist).inserted_id
 
 
-def delete_playlist(playlist_id: str) -> None:
+def delete_playlist(playlist_id: str, db: MongoClient) -> None:
     """Deletes Playlist from the database.
 
     Args:
@@ -133,6 +145,7 @@ def delete_playlist(playlist_id: str) -> None:
 
 def update_playlist_by_id(
     playlist_id: str,
+    db: MongoClient,
     playlist_name: Optional[str] = None,
     tracks: Optional[List[str]] = None,
 ) -> None:
@@ -170,7 +183,7 @@ def update_playlist_by_id(
     )
 
 
-def get_track_by_id(track_id: str) -> Dict | None:
+def get_track(track_id: str, db: MongoClient) -> Dict | None:
     """Searches database for Track with Track ID.
 
     Args:
@@ -182,7 +195,9 @@ def get_track_by_id(track_id: str) -> Dict | None:
     return db["tracks"].find_one({"_id": track_id})
 
 
-def get_track_by_name_artist(track_name: str, artist_name: str) -> Dict | None:
+def get_track_by_name_artist(
+    track_name: str, artist_name: str, db: MongoClient
+) -> Dict | None:
     """Searches database for Track with Track Name and Artist Name.
 
     Args:
@@ -197,7 +212,7 @@ def get_track_by_name_artist(track_name: str, artist_name: str) -> Dict | None:
     )
 
 
-def create_track(track: Dict[str, str]) -> str:
+def create_track(track: Dict[str, str], db: MongoClient) -> str:
     """Creates Track in the database
 
     Args:
@@ -210,7 +225,7 @@ def create_track(track: Dict[str, str]) -> str:
     return db["tracks"].insert_one(track).inserted_id
 
 
-def update_track(track_id: str, track: Dict[str, str]) -> None:
+def update_track(track_id: str, track: Dict[str, str], db: MongoClient) -> None:
     """Updates Track in the database
 
     Args:
@@ -220,7 +235,7 @@ def update_track(track_id: str, track: Dict[str, str]) -> None:
     db["tracks"].update_one({"_id": track_id}, {"$set": track, "time": datetime.now()})
 
 
-def delete_track(track_id: str) -> None:
+def delete_track(track_id: str, db: MongoClient) -> None:
     """Deletes Track from the database
 
     Args:
@@ -232,7 +247,7 @@ def delete_track(track_id: str) -> None:
 # aggregations
 
 
-def get_playlist_with_tracks(playlist_name: str) -> Dict | None:
+def get_playlist_with_tracks(playlist_name: str, db: MongoClient) -> Dict | None:
     """Searches database for Playlist with Playlist Name.
 
     Args:
@@ -245,16 +260,43 @@ def get_playlist_with_tracks(playlist_name: str) -> Dict | None:
         db["playlists"]
         .aggregate(
             [
-                {"$match": {"playlist_name": "songs-for-events"}},
+                {"$match": {"playlist_name": f"{playlist_name}"}},
                 {
                     "$lookup": {
                         "from": "tracks",
                         "localField": "tracks",
                         "foreignField": "_id",
-                        "as": "tracks",
+                        "as": "linkedTracks",
                     }
                 },
-                {"$project": {"tracks.track": 1, "user_id": 1, "playlist_name": 1}},
+                {
+                    "$set": {
+                        "tracks": {
+                            "$map": {
+                                "input": "$tracks",
+                                "as": "t",
+                                "in": {
+                                    "$first": {
+                                        "$filter": {
+                                            "input": "$linkedTracks",
+                                            "cond": {"$eq": ["$$t", "$$this._id"]},
+                                        }
+                                    }
+                                },
+                            }
+                        }
+                    }
+                },
+                {
+                    "$project": {
+                        "tracks.track_name": 1,
+                        "tracks.artist_name": 1,
+                        "tracks.album_name": 1,
+                        "tracks.spotify": 1,
+                        "user_id": 1,
+                        "playlist_name": 1,
+                    }
+                },
             ]
         )
         .next()

@@ -3,7 +3,6 @@ from datetime import datetime
 import json
 import os
 from pymongo import MongoClient
-from pymongo.server_api import ServerApi
 
 MONGO_URL = "soundsmith.x5y65kb.mongodb.net"
 SONG_DATA_DIRECTORY = "song_data"
@@ -17,6 +16,7 @@ def main():
 
 def get_db_connection() -> MongoClient | None:
     """Creates and returns db connection.
+
     Returns:
         MongoClient | None: MongoClient object, or None if connection fails.
     """

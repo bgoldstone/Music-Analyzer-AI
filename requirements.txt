@@ -5,7 +5,6 @@ pandas
 torch
 ipython
 ipykernel
-pandas
 SQLAlchemy
 beautifulsoup4
 bcrypt
@@ -13,3 +12,5 @@ PyJWT
 nltk
 pymongo
 matplotlib
+fastapi
+uvicorn

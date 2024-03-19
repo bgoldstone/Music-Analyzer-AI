@@ -13,7 +13,7 @@ def hash_password(password: str) -> bytes:
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
 
 
-def verify_password(password: str, hashed_password: bytes) -> bool:
+def verify_password(password: str, db_password: str) -> bool:
     """Verifies a password using bcrypt.
 
     Args:
@@ -23,4 +23,5 @@ def verify_password(password: str, hashed_password: bytes) -> bool:
     Returns:
         bool: True if the password is correct, False otherwise.
     """
-    return bcrypt.checkpw(password.encode(), hashed_password)
+    db_password = bytes(db_password, "utf-8")
+    return bcrypt.checkpw(password.encode(), db_password)
