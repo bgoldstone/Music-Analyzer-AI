@@ -29,14 +29,19 @@ def process_data(df):
     tempo = df["tempo"]
     valence = df["valence"]
     energy = df["energy"]
+    danceability = df["danceability"]
 
     emotionVectors = {
     "happy": 0,
     "sad": 0,
     "intense": 0,
     "mild": 0,
+    "danceability": 0,
     }
 
+    # Set danceabiltity
+    
+    # Calculate vectors based on song properties
     song_info.append(calc_mood_from_details(track_name, track_id, emotionVectors, float(tempo), float(valence), float(energy)))
 
 def scale_tempo(tempo):
@@ -72,7 +77,8 @@ def calc_mood_from_details(name, track_id, vectors, tempo, valence, energy):
     #
     vectors["intense"] += scale_tempo(tempo) 
     vectors["mild"] -= scale_tempo(tempo)
-    
+    # set Github
+    # vectors["danceability"] += 
     return(vectors, name, track_id)
 
 def cosine_similarity(vector1, vector2):
