@@ -14,13 +14,6 @@ file_path = os.path.join("song_data", DIRECTORY, filename)
 
 song_info = []
 
-emotionVectors = {
-    "happy": 0,
-    "sad": 0,
-    "intense": 0,
-    "mild": 0,
-}
-
 def process_data(df):
     # Process each DataFrame, `df.values` represent all rows in the csv file.
     # For loop is used to access each row of data in pandas dataframe
@@ -36,11 +29,11 @@ def process_data(df):
     "sad": 0,
     "intense": 0,
     "mild": 0,
-    "danceability": 0,
+    # "danceability": 0,
     }
 
     # Set danceabiltity
-    
+    # emotionVectors["danceability"] = danceability
     # Calculate vectors based on song properties
     song_info.append(calc_mood_from_details(track_name, track_id, emotionVectors, float(tempo), float(valence), float(energy)))
 
@@ -77,8 +70,6 @@ def calc_mood_from_details(name, track_id, vectors, tempo, valence, energy):
     #
     vectors["intense"] += scale_tempo(tempo) 
     vectors["mild"] -= scale_tempo(tempo)
-    # set Github
-    # vectors["danceability"] += 
     return(vectors, name, track_id)
 
 def cosine_similarity(vector1, vector2):
@@ -87,16 +78,6 @@ def cosine_similarity(vector1, vector2):
     magnitude_vector2 = np.linalg.norm(vector2)
     return dot_product / (magnitude_vector1 * magnitude_vector2)
 
-def showPlot(show_plot):
-    if show_plot:
-        x_points = np.array([ x[0] for x in song_info])
-        y_points = np.array([ y[1] for y in song_info])
-        # print(y_points)
-        plt.scatter(x_points, y_points)
-        plt.show()
-        #Two  lines to make our compiler able to draw:
-        plt.savefig(sys.stdout.buffer)
-        sys.stdout.flush()
 
 def main():
     # Get the data(audio features from spotify) from the json
@@ -117,10 +98,8 @@ def main():
 
         for value in song_info:
             P2 = np.array(list(value[0].values()))
-            print(value[1])
+            print(value[1], end=": ")
             print(cosine_similarity(P1, P2))
-
-        showPlot(False)
 
     else:
         print("File not found:", file_path)
