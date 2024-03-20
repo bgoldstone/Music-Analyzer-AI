@@ -181,7 +181,7 @@ def store_lyrics(links: set):
     global invalid_links
     global total_links
     
-    MAX_LINKS = 20
+    MAX_LINKS = 25
     already_parsed = []
     lyrics_dict = {}
 
@@ -209,7 +209,9 @@ def store_lyrics(links: set):
 
                     if lyrics_div:
                         # extract lyrics
-                        lyrics_text = lyrics_div.text.strip()
+                        lyrics_text_with_breaks = lyrics_div.text.strip()
+
+                        lyrics_text = re.sub(r'\n', ' ', lyrics_text_with_breaks)
 
                         # store data in lyrics_dict
                         lyrics_dict[link] = {
