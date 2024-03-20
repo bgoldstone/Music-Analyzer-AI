@@ -29,11 +29,11 @@ def process_data(df):
     "sad": 0,
     "intense": 0,
     "mild": 0,
-    # "danceability": 0,
+    "danceability": 0,
     }
 
     # Set danceabiltity
-    # emotionVectors["danceability"] = danceability
+    emotionVectors["danceability"] = int(danceability)
     # Calculate vectors based on song properties
     song_info.append(calc_mood_from_details(track_name, track_id, emotionVectors, float(tempo), float(valence), float(energy)))
 
