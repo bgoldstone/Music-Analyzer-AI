@@ -211,7 +211,7 @@ def store_lyrics(links: set):
                         # extract lyrics
                         lyrics_text_with_breaks = lyrics_div.text.strip()
 
-                        lyrics_text = re.sub(r'\n', '', lyrics_text_with_breaks)
+                        lyrics_text = re.sub(r'\n', ' ', lyrics_text_with_breaks)
 
                         # store data in lyrics_dict
                         lyrics_dict[link] = {
