@@ -8,15 +8,17 @@ import matplotlib.pyplot as plt
 
 DIRECTORY = "Daeshaun"  # Ex: "Daeshaun"
 filename = (
-    "R&B_track_details.json"  # "Lofi Anime Openings_track_details.json"
+    "Sad_Songs_track_details.json"  # "Lofi_Anime_Openings_track_details.json"
 )
 file_path = os.path.join("song_data", DIRECTORY, filename)
 
 song_info = []
+stand_vect = [({'happy': 19.722225599999994, 'sad': -19.722225599999994, 'intense': 143.98899992674365, 'mild': -143.98899992674365, 'danceability': 0.647}, 'Happy - From "Despicable Me 2"', '60nZcImufyMA1MKQY3dcCH'), ({'happy': 0.029775400000000077, 'sad': -0.029775400000000077, 'intense': 14.442369133635204, 'mild': -14.442369133635204, 'danceability': 0.695}, 'Circles', '21jGcNKet2qwijlDFuPiPb'), ({'happy': -7.451940799999999, 'sad': 7.451940799999999, 'intense': -1.0585302068395999, 'mild': 1.0585302068395999, 'danceability': 0.467}, 'Everybody Hurts', '6PypGyiu0Y2lCDBN1XZEnP'), ({'happy': -5.006553600000000017, 'sad': 5.006553600000000017, 'intense': 10.637991392150001, 'mild': -10.637991392150001, 'danceability': 0.447}, 'Unholy Confessions', '78XFPcFYN8YFOHjtVwnPsl')]
+
 
 def process_data(df):
-    # Process each DataFrame, `df.values` represent all rows in the csv file.
-    # For loop is used to access each row of data in pandas dataframe
+    # Process each DataFrame. `df` is a dictionary of the song's properties. Ex: {"danceability": 0.647, "energy": 0.822,..."album_name": "G I R L"}.
+    # For loop is used to access dict key and value
     track_name = df["track_name"]
     track_id = df["track_id"]
     tempo = df["tempo"]
@@ -33,9 +35,9 @@ def process_data(df):
     }
 
     # Set danceabiltity
-    emotionVectors["danceability"] = int(danceability)
+    emotionVectors["danceability"] = float(danceability)
     # Calculate vectors based on song properties
-    song_info.append(calc_mood_from_details(track_name, track_id, emotionVectors, float(tempo), float(valence), float(energy)))
+    song_info.append(calc_mood_from_details(float(tempo), float(valence), float(energy), track_name, track_id, emotionVectors))
 
 def scale_tempo(tempo):
     # 70-90 bpm is the range where it is unclear that a song is happy or sad based on tempo
@@ -57,7 +59,7 @@ def scale_valence(valence):
     return (5 * (valence - 0.50) ** 3) * 40
 
 
-def calc_mood_from_details(name, track_id, vectors, tempo, valence, energy):
+def calc_mood_from_details(tempo, valence, energy, name, track_id, vectors):
     # Now check the valence level:
     # A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track.
     # Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric),
@@ -78,7 +80,6 @@ def cosine_similarity(vector1, vector2):
     magnitude_vector2 = np.linalg.norm(vector2)
     return dot_product / (magnitude_vector1 * magnitude_vector2)
 
-
 def main():
     # Get the data(audio features from spotify) from the json
     if os.path.exists(file_path):
@@ -90,16 +91,18 @@ def main():
             # Iterate over the JSON objects
             for item in parser:
                 process_data(item)
-        for song in song_info:
-            # print(song)
-            pass
-        
-        P1 = np.array(list(song_info[0][0].values()))
+        # for song in song_info:
+        #     print(song)
+        #     pass
 
-        for value in song_info:
-            P2 = np.array(list(value[0].values()))
-            print(value[1], end=": ")
-            print(cosine_similarity(P1, P2))
+        for song in song_info:
+            print(f"Song name: {song[1]}")
+            P1 = np.array(list(song[0].values()))
+            
+            for value in stand_vect:
+                P2 = np.array(list(value[0].values()))
+                print(value[1], end=": ")
+                print(cosine_similarity(P1, P2))
 
     else:
         print("File not found:", file_path)
