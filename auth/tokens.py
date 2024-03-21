@@ -13,16 +13,16 @@ DAY = HOUR * 24
 TOKEN_EXPIRATION = DAY
 
 
-def create_token(username: str) -> Dict[str, str]:
-    """Create a new token from the given username
+def create_token(token: str) -> Dict[str, str]:
+    """Create a new token from the given token
 
     Args:
-        username (str): Username of the user.
+        token (str): token of the user.
 
     Returns:
         Dict[str,str]: A dictionary containing the token
     """
-    contents = {"username": username, "expiration": int(time.time()) + DAY}
+    contents = {"username": token, "expiration": int(time.time()) + DAY}
     token = jwt.encode(contents, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return {"jwt": token}
 
