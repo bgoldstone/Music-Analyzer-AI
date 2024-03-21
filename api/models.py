@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Dict, List, Optional
+from bson import ObjectId
 from pydantic import BaseModel, Field
 import uuid
 
@@ -7,13 +8,13 @@ import uuid
 class User(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     username: str
-    time: datetime
+    time: Optional[datetime]
 
     class Config:
         populate_by_name = True
         jscon_schema_extra = {
             "example": {
-                "username": "ObjectId('test')",
+                "username": "john doe",
                 "time": datetime.now(),
             }
         }
@@ -27,7 +28,7 @@ class Playlist(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     playlist_name: str
     user_id: uuid.uuid4
-    time: datetime
+    time: Optional[datetime]
     tracks: List[str]
 
     class Config:
@@ -35,7 +36,7 @@ class Playlist(BaseModel):
         json_schema_extra = {
             "example": {
                 "playlist_name": "test",
-                "user_id": "ObjectId('test')",
+                "user_id": str(ObjectId()),
                 "time": datetime.now(),
                 "tracks": ["ObjectId('test')", "ObjectId('test2')"],
             }
@@ -54,7 +55,7 @@ class Track(BaseModel):
     album_name: str
     analysis: Dict
     spotify: Dict
-    time: datetime
+    time: Optional[datetime]
 
     class Config:
         populate_by_name = True
@@ -95,3 +96,19 @@ class TrackUpdate(BaseModel):
     album_name: Optional[str] = None
     analysis: Optional[Dict] = None
     spotify: Optional[Dict] = None
+
+
+class PlaylistGenerate(BaseModel):
+    keywords: str
+    description: Optional[str] = None
+    user_id: uuid.uuid4
+
+    class Config:
+        populate_by_name = True
+        json_schema_extra = {
+            "example": {
+                "keywords": "list of keywords",
+                "description": "detailed description of the playlist",
+                "user_id": str(ObjectId()),
+            }
+        }
