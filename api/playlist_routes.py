@@ -5,7 +5,7 @@ import sys
 import pathlib
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
-from api.models import PlaylistGenerate
+from api.models import Playlist, PlaylistGenerate
 from database.crud import (
     create_playlist,
     delete_playlist,
@@ -37,7 +37,7 @@ def get_playlist(playlist_name: str, request: Request) -> Dict:
     "/",
     response_description="Create a new playlist",
 )
-def create_new_playlist(playlist: Dict, request: Request) -> Dict:
+def create_new_playlist(playlist: Playlist, request: Request) -> Dict:
     playlist = create_playlist(jsonable_encoder(playlist), request.app.database)
     return playlist
 
