@@ -5,6 +5,7 @@ import sys
 import pathlib
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
+from api.models import PlaylistGenerate
 from database.crud import (
     create_playlist,
     delete_playlist,
@@ -56,3 +57,15 @@ def update_playlist(playlist_id: str, playlist: Dict, request: Request) -> Dict:
 )
 def delete_playlist_by_id(playlist_id: str, request: Request) -> None:
     delete_playlist(playlist_id, request.app.database)
+
+
+@playlist_router.post(
+    "/generate",
+    response_description="Generate a new playlist with AI",
+    response_model=PlaylistGenerate,
+)
+def generate_playlist(playlist: PlaylistGenerate) -> Dict:
+    # TODO Call AI to generate playlist
+    # TODO Add playlist to database
+    # TODO return playlist
+    return playlist

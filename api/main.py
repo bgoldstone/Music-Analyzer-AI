@@ -1,10 +1,10 @@
 from contextlib import asynccontextmanager
-import os
 import pathlib
 import sys
 import dotenv
 from fastapi import FastAPI
 from pymongo import MongoClient
+import uvicorn
 
 # FastAPI routes
 from user_routes import user_router
@@ -15,7 +15,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from database.load_data import MONGO_URL
 
 # Load environment variables
-CONFIG = dotenv.dotenv_values("../database/.env")
+CONFIG = dotenv.dotenv_values("database/.env")
 
 # Connect to the MongoDB database
 uri = f"mongodb+srv://{CONFIG.get('MONGO_USER')}:{CONFIG.get('MONGO_PASSWORD')}@{MONGO_URL}/"
@@ -38,3 +38,10 @@ app.database = mongodb_client["soundsmith"]
 app.include_router(user_router)
 app.include_router(playlist_router)
 app.include_router(track_router)
+print("Connected to the MongoDB database!")
+if __name__ == "__main__":
+    uvicorn.run(
+        "main:app",
+        host=f'{CONFIG.get("API_HOST")}',
+        port=f'{int(CONFIG.get("API_PORT"))}',
+    )
