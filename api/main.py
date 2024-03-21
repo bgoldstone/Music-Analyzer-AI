@@ -10,6 +10,7 @@ import uvicorn
 from user_routes import user_router
 from playlist_routes import playlist_router
 from track_routes import track_router
+from oauth_routes import oauth_router
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from database.load_data import MONGO_URL
@@ -39,6 +40,7 @@ app.database = mongodb_client["soundsmith"]
 app.include_router(user_router)
 app.include_router(playlist_router)
 app.include_router(track_router)
+app.include_router(oauth_router)
 print("Connected to the MongoDB database!")
 if __name__ == "__main__":
     uvicorn.run(
