@@ -38,7 +38,7 @@ class Playlist(BaseModel):
                 "playlist_name": "test",
                 "user_id": str(ObjectId()),
                 "time": datetime.now(),
-                "tracks": ["ObjectId('test')", "ObjectId('test2')"],
+                "tracks": [str(ObjectId()), str(ObjectId())],
             }
         }
 
