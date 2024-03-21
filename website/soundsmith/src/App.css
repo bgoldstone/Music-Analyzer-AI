@@ -5,6 +5,7 @@
 .App-logo {
   height: 40vmin;
   pointer-events: none;
+  filter:  invert(83%) sepia(43%) saturate(444%) hue-rotate(355deg) brightness(102%) contrast(91%);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -15,7 +16,7 @@
 
 .App-header {
   font-family: 'Futura';
-  background-color: #540f6f;
+  /* background-color: #540f6f; */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -23,6 +24,13 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: #f3db7d;
+}
+
+.backgroundDJ {
+  background-image: "./dj-background.jpg";
+  background-size: "cover";
+  /* height: 100vh; */
+  background-repeat: no-repeat;
 }
 
 .Clickable-text {
