@@ -23,5 +23,4 @@ def verify_password(password: str, db_password: str) -> bool:
     Returns:
         bool: True if the password is correct, False otherwise.
     """
-    db_password = bytes(db_password, "utf-8")
     return bcrypt.checkpw(password.encode(), db_password)

@@ -9,9 +9,15 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from auth import hasher, tokens
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
-from database.crud import get_user, create_user, update_user, delete_user
+from database.crud import (
+    get_hashed_password,
+    get_user,
+    create_user,
+    update_user,
+    delete_user,
+)
 
-from models import User, UserUpdate
+from models import CreateUser, User, UserUpdate
 
 user_router = APIRouter(prefix="/users", tags=["users"])
 
@@ -35,15 +41,14 @@ def get_user_by_username(username: str, request: Request):
     "/",
     response_description="Create a new user",
 )
-def create_new_user(user: User, request: Request) -> Dict:
-    user = create_user(jsonable_encoder(user), request.app.database)
+def create_new_user(user: CreateUser, request: Request) -> Dict[str, str]:
+    user = create_user(user.username, user.password, request.app.database)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User could not be created",
         )
-    user["_id"] = str(user["_id"])
-    return user
+    return {"user_id": str(user)}
 
 
 @user_router.put(
@@ -65,3 +70,18 @@ def update_user_by_id(user_id: str, user: UserUpdate, request: Request) -> None:
 )
 def delete_user_by_username(username: str, request: Request) -> None:
     delete_user(username, request.app.database)
+
+
+@user_router.post("/auth", response_description="Get Login Token")
+def get_token(user: CreateUser, request: Request, response: Response):
+    password = get_hashed_password(user.username, request.app.database)
+    validCredentials = hasher.verify_password(user.password, password)
+    if validCredentials:
+        token = tokens.create_token(
+            get_user(user.username, request.app.database)["_id"], user.username
+        )
+        return token
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid Credentials",
+    )

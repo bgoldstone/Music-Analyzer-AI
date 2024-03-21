@@ -13,7 +13,10 @@ DAY = HOUR * 24
 TOKEN_EXPIRATION = DAY
 
 
-def create_token(user_id: str) -> Dict[str, str]:
+def create_token(
+    user_id: str,
+    username: str,
+) -> Dict[str, str]:
     """Create a new token from the given token
 
     Args:
@@ -22,7 +25,12 @@ def create_token(user_id: str) -> Dict[str, str]:
     Returns:
         Dict[str,str]: A dictionary containing the token
     """
-    contents = {"user_id": user_id, "expiration": int(time.time()) + TOKEN_EXPIRATION}
+    contents = {
+        "user_id": user_id,
+        "expiration": int(time.time()) + TOKEN_EXPIRATION,
+        "type": "soundsmith",
+        "username": username,
+    }
     token = jwt.encode(contents, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return {"jwt": token}
 
@@ -43,6 +51,7 @@ def create_spotify_token(
         "spotify_token": spotify_token,
         "expiration": expiration,
         "scope": scope,
+        "type": "spotify",
     }
     token = jwt.encode(contents, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token

@@ -37,6 +37,7 @@ def login_to_spotify(request: Request, response: Response):
                 request.app.database,
             )
         print(token)
+
         jwt_token = tokens.create_spotify_token(
             token["access_token"], token["expires_at"], token["scope"]
         )

@@ -8,6 +8,7 @@ import uuid
 class User(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     username: str
+    password: str
     time: Optional[datetime]
 
     class Config:
@@ -15,7 +16,22 @@ class User(BaseModel):
         jscon_schema_extra = {
             "example": {
                 "username": "john doe",
+                "password": "hashed password",
                 "time": datetime.now(),
+            }
+        }
+
+
+class CreateUser(BaseModel):
+    username: str
+    password: str
+
+    class Config:
+        populate_by_name = True
+        json_schema_extra = {
+            "example": {
+                "username": "john doe",
+                "password": "raw password",
             }
         }
 

@@ -18,7 +18,9 @@ def get_user(username: str, db: MongoClient) -> str | None:
     Returns:
         str: User ID
     """
-    return db["users"].find_one({"username": username})
+    user = db["users"].find_one({"username": username, "type": "soundsmith"})
+    user["_id"] = str(user["_id"])
+    return user
 
 
 def create_user(username: str, password: str, db: MongoClient) -> str:
@@ -31,9 +33,12 @@ def create_user(username: str, password: str, db: MongoClient) -> str:
     Returns:
         str: User ID
     """
-    user = {"username": username, "password": hasher.hash_password(password)}
-    user["time"] = datetime.now()
-    return db["users"].insert_one(user).inserted_id
+    if get_user(username, db) is None:
+        user = {"username": username, "password": hasher.hash_password(password)}
+        user["time"] = datetime.now()
+        user["type"] = "soundsmith"
+        return db["users"].insert_one(user).inserted_id
+    return None
 
 
 def create_spotify_user(username: str, spotify_id: str, db: MongoClient) -> str:
@@ -45,6 +50,7 @@ def create_spotify_user(username: str, spotify_id: str, db: MongoClient) -> str:
     """
     user = {"username": username}
     user["time"] = datetime.now()
+    user["type"] = "spotify"
     user["spotify_id"] = spotify_id
     db["users"].insert_one(user)
     return get_spotify_user(spotify_id, db)
@@ -327,3 +333,18 @@ def get_playlist_with_tracks(playlist_name: str, db: MongoClient) -> Dict | None
         )
         .next()
     )
+
+
+def get_hashed_password(username: str, db: MongoClient) -> str | None:
+    """Get password from database from username asyncrously
+
+    Args:
+        username (str): Username
+
+    Returns:
+        str: Password
+    """
+    user = db["users"].find_one({"username": username, "type": "soundsmith"})
+    if user is None:
+        return None
+    return user["password"]
