@@ -8,12 +8,12 @@ import matplotlib.pyplot as plt
 
 DIRECTORY = "Daeshaun"  # Ex: "Daeshaun"
 filename = (
-    "Sad_Songs_track_details.json"  # "Lofi_Anime_Openings_track_details.json"
+    "R&B_track_details.json"  # "Lofi_Anime_Openings_track_details.json"
 )
 file_path = os.path.join("song_data", DIRECTORY, filename)
 
 song_info = []
-stand_vect = [({'happy': 19.722225599999994, 'sad': -19.722225599999994, 'intense': 143.98899992674365, 'mild': -143.98899992674365, 'danceability': 0.647}, 'Happy - From "Despicable Me 2"', '60nZcImufyMA1MKQY3dcCH'), ({'happy': 0.029775400000000077, 'sad': -0.029775400000000077, 'intense': 14.442369133635204, 'mild': -14.442369133635204, 'danceability': 0.695}, 'Circles', '21jGcNKet2qwijlDFuPiPb'), ({'happy': -7.451940799999999, 'sad': 7.451940799999999, 'intense': -1.0585302068395999, 'mild': 1.0585302068395999, 'danceability': 0.467}, 'Everybody Hurts', '6PypGyiu0Y2lCDBN1XZEnP'), ({'happy': -5.006553600000000017, 'sad': 5.006553600000000017, 'intense': 10.637991392150001, 'mild': -10.637991392150001, 'danceability': 0.447}, 'Unholy Confessions', '78XFPcFYN8YFOHjtVwnPsl')]
+stand_vect = [({'happy': 19.722225599999994, 'sad': -19.722225599999994, 'intense': 143.98899992674365, 'mild': -143.98899992674365, 'danceability': 0.647}, 'Happy - From "Despicable Me 2"', '60nZcImufyMA1MKQY3dcCH'), ({'happy': 2.0000000000000052e-07, 'sad': -2.0000000000000052e-07, 'intense': -5.0613370864, 'mild': 5.0613370864, 'danceability': 0.468}, "Cruel Angel's Thesis but is it okay if it's lofi?", '221o9DvmsX6zOIG8BbP3nz'), ({'happy': -7.451940799999999, 'sad': 7.451940799999999, 'intense': -1.0585302068395999, 'mild': 1.0585302068395999, 'danceability': 0.467}, 'Everybody Hurts', '6PypGyiu0Y2lCDBN1XZEnP'), ({'happy': -5.006553600000000017, 'sad': 5.006553600000000017, 'intense': 10.637991392150001, 'mild': -10.637991392150001, 'danceability': 0.447}, 'Unholy Confessions', '78XFPcFYN8YFOHjtVwnPsl')]
 
 
 def process_data(df):
@@ -97,6 +97,7 @@ def main():
 
         for song in song_info:
             print(f"Song name: {song[1]}")
+            print(f"Song dimensions: {song}")
             P1 = np.array(list(song[0].values()))
             
             for value in stand_vect:

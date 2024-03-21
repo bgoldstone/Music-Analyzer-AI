@@ -8,14 +8,14 @@ import time
 import os
 
 # output directory (change this to song_data/{your name})
-OUTPUT_DIRECTORY: str = "ben"
+OUTPUT_DIRECTORY: str = "Sam"
 OUTPUT_DIRECTORY: str = os.path.join("song_data", OUTPUT_DIRECTORY)
 # put playlsit url below
 PLAYLIST_URL: str = (
-    "https://open.spotify.com/playlist/6f93Udu4SPm1ljoOOnydMr?si=81b0a8b23a024b6b"
+    "https://open.spotify.com/playlist/3rO3hj9X3wSY2IafwpVZYS?si=be2efb3d779f423c"
 )
 # put the name of the playlist here in snake(_) case
-PLAYLIST_NAME: str = "songs-for-events"
+PLAYLIST_NAME: str = "sam_playlist_one"
 # default number of songs, will change.
 PLAYLIST_NUMBER_OF_SONGS: int = 0
 
