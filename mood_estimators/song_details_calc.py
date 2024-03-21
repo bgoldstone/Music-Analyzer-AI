@@ -15,6 +15,13 @@ file_path = os.path.join("song_data", DIRECTORY, filename)
 song_info = []
 stand_vect = [({'happy': 19.722225599999994, 'sad': -19.722225599999994, 'intense': 143.98899992674365, 'mild': -143.98899992674365, 'danceability': 0.647}, 'Happy - From "Despicable Me 2"', '60nZcImufyMA1MKQY3dcCH'), ({'happy': 2.0000000000000052e-07, 'sad': -2.0000000000000052e-07, 'intense': -5.0613370864, 'mild': 5.0613370864, 'danceability': 0.468}, "Cruel Angel's Thesis but is it okay if it's lofi?", '221o9DvmsX6zOIG8BbP3nz'), ({'happy': -5.006553600000000017, 'sad': 5.006553600000000017, 'intense': 10.637991392150001, 'mild': -10.637991392150001, 'danceability': 0.447}, 'Unholy Confessions', '78XFPcFYN8YFOHjtVwnPsl'), ({'happy': -7.451940799999999, 'sad': 7.451940799999999, 'intense': -1.0585302068395999, 'mild': 1.0585302068395999, 'danceability': 0.467}, 'Everybody Hurts', '6PypGyiu0Y2lCDBN1XZEnP')]
 
+stand_vect_dict = {
+    "happy" : [({'happy': 19.722225599999994, 'sad': -19.722225599999994, 'intense': 143.98899992674365, 'mild': -143.98899992674365, 'danceability': 0.647}, 'Happy - From "Despicable Me 2"', '60nZcImufyMA1MKQY3dcCH')],
+    "chill": [({'happy': 2.0000000000000052e-07, 'sad': -2.0000000000000052e-07, 'intense': -5.0613370864, 'mild': 5.0613370864, 'danceability': 0.468}, "Cruel Angel's Thesis but is it okay if it's lofi?", '221o9DvmsX6zOIG8BbP3nz')],
+    "stressing": [({'happy': -5.006553600000000017, 'sad': 5.006553600000000017, 'intense': 10.637991392150001, 'mild': -10.637991392150001, 'danceability': 0.447}, 'Unholy Confessions', '78XFPcFYN8YFOHjtVwnPsl')],
+    "sad": [({'happy': -7.451940799999999, 'sad': 7.451940799999999, 'intense': -1.0585302068395999, 'mild': 1.0585302068395999, 'danceability': 0.467}, 'Everybody Hurts', '6PypGyiu0Y2lCDBN1XZEnP')],
+}
+
 
 def process_data(df):
     # Process each DataFrame. `df` is a dictionary of the song's properties. Ex: {"danceability": 0.647, "energy": 0.822,..."album_name": "G I R L"}.
