@@ -2,17 +2,16 @@ from datetime import datetime
 from typing import Dict, List, Optional
 from pydantic import BaseModel, Field
 import uuid
-from bson import ObjectId
 
 
 class User(BaseModel):
-    id: str = Field(default_factory=ObjectId, alias="_id")
+    id: str = Field(default_factory=uuid.uuid4, alias="_id")
     username: str
     time: datetime
 
     class Config:
-        allow_population_by_field_name = True
-        schema_extra = {
+        populate_by_name = True
+        jscon_schema_extra = {
             "example": {
                 "username": "ObjectId('test')",
                 "time": datetime.now(),
@@ -25,15 +24,15 @@ class UserUpdate(BaseModel):
 
 
 class Playlist(BaseModel):
-    id: str = Field(default_factory=ObjectId, alias="_id")
+    id: str = Field(default_factory=uuid.uuid4, alias="_id")
     playlist_name: str
-    user_id: ObjectId
+    user_id: uuid.uuid4
     time: datetime
     tracks: List[str]
 
     class Config:
-        allow_population_by_field_name = True
-        schema_extra = {
+        populate_by_name = True
+        json_schema_extra = {
             "example": {
                 "playlist_name": "test",
                 "user_id": "ObjectId('test')",
@@ -58,8 +57,8 @@ class Track(BaseModel):
     time: datetime
 
     class Config:
-        allow_population_by_field_name = True
-        schema_extra = {
+        populate_by_name = True
+        json_schema_extra = {
             "example": {
                 "track_name": "test",
                 "artist_name": "test",
