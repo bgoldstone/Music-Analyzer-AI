@@ -36,6 +36,32 @@ def create_user(username: str, password: str, db: MongoClient) -> str:
     return db["users"].insert_one(user).inserted_id
 
 
+def create_spotify_user(username: str, spotify_id: str, db: MongoClient) -> str:
+    """Create user in database
+
+    Args:
+        username (str): Username
+        spotify_id (str): Spotify ID
+    """
+    user = {"username": username}
+    user["time"] = datetime.now()
+    user["spotify_id"] = spotify_id
+    db["users"].insert_one(user)
+    return get_spotify_user(spotify_id, db)
+
+
+def get_spotify_user(spotify_id: str, db: MongoClient) -> str | None:
+    """Get user from database from username asyncrously
+
+    Args:
+        username (str): Username
+
+    Returns:
+        str: User ID
+    """
+    return db["users"].find_one({"spotify_id": spotify_id})
+
+
 def update_user(
     user_id: str,
     db: MongoClient,
