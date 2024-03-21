@@ -1,3 +1,4 @@
+import token
 from typing import Dict
 from fastapi import APIRouter, Request, HTTPException, status
 from fastapi.encoders import jsonable_encoder
@@ -5,7 +6,7 @@ import sys
 import pathlib
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
-from api.models import Playlist, PlaylistGenerate
+from api.models import GetPlaylist, Playlist, PlaylistGenerate
 from database.crud import (
     create_playlist,
     delete_playlist,

@@ -35,6 +35,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.database = mongodb_client["soundsmith"]
+# TODO add authentication.
 app.include_router(user_router)
 app.include_router(playlist_router)
 app.include_router(track_router)

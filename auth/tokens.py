@@ -30,7 +30,7 @@ def create_token(username: str) -> Dict[str, str]:
 def decode_token(token: str) -> dict:
     """Decode a token.
     Args:
-        token (Dict[str, str]): The token to decode.
+        token (str): The token to decode.
 
     Returns:
         dict: The decoded token.
