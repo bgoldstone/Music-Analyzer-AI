@@ -20,8 +20,18 @@ class User(BaseModel):
         }
 
 
+class GetToken(BaseModel):
+    username: str
+    password: str
+
+
 class UserUpdate(BaseModel):
     username: Optional[str] = None
+
+
+class GetPlaylist(BaseModel):
+    playlist_id: str
+    authorization_token: str
 
 
 class Playlist(BaseModel):

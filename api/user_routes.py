@@ -1,9 +1,10 @@
 from datetime import datetime
 from fastapi import APIRouter, Body, Request, Response, HTTPException, status
 from fastapi.encoders import jsonable_encoder
-from typing import Dict, List
+from typing import Dict
 import sys
 import pathlib
+from auth import hasher, tokens
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from database.crud import get_user, create_user, update_user, delete_user
