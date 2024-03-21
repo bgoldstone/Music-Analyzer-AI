@@ -4,6 +4,8 @@ from fastapi.encoders import jsonable_encoder
 from typing import Dict
 import sys
 import pathlib
+
+sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from auth import hasher, tokens
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
