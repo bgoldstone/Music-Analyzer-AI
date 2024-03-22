@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 DIRECTORY = "Daeshaun"  # Ex: "Daeshaun"
 filename = (
-    "R&B_track_details.json"  # "Lofi_Anime_Openings_track_details.json"
+    "Sad_Songs_track_details.json"  # "Lofi_Anime_Openings_track_details.json"
 )
 file_path = os.path.join("song_data", DIRECTORY, filename)
 
@@ -19,7 +19,7 @@ stand_vect_dict = {
     "happy" : [({'happy': 19.722225599999994, 'sad': -19.722225599999994, 'intense': 143.98899992674365, 'mild': -143.98899992674365, 'danceability': 0.647}, 'Happy - From "Despicable Me 2"', '60nZcImufyMA1MKQY3dcCH')],
     "chill": [({'happy': 2.0000000000000052e-07, 'sad': -2.0000000000000052e-07, 'intense': -5.0613370864, 'mild': 5.0613370864, 'danceability': 0.468}, "Cruel Angel's Thesis but is it okay if it's lofi?", '221o9DvmsX6zOIG8BbP3nz')],
     "stressing": [({'happy': -5.006553600000000017, 'sad': 5.006553600000000017, 'intense': 10.637991392150001, 'mild': -10.637991392150001, 'danceability': 0.447}, 'Unholy Confessions', '78XFPcFYN8YFOHjtVwnPsl')],
-    "sad": [({'happy': -7.451940799999999, 'sad': 7.451940799999999, 'intense': -1.0585302068395999, 'mild': 1.0585302068395999, 'danceability': 0.467}, 'Everybody Hurts', '6PypGyiu0Y2lCDBN1XZEnP')],
+    "sad": [({'happy': -7.451940799999999, 'sad': 7.451940799999999, 'intense': -1.0585302068395999, 'mild': 1.0585302068395999, 'danceability': 0.467}, 'Everybody Hurts', '6PypGyiu0Y2lCDBN1XZEnP'), ({'happy': -0.0009826000000000025, 'sad': 0.0009826000000000025, 'intense': 86.75278244360685, 'mild': -86.75278244360685, 'danceability': 0.652}, 'Let Me Down Slowly', '2qxmye6gAegTMjLKEBoR3d')],
 }
 
 
@@ -67,18 +67,21 @@ def scale_valence(valence):
 
 
 def calc_mood_from_details(tempo, valence, energy, name, track_id, vectors):
-    # Now check the valence level:
-    # A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track.
-    # Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric),
-    # while tracks with low valence sound more negative (e.g. sad, depressed, angry).
+    # Incorporating valence into mood vectors:
+    # Increase the "happy" vector component and decrease the "sad" vector component based on valence level.
     vectors["happy"] += scale_valence(valence)
     vectors["sad"] -= scale_valence(valence)
     #
+    # Incorporating energy into mood vectors:
+    # Increase the "intense" vector component and decrease the "mild" vector component based on energy level.
     vectors["intense"] += scale_energy(energy) 
     vectors["mild"] -= scale_energy(energy) 
     #
+    # Incorporating tempo into mood vectors:
+    # Increase the "intense" vector component if tempo is high, else adjust "sad" based on the absolute value of scaled tempo.
     vectors["intense"] += scale_tempo(tempo) 
     vectors["mild"] -= scale_tempo(tempo)
+
     return(vectors, name, track_id)
 
 def cosine_similarity(vector1, vector2):
@@ -98,19 +101,39 @@ def main():
             # Iterate over the JSON objects
             for item in parser:
                 process_data(item)
+
+        # avg_happiness
+        # avg_chill
+        # avg_stressing
+        # avg_sadness
+
+        # see cosine between each song in standard songs
         # for song in song_info:
-        #     print(song)
-        #     pass
+        #     print(f"Song name: {song[1]}")
+        #     print(f"Song dimensions: {song}")
+        #     P1 = np.array(list(song[0].values()))
+            
+        #     for quadrant in stand_vect_dict:
+        #         for each_song in stand_vect_dict[quadrant]:
+        #             P2 = np.array(list(each_song[0].values()))
+        #             print(each_song[1], end=": ")
+        #             print(cosine_similarity(P1, P2))
+        #     print("-----------------------------")
 
         for song in song_info:
             print(f"Song name: {song[1]}")
             print(f"Song dimensions: {song}")
             P1 = np.array(list(song[0].values()))
             
-            for value in stand_vect:
-                P2 = np.array(list(value[0].values()))
-                print(value[1], end=": ")
-                print(cosine_similarity(P1, P2))
+            for quadrant in stand_vect_dict:
+                sum = 0
+                print(quadrant, end=": ")
+                for each_song in stand_vect_dict[quadrant]:
+                    P2 = np.array(list(each_song[0].values()))
+                    # print(each_song[1], end=": \n")
+                    # print(cosine_similarity(P1, P2))
+                    sum += cosine_similarity(P1, P2)
+                print(sum / len(stand_vect_dict[quadrant]))
             print("-----------------------------")
 
     else:
