@@ -1,6 +1,6 @@
 import logo from './spotifylogo.svg';
 import './spotifylogin.css';
-import background from "./otherspotify.jpg";
+import background from "./purplespotifyimage.jpg";
 
 
 function App() {
