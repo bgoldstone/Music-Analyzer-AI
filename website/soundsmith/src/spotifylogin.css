@@ -1,0 +1,78 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 20vmin;
+  pointer-events: none;
+  filter: invert(83%) sepia(43%) saturate(444%) hue-rotate(355deg) brightness(102%) contrast(91%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  font-family: 'Futura';
+  /* background-color: #540f6f; */
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(15px + 2vmin);
+  color: #eed15b;
+}
+
+.background {
+  background-image: "./otherspotify.jpg";
+  background-size: "cover";
+  /* height: 100vh; */
+  background-repeat: no-repeat;
+  position: relative;
+}
+
+
+
+input[type="text"],
+input[type="password"] {
+  cursor: text;
+  padding: 10px;
+  background-color: transparent; /* Make the background color transparent */
+  border: 1px solid #ccc; /* Add a border for clarity */
+  color: #eed15b; 
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px; /* Add some spacing between text boxes */
+}
+
+.Clickable-text {
+  cursor: pointer;
+  padding: 10px 20px;
+  background-color: #3c0047;
+  color: #eed15b;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.Clickable-text:hover {
+  background-color: #1f0136;
+  color: #f3db7d;
+}
+
+label {
+  font-weight: bold;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
