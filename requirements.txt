@@ -14,3 +14,5 @@ pymongo
 matplotlib
 fastapi
 uvicorn
+torch
+transformers
