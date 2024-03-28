@@ -168,3 +168,5 @@ spotifyDataRetrival/.env
 
 # Cache specific
 .spotifyoauthcache
+
+.spotipyoauthcache
