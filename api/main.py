@@ -6,13 +6,12 @@ from fastapi import FastAPI
 from pymongo import MongoClient
 import uvicorn
 
-# FastAPI routes
-from user_routes import user_router
-from playlist_routes import playlist_router
-from track_routes import track_router
-from oauth_routes import oauth_router
-
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
+# FastAPI routes
+from api.user_routes import user_router
+from api.playlist_routes import playlist_router
+from api.track_routes import track_router
+from api.oauth_routes import oauth_router
 from database.load_data import MONGO_URL
 
 # Load environment variables
@@ -42,9 +41,15 @@ app.include_router(playlist_router)
 app.include_router(track_router)
 app.include_router(oauth_router)
 print("Connected to the MongoDB database!")
-if __name__ == "__main__":
+
+
+def main():
     uvicorn.run(
-        "main:app",
+        "api.main:app",
         host=f'{CONFIG.get("API_HOST")}',
         port=f'{int(CONFIG.get("API_PORT"))}',
     )
+
+
+if __name__ == "__main__":
+    main()
