@@ -165,4 +165,6 @@ spotifyDataRetrival/.env
 
 # Git specific
 .gitattributes
+
+# Cache specific
 .spotifyoauthcache
