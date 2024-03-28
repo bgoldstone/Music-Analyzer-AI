@@ -87,7 +87,9 @@ def calc_mood_from_details(tempo, valence, energy, name, track_id, vectors):
     vectors["intense"] += scale_tempo(tempo) 
     vectors["mild"] -= scale_tempo(tempo)
 
+    # get an analysis of lyrics; tuples: 
     lyrics_emotions = bertai.get_lyrics_mood()
+
 
     return(vectors, name, track_id)
 
