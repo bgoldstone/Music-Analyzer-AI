@@ -83,6 +83,7 @@ def get_lyrics_mood():
     positive_count = 0
     negative_count = 0
     no_impact_count = 0
+    mixed_count = 0
 
     for line in lines:
         result = pipe(line)[0]
@@ -95,14 +96,17 @@ def get_lyrics_mood():
             negative_count += 1
         elif label == 'no_impact':
             no_impact_count += 1
+        elif label == 'mixed':
+            mixed_count += 1
 
         results_per_line.append((line, score, label))
 
     # Calculate percentage of NO_IMPACT labels
-    total_labels = positive_count + negative_count + no_impact_count
-    no_impact_percentage = (no_impact_count / total_labels) * 100
+    total_labels = positive_count + negative_count + no_impact_count + mixed_count
     positive_percentege = (positive_count / total_labels) * 100
     negative_percentege = (negative_count / total_labels) * 100
+    mixed_percentage = (mixed_count / total_labels) * 100
+    no_impact_percentage = (no_impact_count / total_labels) * 100
 
     printResults = True                    
     if printResults:
@@ -116,18 +120,21 @@ def get_lyrics_mood():
         print("\nSentiment counts:")
         print(f"Positive: {positive_count}")
         print(f"Negative: {negative_count}")
+        print(f"Mixed: {mixed_count}")
         print(f"No Impact: {no_impact_count}")
 
+
         # Check if no_impact_percentage exceeds 75%
-        print(no_impact_percentage)
         if no_impact_percentage > 75:
             print("\nPrioritize Sound Dawg")
         elif positive_percentege > 75:
             print("\nThis may be positive")
-        elif negative_percentege < 75:
+        elif negative_percentege > 75:
             print("\nPrioritze Lyrics")
+        elif mixed_percentage > 75:
+            print("\nMixed Feelings dawg")
 
-    return(positive_count, negative_count, no_impact_count)
+    return(positive_count, negative_count, no_impact_count, mixed_count)
 
 if __name__ == "__main__":
     get_lyrics_mood()
