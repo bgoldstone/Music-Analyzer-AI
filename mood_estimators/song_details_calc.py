@@ -5,6 +5,11 @@ import ijson
 import sys
 import matplotlib
 import matplotlib.pyplot as plt
+import bertai
+
+# sys.path.append('..\lyrics_ai')  
+
+# import bertai
 
 DIRECTORY = "Daeshaun"  # Ex: "Daeshaun"
 filename = (
@@ -33,7 +38,7 @@ def process_data(df):
     energy = df["energy"]
     danceability = df["danceability"]
 
-    emotionVectors = {
+    emotion_dimensions = {
     "happy": 0,
     "sad": 0,
     "intense": 0,
@@ -42,9 +47,9 @@ def process_data(df):
     }
 
     # Set danceabiltity
-    emotionVectors["danceability"] = float(danceability)
+    emotion_dimensions["danceability"] = float(danceability)
     # Calculate vectors based on song properties
-    song_info.append(calc_mood_from_details(float(tempo), float(valence), float(energy), track_name, track_id, emotionVectors))
+    song_info.append(calc_mood_from_details(float(tempo), float(valence), float(energy), track_name, track_id, emotion_dimensions))
 
 def scale_tempo(tempo):
     # 70-90 bpm is the range where it is unclear that a song is happy or sad based on tempo
@@ -82,6 +87,10 @@ def calc_mood_from_details(tempo, valence, energy, name, track_id, vectors):
     vectors["intense"] += scale_tempo(tempo) 
     vectors["mild"] -= scale_tempo(tempo)
 
+    # get an analysis of lyrics; tuples: 
+    lyrics_emotions = bertai.get_lyrics_mood()
+
+
     return(vectors, name, track_id)
 
 def cosine_similarity(vector1, vector2):
@@ -101,24 +110,6 @@ def main():
             # Iterate over the JSON objects
             for item in parser:
                 process_data(item)
-
-        # avg_happiness
-        # avg_chill
-        # avg_stressing
-        # avg_sadness
-
-        # see cosine between each song in standard songs
-        # for song in song_info:
-        #     print(f"Song name: {song[1]}")
-        #     print(f"Song dimensions: {song}")
-        #     P1 = np.array(list(song[0].values()))
-            
-        #     for quadrant in stand_vect_dict:
-        #         for each_song in stand_vect_dict[quadrant]:
-        #             P2 = np.array(list(each_song[0].values()))
-        #             print(each_song[1], end=": ")
-        #             print(cosine_similarity(P1, P2))
-        #     print("-----------------------------")
 
         for song in song_info:
             print(f"Song name: {song[1]}")
