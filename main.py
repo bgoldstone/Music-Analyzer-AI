@@ -1,4 +1,6 @@
 import multiprocessing
+import signal
+import sys
 import api.main
 import website.main
 
@@ -11,15 +13,19 @@ def main():
     react_server = multiprocessing.Process(target=website.main.main)
     react_server.start()
     print("Running React Server on http://localhost:3000")
-    while True:
-        try:
-            pass
-        except KeyboardInterrupt:
-            break
-    print("Shutting down API Server...")
-    api_server.terminate()
-    print("Shutting down React Server...")
-    react_server.terminate()
+    running = True
+
+    def handle_signal(signum, frame):
+        print(signum, frame)
+        print("Shutting down API Server...")
+        api_server.join()
+        print("Shutting down React Server...")
+        react_server.join()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, handle_signal)
+    while running:
+        pass
 
 
 if __name__ == "__main__":
