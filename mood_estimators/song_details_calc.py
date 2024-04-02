@@ -74,22 +74,21 @@ def scale_valence(valence):
 def calc_mood_from_details(tempo, valence, energy, name, track_id, vectors):
     # Incorporating valence into mood vectors:
     # Increase the "happy" vector component and decrease the "sad" vector component based on valence level.
-    vectors["happy"] += scale_valence(valence)
-    vectors["sad"] -= scale_valence(valence)
+    vectors["happy"] += round(scale_valence(valence), 3)
+    vectors["sad"] -= round(scale_valence(valence), 3)
     #
     # Incorporating energy into mood vectors:
     # Increase the "intense" vector component and decrease the "mild" vector component based on energy level.
-    vectors["intense"] += scale_energy(energy) 
-    vectors["mild"] -= scale_energy(energy) 
+    vectors["intense"] += round(scale_energy(energy) , 3)
+    vectors["mild"] -= round(scale_energy(energy) , 3)
     #
     # Incorporating tempo into mood vectors:
     # Increase the "intense" vector component if tempo is high, else adjust "sad" based on the absolute value of scaled tempo.
-    vectors["intense"] += scale_tempo(tempo) 
-    vectors["mild"] -= scale_tempo(tempo)
+    vectors["intense"] += round(scale_tempo(tempo), 3) 
+    vectors["mild"] -= round(scale_tempo(tempo), 3)
 
-    # get an analysis of lyrics; tuples: 
-    lyrics_emotions = bertai.get_lyrics_mood()
-
+    # get an analysis of lyrics; tuples: positive_count, negative_count, mixed_count, no_impact_count
+    # lyrics_emotions = bertai.get_lyrics_mood()
 
     return(vectors, name, track_id)
 

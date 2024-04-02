@@ -134,7 +134,9 @@ def get_lyrics_mood():
         elif mixed_percentage > 75:
             print("\nMixed Feelings dawg")
 
-    return(positive_count, negative_count, mixed_count, no_impact_count)
+    print(positive_percentege, negative_percentege, mixed_percentage, no_impact_percentage)
+    # {'one':1, 'two':2, 'three':3}
+    return(positive_percentege, negative_percentege, mixed_percentage, no_impact_percentage)
 
 if __name__ == "__main__":
     get_lyrics_mood()
