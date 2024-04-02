@@ -2,6 +2,8 @@ import logo from '../musicnotelogo.svg';
 import '../App.css';
 import background from "../dj-background.jpg";
 import React from 'react';
+import { Outlet, Link } from "react-router-dom";
+
 
 
 const Home = () => {
@@ -12,15 +14,16 @@ const Home = () => {
           <h1>Welcome to SoundSmith</h1>
           <img src={logo} className="App-logo" alt="logo" />
           <p>Crafting Melodies</p>
-          <div className="Clickable-text" onClick={handleBeginClick}>Click to Begin</div>
+          {handleBeginClick()}
         </header>
     </div>
   );
 }
 
 function handleBeginClick() {
-  // Add code to handle click event (e.g., navigate to next page)
-  alert('Let sound adventure begin!');
+  return(
+  <div className="Clickable-text"><Link to="/blogs">Click to Begin</Link></div>)
+  
 }
 
 export default Home;
