@@ -2,6 +2,10 @@
   text-align: center;
 }
 
+body{
+  margin: 0px;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -41,6 +45,8 @@
   border: none; /* Remove button border */
   border-radius: 5px; /* Add border-radius for rounded corners */
   font-size: 16px; /* Adjust font size */
+  text-decoration: none;
+
 }
 
 .Clickable-text:hover {
