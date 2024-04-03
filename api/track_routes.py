@@ -12,7 +12,7 @@ from database.crud import (
     update_track,
 )
 
-from models import Track, TrackUpdate
+from api.models import Track, TrackUpdate
 
 track_router = APIRouter(prefix="/tracks", tags=["tracks"])
 

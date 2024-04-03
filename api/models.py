@@ -127,7 +127,8 @@ class TrackUpdate(BaseModel):
 class PlaylistGenerate(BaseModel):
     keywords: str
     description: Optional[str] = None
-    user_id: uuid.uuid4
+    mood: str
+    user_id: str
 
     class Config:
         populate_by_name = True
@@ -135,6 +136,7 @@ class PlaylistGenerate(BaseModel):
             "example": {
                 "keywords": "list of keywords",
                 "description": "detailed description of the playlist",
-                "user_id": str(ObjectId()),
+                "mood": "Happy",
+                "jwt": str(ObjectId()),
             }
         }

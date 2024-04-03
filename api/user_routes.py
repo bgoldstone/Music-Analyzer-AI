@@ -7,8 +7,6 @@ import pathlib
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from auth import hasher, tokens
-
-sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from database.crud import (
     get_hashed_password,
     get_user,
@@ -17,7 +15,7 @@ from database.crud import (
     delete_user,
 )
 
-from models import CreateUser, User, UserUpdate
+from api.models import CreateUser, User, UserUpdate
 
 user_router = APIRouter(prefix="/users", tags=["users"])
 
