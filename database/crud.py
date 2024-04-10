@@ -325,6 +325,7 @@ def get_playlist_with_tracks(playlist_name: str, db: MongoClient) -> Dict | None
                         "tracks.artist_name": 1,
                         "tracks.album_name": 1,
                         "tracks.spotify": 1,
+                        "tracks.analysis": 1,
                         "user_id": 1,
                         "playlist_name": 1,
                     }

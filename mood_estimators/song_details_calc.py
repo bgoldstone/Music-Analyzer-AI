@@ -7,10 +7,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 import bertai
 
-# sys.path.append('..\lyrics_ai')  
-
-# import bertai
-
 DIRECTORY = "Daeshaun"  # Ex: "Daeshaun"
 filename = (
     "Lofi_Anime_Openings_track_details.json"  # "Lofi_Anime_Openings_track_details.json"
@@ -87,7 +83,7 @@ def calc_mood_from_details(tempo, valence, energy, name, track_id, vectors):
     vectors["intense"] += round(scale_tempo(tempo), 3) 
     vectors["mild"] -= round(scale_tempo(tempo), 3)
 
-    # get an analysis of lyrics; tuples: positive_count, negative_count, mixed_count, no_impact_count
+    # Incorporates an analysis of lyrics using bertai; tuples: positive_count, negative_count, mixed_count, no_impact_count
     # lyrics_emotions = bertai.get_lyrics_mood()
 
     return(vectors, name, track_id)
@@ -129,7 +125,6 @@ def main():
     else:
         print("File not found:", file_path)
         return 0
-
 
 if __name__ == "__main__":
     main()
