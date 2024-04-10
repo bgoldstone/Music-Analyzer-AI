@@ -6,19 +6,20 @@ import lyricsgenius
 import time
 import json
 
-
+# Initialize Spotify and Genius API credentials
 spotify_client_id = "5c787e0eccd246ba9c4500f755bff00b"
 spotify_client_secret = "a9b2fc8b4eac4f219aaa8dd852e98b1c"
 spotify_user_id = "spotify:user:daeshaunmorrison"
 spotify_playlist_id = "spotify:playlist:47FWzqz1PwNyKaIApQjF9H"
-#spotify_playlist_id ="spotify:playlist:6k6gktoOhlHLrGXr8M8Psy"
+spotify_playlist_id ="spotify:playlist:6k6gktoOhlHLrGXr8M8Psy"
 genius_key = "dZCHAObV2X7ZCH4QN2bewuX7lAVoVHedaot3cNn8l_dpwtSwWEaK1cHg8TrbhDtq"
 genius_token='4Os3tEbxKSqR_gE76OqwUY3TTQVO11MVLDy14ZmmrC4AS0SygKak8dpgZy3wb5pe'
 genius = lyricsgenius.Genius(genius_token)
 
 def clean_lyrics(txt):
     no_brackets = re.sub(r'\[.*?\]', '', txt)
-    return no_brackets
+    no_artist = re.sub(r'^(.*?\n)','',no_brackets)
+    return no_artist
 
 class GetLyrics():
     
@@ -51,11 +52,12 @@ class GetLyrics():
         return self.track_artists
         
 
+    # Method to fetch lyrics for each track in the playlist
     def get_lyrics(self):
         playlist = GetLyrics.get_playlist_info(self)
         track_names = GetLyrics.get_track_names(self)
         track_artists = GetLyrics.get_track_artists(self)
-        song_lyrics = {}
+        song_lyrics = []
 
         for i in range(len(track_names)):
             time.sleep(3)
@@ -63,22 +65,26 @@ class GetLyrics():
             print(f"Working on track {i}: {track_names[i]} {track_artists[i]}.")
             try:
                 song = genius.search_song(track_names[i], artist=track_artists[i])
-            except:
-                print("Timed out\n\n\n\n\n")
+            except: # Time out error can be avoided by adding in another time.sleep
+                print("Timed out\n")
                 time.sleep(8)
                 song = genius.search_song(track_names[i], artist=track_artists[i])
             
             if song is None or song.lyrics is None:
                 print(f"Track {i} is not in the Genius database.")
-            else:
+            else: # Successful lyric grab
                 lyrics_clean = clean_lyrics(song.lyrics)
-                #print(f"Retrieved track {i} lyrics! {lyrics_clean}")
-                song_lyrics[i] = {'artist': track_artists[i], 'song': track_names[i], 'lyrics': lyrics_clean}
+                
+                # Store track information and cleaned lyrics in a nested dictionary
+                song_lyrics.append({'artist': track_artists[i],
+                                  'song': track_names[i],
+                                  'lyrics': lyrics_clean})
 
         return song_lyrics
 
-
+# Initialize GetLyrics class with Spotify and Genius credentials
 songs = GetLyrics(spotify_client_id, spotify_client_secret, spotify_user_id, spotify_playlist_id, genius_key)
+# Retrieve lyrics for all tracks in the playlist
 song_lyrics = songs.get_lyrics()
 
 # Write artist-song-lyrics data to a JSON file
