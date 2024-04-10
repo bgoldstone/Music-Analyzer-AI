@@ -21,6 +21,7 @@ const Home = () => {
 }
 
 function handleBeginClick() {
+  // Add code to handle click event, navigate to next page
   return(
   <div className="Clickable-text"><Link to="/blogs">Click to Begin</Link></div>)
   
