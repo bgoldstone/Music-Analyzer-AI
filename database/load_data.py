@@ -34,7 +34,6 @@ def get_db_connection() -> MongoClient | None:
         return
     return db
 
-
 def load_playlists(db: MongoClient) -> None:
     # for each user
     for user_folder in os.listdir(SONG_DATA_DIRECTORY_PATH):
@@ -86,7 +85,6 @@ def load_playlists(db: MongoClient) -> None:
                 upsert=True,
             )
 
-
 def clean_track(track: dict) -> dict:
     """
     Function to clean up the given track dictionary by reorganizing and removing unnecessary fields.
@@ -121,7 +119,6 @@ def clean_track(track: dict) -> dict:
     del new_track["analysis"]["track_href"]
 
     return new_track
-
 
 if __name__ == "__main__":
     main()

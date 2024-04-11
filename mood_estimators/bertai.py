@@ -135,7 +135,6 @@ def get_lyrics_mood():
             print("\nMixed Feelings dawg")
 
     if (text.strip() != None) or (text.strip() != ""): 
-        # {'one':1, 'two':2, 'three':3}
         return(positive_percentege, negative_percentege, mixed_percentage, no_impact_percentage)
 
 if __name__ == "__main__":

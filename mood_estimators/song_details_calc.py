@@ -6,8 +6,9 @@ import sys
 import matplotlib
 import matplotlib.pyplot as plt
 import bertai
+# from pymongo import MongoClient
 
-DIRECTORY = "ben"  # Ex: "Daeshaun"
+DIRECTORY = "Daeshaun"  # Ex: "Daeshaun"
 filename = (
     "songs-for-events_track_details.json"  # "Lofi_Anime_Openings_track_details.json"
 )
