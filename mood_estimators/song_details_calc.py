@@ -10,7 +10,7 @@ import bertai
 
 DIRECTORY = "Daeshaun"  # Ex: "Daeshaun"
 filename = (
-    "songs-for-events_track_details.json"  # "Lofi_Anime_Openings_track_details.json"
+    "Sad_Songs_track_details.json"  # "Lofi_Anime_Openings_track_details.json"
 )
 file_path = os.path.join("song_data", DIRECTORY, filename)
 
@@ -83,20 +83,19 @@ def calc_mood_from_details(tempo, valence, energy, name, track_id, vectors):
     vectors["mild"] -= round(scale_tempo(tempo), 3)
 
     # Incorporates an analysis of lyrics using bertai; tuples: positive_count, negative_count, mixed_count, no_impact_count
-    lyrics_emotions = bertai.get_lyrics_mood()
+    # Increase the "intense" vector component if tempo is high, else adjust "negative" based on the absolute value of scaled tempo.
+    vectors["intense"] += round(scale_tempo(tempo), 3) 
+    vectors["mild"] -= round(scale_tempo(tempo), 3)
 
-    for eachPercent in lyrics_emotions:
-        index = 0
-        if index == 0:
-            vectors["positive"] += (eachPercent * 20)
-        elif index == 1:
-            vectors["negative"] += (eachPercent * 20)
-        elif index == 2:
-            vectors["positive"] += (eachPercent * 20)
-            vectors["negative"] += (eachPercent * 20)
-        elif index == 3:
-            vectors["positive"] -= (eachPercent * 20)
-            vectors["negative"] -= (eachPercent * 20)
+    # Incorporates an analysis of lyrics using bertai; tuples: positive_percentage, negative_percentage, mixed_percentage, no_impact_percentage
+    lyrics_emotions = bertai.get_lyrics_mood()
+    baseNum = 16
+    # Modify dimension values based on bert.ai sentiment analysis. 
+    vectors["positive"] += (baseNum * (lyrics_emotions[0] / 100))
+    vectors["negative"] += (baseNum * (lyrics_emotions[1] / 100))
+    # Mixed percentage increases both dimensions
+    vectors["positive"] += (baseNum * (lyrics_emotions[2] / 100))
+    vectors["negative"] += (baseNum * (lyrics_emotions[2] / 100))
 
     return(vectors, track_id, name)
 

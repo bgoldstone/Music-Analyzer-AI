@@ -79,21 +79,15 @@ def calc_mood_from_details(tempo, valence, energy, name, track_id, vectors):
     vectors["intense"] += round(scale_tempo(tempo), 3) 
     vectors["mild"] -= round(scale_tempo(tempo), 3)
 
-    # Incorporates an analysis of lyrics using bertai; tuples: positive_count, negative_count, mixed_count, no_impact_count
+    # Incorporates an analysis of lyrics using bertai; tuples: positive_percentage, negative_percentage, mixed_percentage, no_impact_percentage
     lyrics_emotions = bertai.get_lyrics_mood()
-
-    for eachPercent in lyrics_emotions:
-        index = 0
-        if index == 0:
-            vectors["positive"] += (16 * (eachPercent / 100))
-        elif index == 1:
-            vectors["negative"] += (16 * (eachPercent / 100))
-        elif index == 2:
-            vectors["positive"] += (16 * (eachPercent / 100))
-            vectors["negative"] += (16 * (eachPercent / 100))
-        elif index == 3:
-            vectors["positive"] -= (16 * (eachPercent / 100))
-            vectors["negative"] -= (16 * (eachPercent / 100))
+    baseNum = 16
+    # Modify dimension values based on bert.ai sentiment analysis. 
+    vectors["positive"] += (baseNum * (lyrics_emotions[0] / 100))
+    vectors["negative"] += (baseNum * (lyrics_emotions[1] / 100))
+    # Mixed percentage increases both dimensions
+    vectors["positive"] += (baseNum * (lyrics_emotions[2] / 100))
+    vectors["negative"] += (baseNum * (lyrics_emotions[2] / 100))
 
     return(vectors, track_id, name)
 
