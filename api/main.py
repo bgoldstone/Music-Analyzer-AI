@@ -4,6 +4,7 @@ import sys
 import certifi
 import dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 import uvicorn
 
@@ -41,6 +42,8 @@ app.include_router(user_router)
 app.include_router(playlist_router)
 app.include_router(track_router)
 app.include_router(oauth_router)
+
+app.add_middleware(CORSMiddleware,allow_origins=["*"],allow_credentials=True,allow_methods=["*"],allow_headers=["*"])
 print("Connected to the MongoDB database!")
 
 
@@ -49,7 +52,10 @@ def main():
         "api.main:app",
         host=f'{CONFIG.get("API_HOST")}',
         port=f'{int(CONFIG.get("API_PORT"))}',
+        reload=True
     )
+    print("Running API Server on http://localhost:8000")
+
 
 
 if __name__ == "__main__":
