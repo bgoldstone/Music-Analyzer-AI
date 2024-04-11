@@ -52,35 +52,49 @@ class GetLyrics():
         return self.track_artists
         
 
-    # Method to fetch lyrics for each track in the playlist
-    def get_lyrics(self):
-        playlist = GetLyrics.get_playlist_info(self)
-        track_names = GetLyrics.get_track_names(self)
-        track_artists = GetLyrics.get_track_artists(self)
-        song_lyrics = []
+def get_lyrics(self):
+    playlist = GetLyrics.get_playlist_info(self)
+    track_names = GetLyrics.get_track_names(self)
+    track_artists = GetLyrics.get_track_artists(self)
+    song_lyrics = []
 
-        for i in range(len(track_names)):
-            time.sleep(3)
-            print("\n")
-            print(f"Working on track {i}: {track_names[i]} {track_artists[i]}.")
+    for i in range(len(track_names)):
+        # the delay for each API call. Initialized to 3 and increase if there's a time out.
+        delay = 3
+
+        time.sleep(delay)
+        print("\n")
+        print(f"Working on track {i}: {track_names[i]} {track_artists[i]}.")
+        
+        attempt = 0
+        max_attempts = 3  # Maximum number of attempts for each song
+        
+        while attempt <= max_attempts:
             try:
                 song = genius.search_song(track_names[i], artist=track_artists[i])
-            except: # Time out error can be avoided by adding in another time.sleep
-                print("Timed out\n")
-                time.sleep(8)
-                song = genius.search_song(track_names[i], artist=track_artists[i])
+                if song is not None and song.lyrics is not None:
+                    break  # If song is found and lyrics are available, exit the loop
+            except Exception as e:
+                print(f"Error occurred: {e}")
+                print("Retrying...")
+                delay *= 3
+                time.sleep(delay)
+            finally:
+                attempt += 1
+        
+        if song is None or song.lyrics is None:
+            print(f"Track {i} is not in the Genius database.")
+        else:
+            # Successful lyric grab
+            lyrics_clean = clean_lyrics(song.lyrics)
             
-            if song is None or song.lyrics is None:
-                print(f"Track {i} is not in the Genius database.")
-            else: # Successful lyric grab
-                lyrics_clean = clean_lyrics(song.lyrics)
-                
-                # Store track information and cleaned lyrics in a nested dictionary
-                song_lyrics.append({'artist': track_artists[i],
-                                  'song': track_names[i],
-                                  'lyrics': lyrics_clean})
+            # Store track information and cleaned lyrics in a nested dictionary
+            song_lyrics.append({'artist': track_artists[i],
+                                'song': track_names[i],
+                                'lyrics': lyrics_clean})
 
-        return song_lyrics
+    return song_lyrics
+
 
 # Initialize GetLyrics class with Spotify and Genius credentials
 songs = GetLyrics(spotify_client_id, spotify_client_secret, spotify_user_id, spotify_playlist_id, genius_key)
