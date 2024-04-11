@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 import pathlib
 import sys
+import certifi
 import dotenv
 from fastapi import FastAPI
 from pymongo import MongoClient
@@ -19,7 +20,7 @@ CONFIG = dotenv.dotenv_values("database/.env")
 
 # Connect to the MongoDB database
 uri = f"mongodb+srv://{CONFIG.get('MONGO_USER')}:{CONFIG.get('MONGO_PASSWORD')}@{MONGO_URL}/"
-mongodb_client = MongoClient(uri)
+mongodb_client = MongoClient(uri, tlsCAFile=certifi.where())
 
 
 # Handles startup and shutdown events
