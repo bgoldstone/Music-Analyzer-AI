@@ -128,7 +128,7 @@ class PlaylistGenerate(BaseModel):
     keywords: str
     description: Optional[str] = None
     mood: str
-    user_id: str
+    jwt: str
 
     class Config:
         populate_by_name = True
