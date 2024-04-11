@@ -38,6 +38,8 @@ def get_db_connection() -> MongoClient | None:
 def load_playlists(db: MongoClient) -> None:
     # for each user
     for user_folder in os.listdir(SONG_DATA_DIRECTORY_PATH):
+        if(not os.path.isdir(os.path.join(SONG_DATA_DIRECTORY_PATH, user_folder))):
+            continue
         user_query = {"username": user_folder}
         # Find or create user
         mongo_user = db["users"].find_one_and_update(
