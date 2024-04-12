@@ -226,6 +226,16 @@ def get_track(track_id: str, db: MongoClient) -> Dict | None:
     """
     return db["tracks"].find_one({"_id": track_id})
 
+def get_track_by_name(track_name: str, artist_name: str, db: MongoClient) -> Dict | None:
+    """Searches database for Track with Track Name.
+
+    Args:
+        track_name (str): Track Name.
+        db (MongoClient): Database
+    Returns:
+        Dict: Track Object or None if not found.
+    """
+    return db["tracks"].find_one({"track_name": track_name, "artist_name": artist_name})
 
 def get_track_by_name_artist(
     track_name: str, artist_name: str, db: MongoClient

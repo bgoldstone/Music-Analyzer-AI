@@ -1,74 +1,43 @@
 from transformers import pipeline
 
-def get_lyrics_mood():
+def get_lyrics_mood(printResults = False):
     # Load the text classification pipeline with a pre-trained model
     pipe = pipeline("text-classification", model='nickwong64/bert-base-uncased-poems-sentiment')
 
     # Example text
     text = """
-    It might seem crazy what I'm 'bout to say
-    Sunshine, she's here, you can take a break
-    I'm a hot air balloon that could go to space
-    With the air like I don't care, baby, by the way
-    Clap along if you feel like a room without a roof
-    (Because I'm happy)
-    Clap along if you feel like happiness is the truth
-    (Because I'm happy)
-    Clap along if you know what happiness is to you
-    (Because I'm happy)
-    Clap along if you feel like that's what you wanna do
-    Here come bad news talking this and that (yeah)
-    Well, give me all you got and don't hold it back (yeah)
-    Well, I should probably warn you I'll be just fine (yeah)
-    No offense to you, don't wanna waste your time
-    Here's why
-    Clap along if you feel like a room without a roof
-    (Because I'm happy)
-    Clap along if you feel like happiness is the truth
-    (Because I'm happy)
-    Clap along if you know what happiness is to you
-    (Because I'm happy)
-    Clap along if you feel like that's what you wanna do
-    Bring me down, can't nothing (happy)
-    Bring me down, my level's too high (happy)
-    Bring me down, can't nothing (happy)
-    Bring me down, I said (I tell you)
-    Bring me down, can't nothing (happy, happy, happy)
-    Bring me down, my level's too high (happy, happy, happy)
-    Bring me down, can't nothing (happy, happy)
-    Bring me down, I said (happy, happy)
-    Clap along if you feel like a room without a roof
-    (Because I'm happy)
-    Clap along if you feel like happiness is the truth
-    (Because I'm happy)
-    Clap along if you know that happiness is to you
-    (Because I'm happy)
-    Clap along if you feel like that's what you wanna do
-    Clap along if you feel like a room without a roof
-    (Because I'm happy)
-    Clap along if you feel like happiness is the truth
-    (Because I'm happy)
-    Clap along if you know that happiness is to you
-    (Because I'm happy)
-    Clap along if you feel like that's what you wanna do
-    Bring me down, can't nothing (happy, happy, happy)
-    Bring me down, my level's too (happy, happy, happy)
-    Bring me down, can't nothing (happy, happy, happy)
-    Bring me down, I said (happy, happy, happy)
-    Clap along if you feel like a room without a roof
-    (Because I'm happy)
-    Clap along if you feel like happiness is the truth
-    (Because I'm happy)
-    Clap along if you know what happiness is to you
-    (Because I'm happy)
-    Clap along if you feel like that's what you wanna do
-    Clap along if you feel like a room without a roof
-    (Because I'm happy)
-    Clap along if you feel like happiness is the truth
-    (Because I'm happy)
-    Clap along if you know what happiness is to you
-    (Because I'm happy)
-    Clap along if you feel like that's what you wanna do
+When your day is long
+And the night, the night is yours alone
+When you're sure you've had enough
+Of this life, well hang on
+Don't let yourself go
+'Cause everybody cries
+Everybody hurts sometimes
+Sometimes everything is wrong
+Now it's time to sing along
+When your day is night alone (hold on, hold on)
+If you feel like letting go (hold on)
+If you think you've had too much
+Of this life, well hang on
+'Cause everybody hurts
+Take comfort in your friends
+Everybody hurts
+Don't throw your hand, oh no
+Don't throw your hand
+If you feel like you're alone
+No, no, no, you are not alone
+If you're on your own in this life
+The days and nights are long
+When you think you've had too much
+Of this life to hang on
+Well, everybody hurts sometimes
+Everybody cries
+Everybody hurts, sometimes
+And everybody hurts sometimes
+So hold on, hold on
+Hold on, hold on, hold on
+Hold on, hold on, hold on
+Everybody hurts
     """
 
     # Split text into lines
@@ -107,8 +76,7 @@ def get_lyrics_mood():
     negative_percentege = (negative_count / total_labels) * 100
     mixed_percentage = (mixed_count / total_labels) * 100
     no_impact_percentage = (no_impact_count / total_labels) * 100
-
-    printResults = True                    
+                    
     if printResults:
         # Print results for each line
         print("Results for each line:")
@@ -134,9 +102,12 @@ def get_lyrics_mood():
         elif mixed_percentage > 75:
             print("\nMixed Feelings dawg")
 
-    print(positive_percentege, negative_percentege, mixed_percentage, no_impact_percentage)
-    # {'one':1, 'two':2, 'three':3}
-    return(positive_percentege, negative_percentege, mixed_percentage, no_impact_percentage)
+        print("{0}% positive, {1}% negative, {2}% mixed, {3}% no impact".format(positive_percentege, negative_percentege, mixed_percentage, no_impact_percentage))
+        
+    if (text.strip() != None) or (text.strip() != ""): 
+        return(positive_percentege, negative_percentege, mixed_percentage, no_impact_percentage)
+    else:
+        return None
 
 if __name__ == "__main__":
-    get_lyrics_mood()
+    get_lyrics_mood(True)

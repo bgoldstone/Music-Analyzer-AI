@@ -1,8 +1,10 @@
 from contextlib import asynccontextmanager
 import pathlib
 import sys
+import certifi
 import dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 import uvicorn
 
@@ -19,7 +21,7 @@ CONFIG = dotenv.dotenv_values("database/.env")
 
 # Connect to the MongoDB database
 uri = f"mongodb+srv://{CONFIG.get('MONGO_USER')}:{CONFIG.get('MONGO_PASSWORD')}@{MONGO_URL}/"
-mongodb_client = MongoClient(uri)
+mongodb_client = MongoClient(uri, tlsCAFile=certifi.where())
 
 
 # Handles startup and shutdown events
@@ -40,6 +42,8 @@ app.include_router(user_router)
 app.include_router(playlist_router)
 app.include_router(track_router)
 app.include_router(oauth_router)
+
+app.add_middleware(CORSMiddleware,allow_origins=["*"],allow_credentials=True,allow_methods=["*"],allow_headers=["*"])
 print("Connected to the MongoDB database!")
 
 
@@ -47,8 +51,10 @@ def main():
     uvicorn.run(
         "api.main:app",
         host=f'{CONFIG.get("API_HOST")}',
-        port=f'{int(CONFIG.get("API_PORT"))}',
+        port=f'{int(CONFIG.get("API_PORT"))}'
     )
+    print("Running API Server on http://localhost:8000")
+
 
 
 if __name__ == "__main__":
