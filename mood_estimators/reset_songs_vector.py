@@ -18,7 +18,13 @@ filename = (
 
 file_path = os.path.join("song_data", DIRECTORY, filename)
 
+dict_DB = []
 song_info = []
+
+def import_tracks(db: MongoClient):
+    dict_DB = list(db.tracks.find({}))
+    print(dict_DB)
+
 
 def process_data(df):
     # Process each DataFrame. `df` is a dictionary of the song's properties. Ex: {"danceability": 0.647, "energy": 0.822,..."album_name": "G I R L"}.
@@ -122,65 +128,40 @@ def load_vectors(db: MongoClient, vector, id) -> None:
         return_document=True,
     )
 
-def clean_track(track: dict) -> dict:
-    """
-    Function to clean up the given track dictionary by reorganizing and removing unnecessary fields.
-    Takes a dictionary representing a track and returns a new cleaned-up dictionary.
-
-    Args:
-        track (dict): A dictionary representing a track.
-
-    Returns:
-        dict: A cleaned-up dictionary representing a track.
-    """
-    new_track = {}
-    # Move analsis to separate field
-    new_track["analysis"] = track
-    # Remove unnecessary fields
-    del new_track["analysis"]["type"]
-    del new_track["analysis"]["id"]
-    # move track attributes to track field
-    new_track["track_name"] = new_track["analysis"]["track_name"]
-    del new_track["analysis"]["track_name"]
-    new_track["artist_name"] = new_track["analysis"]["artist_name"]
-    del new_track["analysis"]["artist_name"]
-    new_track["album_name"] = new_track["analysis"]["album_name"]
-    del new_track["analysis"]["album_name"]
-    # move spotify_specific attributes to own field
-    new_track["spotify"] = {}
-    new_track["spotify"]["track_id"] = new_track["analysis"]["track_id"]
-    del new_track["analysis"]["track_id"]
-    new_track["spotify"]["uri"] = new_track["analysis"]["uri"]
-    del new_track["analysis"]["uri"]
-    new_track["spotify"]["track_href"] = new_track["analysis"]["track_href"]
-    del new_track["analysis"]["track_href"]
-
-    return new_track
-
-
 def main():
-    # Get the data(audio features from spotify) from the json
-    if os.path.exists(file_path):
-        # Open the JSON file
-        with open(file_path, "r") as file:
-            # Parse the JSON objects one by one
-            parser = ijson.items(file, "item")
+    # # Get the data(audio features from spotify) from the json
+    # if os.path.exists(file_path):
+    #     # Open the JSON file
+    #     with open(file_path, "r") as file:
+    #         # Parse the JSON objects one by one
+    #         parser = ijson.items(file, "item")
 
-            # Iterate over the JSON objects
-            for item in parser:
-                process_data(item)
+    #         # Iterate over the JSON objects
+    #         for item in parser:
+    #             process_data(item)
 
-        for song in song_info:
-            print(f"Song name: {song[2]}")
-            print(f"Song dimensions: {song}")
-            print("-----------------------------")
-            #
-            client = get_db_connection()
-            load_vectors(client, song[0], song[1])
+    #     for song in song_info:
+    #         print(f"Song name: {song[2]}")
+    #         print(f"Song dimensions: {song}")
+    #         print("-----------------------------")
+    #         #
+    #         client = get_db_connection()
+    #         load_vectors(client, song[0], song[1])
 
-    else:
-        print("File not found:", file_path)
-        return 0
+    # else:
+    #     print("File not found:", file_path)
+    #     return 0
+    # for song in song_info:
+    #     print(f"Song name: {song[2]}")
+    #     print(f"Song dimensions: {song}")
+    #     print("-----------------------------")
+    #     #
+    #     client = get_db_connection()
+    #     load_vectors(client, song[0], song[1])
+    client = get_db_connection()
+    import_tracks(client)
+
+    
 
 if __name__ == "__main__":
     main()
