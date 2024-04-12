@@ -8,6 +8,30 @@ from pymongo import MongoClient
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from auth import hasher
 
+def get_lyrics(artist, title, db: MongoClient):
+    artist_tracks = db["lyrics"].find_one({"artist" : artist})
+    lyrics = artist_tracks[title]
+    if(lyrics is None):
+        return lyrics
+    else:
+        lyrics["_id"] = str(lyrics["_id"])
+    return lyrics
+
+def create_lyrics(artist, title, lyrics, db):
+    # if no artist in DB
+    if(get_artist_lyrics(artist, db) is None):
+        return db["lyrics"].insert_one({artist:{title:lyrics}})
+    
+    # if artist in DB but song isn't
+    if(get_lyrics(artist,title,db) is None):
+        db["lyrics"].update_one({"artist": artist}, 
+                                {"$set": {title : lyrics}})
+    
+
+def get_artist_lyrics(artist, db):
+    return db["lyrics"].find_one({"artist":artist})
+    
+
 
 def get_user(username: str, db: MongoClient) -> str | None:
     """Get user from database from username asyncrously
