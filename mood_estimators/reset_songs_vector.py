@@ -18,12 +18,10 @@ filename = (
 
 file_path = os.path.join("song_data", DIRECTORY, filename)
 
-dict_DB = []
 song_info = []
 
 def import_tracks(db: MongoClient):
-    dict_DB = list(db.tracks.find({}))
-    print(dict_DB)
+    return list(db.tracks.find({}))
 
 
 def process_data(df):
@@ -31,6 +29,29 @@ def process_data(df):
     # For loop is used to access dict key and value
     track_name = df["track_name"]
     track_id = df["track_id"]
+    tempo = df["tempo"]
+    valence = df["valence"]
+    energy = df["energy"]
+    danceability = df["danceability"]
+
+    emotion_dimensions = {
+    "positive": 0,
+    "negative": 0,
+    "intense": 0,
+    "mild": 0,
+    "danceability": 0,
+    }
+
+    # Set danceabiltity
+    emotion_dimensions["danceability"] = float(danceability)
+    # Calculate vectors based on song properties
+    song_info.append(calc_mood_from_details(float(tempo), float(valence), float(energy), track_name, track_id, emotion_dimensions))
+
+def process_data_DB(df, track_id, track_name):
+    # Process each DataFrame. `df` is a dictionary of the song's properties. Ex: {"danceability": 0.647, "energy": 0.822,..."album_name": "G I R L"}.
+    # For loop is used to access dict key and value
+    track_name = track_name
+    track_id = track_id
     tempo = df["tempo"]
     valence = df["valence"]
     energy = df["energy"]
@@ -151,17 +172,28 @@ def main():
     # else:
     #     print("File not found:", file_path)
     #     return 0
-    # for song in song_info:
-    #     print(f"Song name: {song[2]}")
-    #     print(f"Song dimensions: {song}")
-    #     print("-----------------------------")
-    #     #
-    #     client = get_db_connection()
-    #     load_vectors(client, song[0], song[1])
-    client = get_db_connection()
-    import_tracks(client)
-
     
+    client = get_db_connection()
+    dict_DB = import_tracks(client)
+    # Open the JSON file
+    for item in dict_DB:
+        # print(item[""])
+        process_data_DB(item["analysis"], item["spotify"]["track_id"], item["track_name"])
+        # print(item["analysis"], item["spotify"]["track_id"], item["track_name"])
+
+        for song in song_info:
+            print(f"Song name: {song[2]}")
+            print(f"Song dimensions: {song}")
+            print("-----------------------------")
+            #
+            client = get_db_connection()
+            load_vectors(client, song[0], song[1])
+
+    # else:
+    #     print("File not found:", file_path)
+    #     return 0
+
+
 
 if __name__ == "__main__":
     main()
