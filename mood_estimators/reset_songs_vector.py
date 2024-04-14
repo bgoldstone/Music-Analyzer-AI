@@ -21,10 +21,23 @@ file_path = os.path.join("song_data", DIRECTORY, filename)
 song_info = []
 
 def import_tracks(db: MongoClient):
+    """Import tracks from the database.
+
+    Args:
+        db (MongoClient): The MongoDB client.
+
+    Returns:
+        list: List of tracks.
+    """
     return list(db.tracks.find({}))
 
 
 def process_data(df):
+    """Process data for each track.
+
+    Args:
+        df (dict): Dictionary containing song properties.
+    """
     # Process each DataFrame. `df` is a dictionary of the song's properties. Ex: {"danceability": 0.647, "energy": 0.822,..."album_name": "G I R L"}.
     # For loop is used to access dict key and value
     track_name = df["track_name"]
@@ -48,6 +61,13 @@ def process_data(df):
     song_info.append(calc_mood_from_details(float(tempo), float(valence), float(energy), track_name, track_id, emotion_dimensions))
 
 def process_data_DB(df, track_id, track_name):
+    """Process data from database for each track.
+
+    Args:
+        df (dict): Dictionary containing song properties.
+        track_id (str): Track ID.
+        track_name (str): Track name.
+    """
     # Process each DataFrame. `df` is a dictionary of the song's properties. Ex: {"danceability": 0.647, "energy": 0.822,..."album_name": "G I R L"}.
     # For loop is used to access dict key and value
     track_name = track_name
@@ -71,6 +91,14 @@ def process_data_DB(df, track_id, track_name):
     song_info.append(calc_mood_from_details(float(tempo), float(valence), float(energy), track_name, track_id, emotion_dimensions))
 
 def scale_tempo(tempo):
+    """Scale tempo.
+
+    Args:
+        tempo (float): Tempo value.
+
+    Returns:
+        float: Scaled tempo.
+    """
     # 70-90 bpm is the range where it is unclear that a song is positive or negative based on tempo
     # Therefore, equation  output smaller values between that range
     # Outliners(60bpm or 120bpm) have exponentially higher outputs
@@ -78,12 +106,28 @@ def scale_tempo(tempo):
 
 
 def scale_energy(energy):
+    """Scale energy.
+
+    Args:
+        energy (float): Energy value.
+
+    Returns:
+        float: Scaled energy.
+    """
     # 0.40 - 0.60 energy level is the range where it is unclear that a song is positive or negative
     # Therefore, equation  output smaller values between that range
     # Outliners(0.10 or 0.9) have exponentially higher outputs
     return (5 * (energy - 0.50) ** 3) * 40
 
 def scale_valence(valence):
+    """Scale valence.
+
+    Args:
+        valence (float): Valence value.
+
+    Returns:
+        float: Scaled valence.
+    """
     # 0.40 - 0.60 energy level is the range where it is unclear that a song is positive or negative
     # Therefore, equation  output smaller values between that range
     # Outliners(0.10 or 0.9) have exponentially higher outputs
@@ -91,6 +135,19 @@ def scale_valence(valence):
 
 
 def calc_mood_from_details(tempo, valence, energy, name, track_id, vectors):
+    """Calculate mood vectors based on song details.
+
+    Args:
+        tempo (float): Tempo value.
+        valence (float): Valence value.
+        energy (float): Energy value.
+        name (str): Track name.
+        track_id (str): Track ID.
+        vectors (dict): Emotion vectors.
+
+    Returns:
+        tuple: Mood vectors, track ID, and track name.
+    """
     # Incorporating valence into mood vectors:
     # Increase the "positive" vector component and decrease the "negative" vector component based on valence level.
     vectors["positive"] += round(scale_valence(valence), 3)
@@ -121,7 +178,7 @@ def calc_mood_from_details(tempo, valence, energy, name, track_id, vectors):
     # Mixed percentage increases both dimensions
     vectors["positive"] += (baseNum * (25 / 100))
     vectors["negative"] += (baseNum * (25 / 100))
-
+    
     return(vectors, track_id, name)
 
 def get_db_connection() -> MongoClient | None:
@@ -145,6 +202,13 @@ def get_db_connection() -> MongoClient | None:
     return db
 
 def load_vectors(db: MongoClient, vector, id) -> None:
+    """Load vectors into the database.
+
+    Args:
+        db (MongoClient): The MongoDB client.
+        vector (dict): The vector to be loaded.
+        id (str): The ID of the track.
+    """
     track_query = {"spotify.track_id": id}
 
     # Find or create track
@@ -186,11 +250,11 @@ def main():
         process_data_DB(item["analysis"], item["spotify"]["track_id"], item["track_name"])
         # print(item["analysis"], item["spotify"]["track_id"], item["track_name"])
 
-        for song in song_info:
-            print(f"Song name: {song[2]}")
-            print(f"Song dimensions: {song}")
-            print("-----------------------------")
-            load_vectors(client, song[0], song[1])
+    for song in song_info:
+        print(f"Song name: {song[2]}")
+        print(f"Song dimensions: {song}")
+        print("-----------------------------")
+        load_vectors(client, song[0], song[1])
 
 if __name__ == "__main__":
     main()
