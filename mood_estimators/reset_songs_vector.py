@@ -11,12 +11,12 @@ from pymongo import MongoClient
 
 MONGO_URL = "soundsmith.x5y65kb.mongodb.net"
 
-DIRECTORY = "Daeshaun"  # Ex: "Daeshaun"
-filename = (
-    "Standard_songs_track_details.json"  # "Lofi_Anime_Openings_track_details.json"
-)
+# DIRECTORY = "Daeshaun"  # Ex: "Daeshaun"
+# filename = (
+#     "Standard_songs_track_details.json"  # "Lofi_Anime_Openings_track_details.json"
+# )
 
-file_path = os.path.join("song_data", DIRECTORY, filename)
+# file_path = os.path.join("song_data", DIRECTORY, filename)
 
 song_info = []
 
@@ -102,8 +102,7 @@ def scale_tempo(tempo):
     # 70-90 bpm is the range where it is unclear that a song is positive or negative based on tempo
     # Therefore, equation  output smaller values between that range
     # Outliners(60bpm or 120bpm) have exponentially higher outputs
-    return 0.0004 * (tempo - 90) ** 3
-
+    return 0.0001 * (tempo - 90) ** 3
 
 def scale_energy(energy):
     """Scale energy.
@@ -117,7 +116,7 @@ def scale_energy(energy):
     # 0.40 - 0.60 energy level is the range where it is unclear that a song is positive or negative
     # Therefore, equation  output smaller values between that range
     # Outliners(0.10 or 0.9) have exponentially higher outputs
-    return (5 * (energy - 0.50) ** 3) * 40
+    return (50 * (energy - 0.60) ** 3) * 40
 
 def scale_valence(valence):
     """Scale valence.
@@ -131,7 +130,7 @@ def scale_valence(valence):
     # 0.40 - 0.60 energy level is the range where it is unclear that a song is positive or negative
     # Therefore, equation  output smaller values between that range
     # Outliners(0.10 or 0.9) have exponentially higher outputs
-    return (5 * (valence - 0.50) ** 3) * 40
+    return (50 * (valence - 0.60) ** 3) * 40
 
 
 def calc_mood_from_details(tempo, valence, energy, name, track_id, vectors):
@@ -164,7 +163,7 @@ def calc_mood_from_details(tempo, valence, energy, name, track_id, vectors):
     vectors["mild"] -= round(scale_tempo(tempo), 3)
 
     # Incorporates an analysis of lyrics using bertai; tuples: positive_percentage, negative_percentage, mixed_percentage, no_impact_percentage
-    baseNum = 16
+    baseNum = 20
     # lyrics_emotions = bertai.get_lyrics_mood()
     # # Modify dimension values based on bert.ai sentiment analysis. 
     # vectors["positive"] += (baseNum * (lyrics_emotions[0] / 100))
