@@ -107,14 +107,20 @@ def calc_mood_from_details(tempo, valence, energy, name, track_id, vectors):
     vectors["mild"] -= round(scale_tempo(tempo), 3)
 
     # Incorporates an analysis of lyrics using bertai; tuples: positive_percentage, negative_percentage, mixed_percentage, no_impact_percentage
-    lyrics_emotions = bertai.get_lyrics_mood()
     baseNum = 16
-    # Modify dimension values based on bert.ai sentiment analysis. 
-    vectors["positive"] += (baseNum * (lyrics_emotions[0] / 100))
-    vectors["negative"] += (baseNum * (lyrics_emotions[1] / 100))
+    # lyrics_emotions = bertai.get_lyrics_mood()
+    # # Modify dimension values based on bert.ai sentiment analysis. 
+    # vectors["positive"] += (baseNum * (lyrics_emotions[0] / 100))
+    # vectors["negative"] += (baseNum * (lyrics_emotions[1] / 100))
+    # # Mixed percentage increases both dimensions
+    # vectors["positive"] += (baseNum * (lyrics_emotions[2] / 100))
+    # vectors["negative"] += (baseNum * (lyrics_emotions[2] / 100))
+    
+    vectors["positive"] += (baseNum * (25 / 100))
+    vectors["negative"] += (baseNum * (50 / 100))
     # Mixed percentage increases both dimensions
-    vectors["positive"] += (baseNum * (lyrics_emotions[2] / 100))
-    vectors["negative"] += (baseNum * (lyrics_emotions[2] / 100))
+    vectors["positive"] += (baseNum * (25 / 100))
+    vectors["negative"] += (baseNum * (25 / 100))
 
     return(vectors, track_id, name)
 
@@ -177,7 +183,6 @@ def main():
     dict_DB = import_tracks(client)
     # Open the JSON file
     for item in dict_DB:
-        # print(item[""])
         process_data_DB(item["analysis"], item["spotify"]["track_id"], item["track_name"])
         # print(item["analysis"], item["spotify"]["track_id"], item["track_name"])
 
@@ -188,12 +193,6 @@ def main():
             #
             client = get_db_connection()
             load_vectors(client, song[0], song[1])
-
-    # else:
-    #     print("File not found:", file_path)
-    #     return 0
-
-
 
 if __name__ == "__main__":
     main()
