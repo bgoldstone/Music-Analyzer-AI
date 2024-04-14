@@ -190,8 +190,6 @@ def main():
             print(f"Song name: {song[2]}")
             print(f"Song dimensions: {song}")
             print("-----------------------------")
-            #
-            client = get_db_connection()
             load_vectors(client, song[0], song[1])
 
 if __name__ == "__main__":
