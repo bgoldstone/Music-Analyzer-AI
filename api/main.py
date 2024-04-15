@@ -22,7 +22,16 @@ CONFIG = dotenv.dotenv_values("database/.env")
 
 # Connect to the MongoDB database
 uri = f"mongodb+srv://{CONFIG.get('MONGO_USER')}:{CONFIG.get('MONGO_PASSWORD')}@{MONGO_URL}/"
+<<<<<<< Updated upstream
 mongodb_client = MongoClient(uri)
+=======
+<<<<<<< HEAD
+mongodb_client = MongoClient(uri,tlsCAFile=certifi.where())
+
+=======
+mongodb_client = MongoClient(uri, tlsCAFile=certifi.where())
+>>>>>>> 1d44cef4ddd01cf8eee4474bad19d44279328c5c
+>>>>>>> Stashed changes
 
 
 # Handles startup and shutdown events
