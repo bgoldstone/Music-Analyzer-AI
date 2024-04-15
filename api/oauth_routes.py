@@ -59,7 +59,7 @@ def login_to_spotify(request: Request, response: Response):
             "username": user["username"],
         }    
         query_string = urlencode(response_data)
-        redirect_url = f"/Blogs.js?{query_string}"
+        redirect_url = f"http://localhost:3000/Contact"
         return RedirectResponse(url=redirect_url)
         
     else:
