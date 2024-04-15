@@ -140,8 +140,8 @@ def import_lyrics(db: MongoClient, spotify_id):
     Returns:
         A string representing the song's lyrics
     """
-    objL = db.lyrics.find({track_id: spotify_id})
-    return objL[lyrics]
+    entry = (list(db.lyrics.find({"track_id": spotify_id}))[0])
+    return entry["lyrics"]
 
 def calc_mood_from_details(tempo, valence, energy, track_id, vectors, text):
     """Calculate mood vectors based on song details.
