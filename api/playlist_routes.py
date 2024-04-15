@@ -4,6 +4,8 @@ from fastapi import APIRouter, Request, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 import sys
 import pathlib
+from transformers import pipeline
+import json
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from api.models import GetPlaylist, Playlist, PlaylistGenerate
@@ -67,7 +69,28 @@ def delete_playlist_by_id(playlist_id: str, request: Request) -> None:
     response_model=PlaylistGenerate,
 )
 def generate_playlist(playlist: PlaylistGenerate) -> Dict:
-    # TODO Call AI to generate playlist
-    # TODO Add playlist to database
-    # TODO return playlist
-    return playlist
+    
+
+
+    # Initialize the text classification pipeline
+    classifier = pipeline(task="text-classification", model="SamLowe/roberta-base-go_emotions", top_k=None)
+
+
+
+    # Classify emotions for the given sentence
+    predictions = classifier(playlist.description)
+
+    # Extract the emotion labels and scores from the predictions
+    emotion_labels = [emotion['label'] for emotion in predictions[0]]
+    emotion_scores = [emotion['score'] for emotion in predictions[0]]
+
+    # Combine emotion labels and scores into a dictionary
+    emotion_predictions = dict(zip(emotion_labels, emotion_scores))
+
+    # Write the dictionary to a JSON file
+    output_file = "emotion_predictions.json"
+    with open(output_file, 'w') as f:
+        json.dump(emotion_predictions, f, indent=4)
+
+    print("Emotion predictions have been saved to", output_file)
+    return output_file

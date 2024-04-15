@@ -6,12 +6,16 @@ import sys
 import matplotlib
 import matplotlib.pyplot as plt
 import bertai
+import dotenv
+from pymongo import MongoClient
 
-DIRECTORY = "ben"  # Ex: "Daeshaun"
-filename = (
-    "songs-for-events_track_details.json"  # "Lofi_Anime_Openings_track_details.json"
-)
-file_path = os.path.join("song_data", DIRECTORY, filename)
+MONGO_URL = "soundsmith.x5y65kb.mongodb.net"
+
+# DIRECTORY = "Daeshaun"  # Ex: "Daeshaun"
+# filename = (
+#     "Sad_Songs_track_details.json"  # "Lofi_Anime_Openings_track_details.json"
+# )
+# file_path = os.path.join("song_data", DIRECTORY, filename)
 
 song_info = []
 
@@ -22,120 +26,99 @@ stand_vect_dict = {
     "negative": [({'positive': -7.451940799999999, 'negative': 7.451940799999999, 'intense': -1.0585302068395999, 'mild': 1.0585302068395999, 'danceability': 0.467}, 'Everybody Hurts', '6PypGyiu0Y2lCDBN1XZEnP'), ({'positive': -0.0009826000000000025, 'negative': 0.0009826000000000025, 'intense': 86.75278244360685, 'mild': -86.75278244360685, 'danceability': 0.652}, 'Let Me Down Slowly', '2qxmye6gAegTMjLKEBoR3d'), ({'positive': -6.3108992, 'negative': 6.3108992, 'intense': -0.1848024869664003, 'mild': 0.1848024869664003, 'danceability': 0.418}, 'Stay With Me', '5Nm9ERjJZ5oyfXZTECKmRt')],
 }
 
-def process_data(df):
-    # Process each DataFrame. `df` is a dictionary of the song's properties. Ex: {"danceability": 0.647, "energy": 0.822,..."album_name": "G I R L"}.
-    # For loop is used to access dict key and value
-    track_name = df["track_name"]
-    track_id = df["track_id"]
-    tempo = df["tempo"]
-    valence = df["valence"]
-    energy = df["energy"]
-    danceability = df["danceability"]
+def get_db_connection() -> MongoClient | None:
+    """Creates and returns db connection.
 
-    emotion_dimensions = {
-    "positive": 0,
-    "negative": 0,
-    "intense": 0,
-    "mild": 0,
-    "danceability": 0,
-    }
+    Returns:
+        MongoClient | None: MongoClient object, or None if connection fails.
+    """
+    dotenv.load_dotenv(os.path.join(__file__, ".env"))
+    mongo_user = dotenv.dotenv_values().get("MONGO_USER")
+    mongo_password = dotenv.dotenv_values().get("MONGO_PASSWORD")
+    mongo_uri = f"mongodb+srv://{mongo_user}:{mongo_password}@{MONGO_URL}/"
+    client = MongoClient(mongo_uri)
+    db = client.soundsmith
+    try:
+        db.command("ping")
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
+        return
+    return db
 
-    # Set danceabiltity
-    emotion_dimensions["danceability"] = float(danceability)
-    # Calculate vectors based on song properties
-    song_info.append(calc_mood_from_details(float(tempo), float(valence), float(energy), track_name, track_id, emotion_dimensions))
+def import_tracks(db: MongoClient):
+    """Import tracks from the database.
 
-def scale_tempo(tempo):
-    # 70-90 bpm is the range where it is unclear that a song is positive or negative based on tempo
-    # Therefore, equation  output smaller values between that range
-    # Outliners(60bpm or 120bpm) have exponentially higher outputs
-    return 0.0004 * (tempo - 90) ** 3
+    Args:
+        db (MongoClient): The MongoDB client.
 
+    Returns:
+        list: List of tracks.
+    """
+    return list(db.tracks.find({}))
 
-def scale_energy(energy):
-    # 0.40 - 0.60 energy level is the range where it is unclear that a song is positive or negative
-    # Therefore, equation  output smaller values between that range
-    # Outliners(0.10 or 0.9) have exponentially higher outputs
-    return (5 * (energy - 0.50) ** 3) * 40
-
-def scale_valence(valence):
-    # 0.40 - 0.60 energy level is the range where it is unclear that a song is positive or negative
-    # Therefore, equation  output smaller values between that range
-    # Outliners(0.10 or 0.9) have exponentially higher outputs
-    return (5 * (valence - 0.50) ** 3) * 40
-
-
-def calc_mood_from_details(tempo, valence, energy, name, track_id, vectors):
-    # Incorporating valence into mood vectors:
-    # Increase the "positive" vector component and decrease the "negative" vector component based on valence level.
-    vectors["positive"] += round(scale_valence(valence), 3)
-    vectors["negative"] -= round(scale_valence(valence), 3)
-    #
-    # Incorporating energy into mood vectors:
-    # Increase the "intense" vector component and decrease the "mild" vector component based on energy level.
-    vectors["intense"] += round(scale_energy(energy) , 3)
-    vectors["mild"] -= round(scale_energy(energy) , 3)
-    #
-    # Incorporating tempo into mood vectors:
-    # Increase the "intense" vector component if tempo is high, else adjust "negative" based on the absolute value of scaled tempo.
-    vectors["intense"] += round(scale_tempo(tempo), 3) 
-    vectors["mild"] -= round(scale_tempo(tempo), 3)
-
-    # Incorporates an analysis of lyrics using bertai; tuples: positive_count, negative_count, mixed_count, no_impact_count
-    lyrics_emotions = bertai.get_lyrics_mood()
-
-    for eachPercent in lyrics_emotions:
-        index = 0
-        if index == 0:
-            vectors["positive"] += (eachPercent * 20)
-        elif index == 1:
-            vectors["negative"] += (eachPercent * 20)
-        elif index == 2:
-            vectors["positive"] += (eachPercent * 20)
-            vectors["negative"] += (eachPercent * 20)
-        elif index == 3:
-            vectors["positive"] -= (eachPercent * 20)
-            vectors["negative"] -= (eachPercent * 20)
-
-    return(vectors, track_id, name)
 
 def cosine_similarity(vector1, vector2):
+    """Calculate the cosine similarity between two vectors.
+
+    Args:
+        vector1 (np.ndarray): The first vector.
+        vector2 (np.ndarray): The second vector.
+
+    Returns:
+        float: The cosine similarity between the two vectors.
+    """
     dot_product = np.dot(vector1, vector2)
     magnitude_vector1 = np.linalg.norm(vector1)
     magnitude_vector2 = np.linalg.norm(vector2)
     return dot_product / (magnitude_vector1 * magnitude_vector2)
 
 def main():
-    # Get the data(audio features from spotify) from the json
-    if os.path.exists(file_path):
-        # Open the JSON file
-        with open(file_path, "r") as file:
-            # Parse the JSON objects one by one
-            parser = ijson.items(file, "item")
+    # # Get the data(audio features from spotify) from the json
+    # if os.path.exists(file_path):
+    #     # Open the JSON file
+    #     with open(file_path, "r") as file:
+    #         # Parse the JSON objects one by one
+    #         parser = ijson.items(file, "item")
 
-            # Iterate over the JSON objects
-            for item in parser:
-                process_data(item)
+    #         # Iterate over the JSON objects
+    #         for item in parser:
+    #             process_data(item)
 
-        for song in song_info:
-            print(f"Song name: {song[2]}")
-            print(f"Song dimensions: {song}")
-            P1 = np.array(list(song[0].values()))
+    #     for song in song_info:
+    #         print(f"Song name: {song[2]}")
+    #         print(f"Song dimensions: {song}")
+    #         P1 = np.array(list(song[0].values()))
             
-            for quadrant in stand_vect_dict:
-                sum = 0
-                print(quadrant, end=": ")
-                for each_song in stand_vect_dict[quadrant]:
-                    P2 = np.array(list(each_song[0].values()))
-                    # print(each_song[1], end=": \n")
-                    # print(cosine_similarity(P1, P2))
-                    sum += cosine_similarity(P1, P2)
-                print(sum / len(stand_vect_dict[quadrant]))
-            print("-----------------------------")
+    #         for quadrant in stand_vect_dict:
+    #             sum = 0
+    #             print(quadrant, end=": ")
+    #             for each_song in stand_vect_dict[quadrant]:
+    #                 P2 = np.array(list(each_song[0].values()))
+    #                 sum += cosine_similarity(P1, P2)
+    #             print(sum / len(stand_vect_dict[quadrant]))
+    #         print("-----------------------------")
 
-    else:
-        print("File not found:", file_path)
-        return 0
+    # else:
+    #     print("File not found:", file_path)
+    #     return 0
+
+    client = get_db_connection()
+    dict_DB = import_tracks(client)
+
+    for track in dict_DB:
+        print(f"Song name: {track["track_name"]} by {track["artist_name"]}")
+        print(f"Song dimensions: {track["vector"]}")
+        P1 = np.array(list(track["vector"].values()))
+        
+        for quadrant in stand_vect_dict:
+            sum = 0
+            print(quadrant, end=": ")
+            for each_song in stand_vect_dict[quadrant]:
+                P2 = np.array(list(each_song[0].values()))
+                sum += cosine_similarity(P1, P2)
+            print(sum / len(stand_vect_dict[quadrant]))
+        print("-----------------------------")
 
 if __name__ == "__main__":
     main()
