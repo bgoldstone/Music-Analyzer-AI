@@ -13,6 +13,16 @@ def main():
     client = get_db_connection()
     load_playlists(client)
 
+def load_lyrics(db: MongoClient, id, lyrics):
+    track_query = {"track_id": id}
+
+    # Find or create track
+    mongo_track = db.tracks.find_one_and_update(
+        track_query,
+        {"$set": {"lyrics": lyrics, "id" : id}},
+        upsert=True,
+        return_document=True,
+    )
 
 def get_db_connection() -> MongoClient | None:
     """Creates and returns db connection.

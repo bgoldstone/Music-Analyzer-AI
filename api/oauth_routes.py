@@ -1,6 +1,6 @@
 import pathlib
 import sys
-from fastapi import APIRouter, Request, Response
+from fastapi import APIRouter, Request, Response, WebSocket
 from fastapi.responses import RedirectResponse
 from requests import request
 from spotipy import oauth2, Spotify
@@ -21,6 +21,13 @@ sp_oauth = oauth2.SpotifyOAuth(
     cache_path=CONFIG.get("SPOTIFY_CACHE_PATH"),
 )
 
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    while True:
+        data = await websocket.receive_text()
+        await websocket.send_text(f"Message text was: {data}")
+
 
 @oauth_router.get("/spotify")
 def login_to_spotify(request: Request, response: Response):
@@ -36,7 +43,7 @@ def login_to_spotify(request: Request, response: Response):
                 sp.current_user()["id"],
                 request.app.database,
             )
-        print(token)
+        # print(token)
 
         jwt_token = tokens.create_spotify_token(
             token["access_token"], token["expires_at"], token["scope"]
@@ -51,3 +58,5 @@ def login_to_spotify(request: Request, response: Response):
         auth_url = sp_oauth.get_authorize_url()
         response = RedirectResponse(url=auth_url)
         return response
+    
+
