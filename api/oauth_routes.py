@@ -1,16 +1,21 @@
 import pathlib
 import sys
-from fastapi import APIRouter, Request, Response, WebSocket
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Request, Response, WebSocket, FastAPI
+from fastapi.responses import RedirectResponse, JSONResponse
 from requests import request
 from spotipy import oauth2, Spotify
 import dotenv
+from urllib.parse import urlencode
+
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from auth import tokens
 from database.crud import create_spotify_user, create_user, get_spotify_user
 
 CONFIG = dotenv.dotenv_values("spotify_data_retrival/.env")
+
+app = FastAPI()
+
 
 oauth_router = APIRouter(prefix="/oauth", tags=["oauth"])
 sp_oauth = oauth2.SpotifyOAuth(
@@ -48,11 +53,15 @@ def login_to_spotify(request: Request, response: Response):
         jwt_token = tokens.create_spotify_token(
             token["access_token"], token["expires_at"], token["scope"]
         )
-        return {
+        response_data = {
             "jwt": jwt_token,
             "spotify_id": user["spotify_id"],
             "username": user["username"],
-        }
+        }    
+        query_string = urlencode(response_data)
+        redirect_url = f"/Blogs.js?{query_string}"
+        return RedirectResponse(url=redirect_url)
+        
     else:
         print("No token found. Re-authenticating...")
         auth_url = sp_oauth.get_authorize_url()
