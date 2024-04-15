@@ -18,8 +18,6 @@ MONGO_URL = "soundsmith.x5y65kb.mongodb.net"
 
 # file_path = os.path.join("song_data", DIRECTORY, filename)
 
-song_info = []
-
 def import_tracks(db: MongoClient):
     """Import tracks from the database.
 
@@ -58,9 +56,9 @@ def process_data(df):
     # Set danceabiltity
     emotion_dimensions["danceability"] = float(danceability)
     # Calculate vectors based on song properties
-    song_info.append(calc_mood_from_details(float(tempo), float(valence), float(energy), track_name, track_id, emotion_dimensions))
+    song_info.append(calc_mood_from_details(float(tempo), float(valence), float(energy), track_id, emotion_dimensions))
 
-def process_data_DB(df, track_id, track_name):
+def process_data_DB(df, track_id, text):
     """Process data from database for each track.
 
     Args:
@@ -88,7 +86,7 @@ def process_data_DB(df, track_id, track_name):
     # Set danceabiltity
     emotion_dimensions["danceability"] = float(danceability)
     # Calculate vectors based on song properties
-    song_info.append(calc_mood_from_details(float(tempo), float(valence), float(energy), track_name, track_id, emotion_dimensions))
+    song_info.append(calc_mood_from_details(float(tempo), float(valence), float(energy), track_id, emotion_dimensions, text))
 
 def scale_tempo(tempo):
     """Scale tempo.
@@ -132,8 +130,20 @@ def scale_valence(valence):
     # Outliners(0.10 or 0.9) have exponentially higher outputs
     return (50 * (valence - 0.60) ** 3) * 40
 
+def import_lyrics(db: MongoClient, spotify_id):
+    """Import lyrics from the database.
 
-def calc_mood_from_details(tempo, valence, energy, name, track_id, vectors):
+    Args:
+        db (MongoClient): The MongoDB client. 
+        id: The spotify song ID
+
+    Returns:
+        A string representing the song's lyrics
+    """
+    objL = db.lyrics.find({track_id: spotify_id})
+    return objL[lyrics]
+
+def calc_mood_from_details(tempo, valence, energy, track_id, vectors, text):
     """Calculate mood vectors based on song details.
 
     Args:
@@ -163,7 +173,8 @@ def calc_mood_from_details(tempo, valence, energy, name, track_id, vectors):
     vectors["mild"] -= round(scale_tempo(tempo), 3)
 
     # Incorporates an analysis of lyrics using bertai; tuples: positive_percentage, negative_percentage, mixed_percentage, no_impact_percentage
-    baseNum = 20
+    # track_lyrics = import_lyrics(client)
+    # baseNum = 20
     # lyrics_emotions = bertai.get_lyrics_mood()
     # # Modify dimension values based on bert.ai sentiment analysis. 
     # vectors["positive"] += (baseNum * (lyrics_emotions[0] / 100))
@@ -200,6 +211,8 @@ def get_db_connection() -> MongoClient | None:
         return
     return db
 
+
+
 def load_vectors(db: MongoClient, vector, id) -> None:
     """Load vectors into the database.
 
@@ -217,6 +230,10 @@ def load_vectors(db: MongoClient, vector, id) -> None:
         upsert=True,
         return_document=True,
     )
+
+song_info = []
+client = get_db_connection()
+dict_DB = import_tracks(client)
 
 def main():
     # # Get the data(audio features from spotify) from the json
@@ -241,12 +258,10 @@ def main():
     # else:
     #     print("File not found:", file_path)
     #     return 0
-    
-    client = get_db_connection()
-    dict_DB = import_tracks(client)
     # Open the JSON file
     for item in dict_DB:
-        process_data_DB(item["analysis"], item["spotify"]["track_id"], item["track_name"])
+        track_lyrics = import_lyrics(client, item["spotify"]["track_id"])
+        process_data_DB(item["analysis"], item["spotify"]["track_id"], import_lyrics(client, item["spotify"]["track_id"]))
         # print(item["analysis"], item["spotify"]["track_id"], item["track_name"])
 
     for song in song_info:
