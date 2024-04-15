@@ -5,13 +5,20 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import lyricsgenius
 import time
 import json
+import dotenv
+import os
+from pymongo import MongoClient
+
+MONGO_URL = "soundsmith.x5y65kb.mongodb.net"
+SONG_DATA_DIRECTORY = "song_data"
+SONG_DATA_DIRECTORY_PATH = os.path.join(os.getcwd(), SONG_DATA_DIRECTORY)
 
 # Initialize Spotify and Genius API credentials
 spotify_client_id = "5c787e0eccd246ba9c4500f755bff00b"
 spotify_client_secret = "a9b2fc8b4eac4f219aaa8dd852e98b1c"
 spotify_user_id = "spotify:user:daeshaunmorrison"
-spotify_playlist_id = "spotify:playlist:47FWzqz1PwNyKaIApQjF9H"
-#spotify_playlist_id ="spotify:playlist:6k6gktoOhlHLrGXr8M8Psy"
+spotify_playlist_id = "spotify:playlist:47FWzqz1PwNyKaIApQjF9H" # longer playlist
+#spotify_playlist_id ="spotify:playlist:6k6gktoOhlHLrGXr8M8Psy" # shorter playlist
 genius_key = "dZCHAObV2X7ZCH4QN2bewuX7lAVoVHedaot3cNn8l_dpwtSwWEaK1cHg8TrbhDtq"
 genius_token='4Os3tEbxKSqR_gE76OqwUY3TTQVO11MVLDy14ZmmrC4AS0SygKak8dpgZy3wb5pe'
 genius = lyricsgenius.Genius(genius_token)
@@ -50,11 +57,19 @@ class GetLyrics():
             track_artists.append(self.playlist['items'][song]['track']['artists'][0]['name'])
         self.track_artists = track_artists
         return self.track_artists
+    
+    def get_track_ids(self):
+        track_ids = []
+        for song in range(len(self.playlist['items'])):
+            track_ids.append(self.playlist['items'][song]['track']['id'])
+        self.track_ids = track_ids
+        return self.track_ids
         
 
     def get_lyrics(self):
         playlist = GetLyrics.get_playlist_info(self)
         track_names = GetLyrics.get_track_names(self)
+        track_ids = self.get_track_ids()
         track_artists = GetLyrics.get_track_artists(self)
         song_lyrics = {}
 
@@ -90,13 +105,18 @@ class GetLyrics():
                 
                 # Store track information and cleaned lyrics in a nested dictionary
                 artist = track_artists[i]
-                song= track_names[i]
+                song_title= track_names[i]
+                song_id = track_ids[i]
                 lyrics = lyrics_clean
 
                 if(artist not in song_lyrics):
-                    song_lyrics[artist] = {song : lyrics}
+                    song_lyrics[artist] = {song_title : {song_id : lyrics}}
                 else:
-                    song_lyrics[artist][song] = lyrics
+                    if song_title not in song_lyrics[artist]:
+                        song_lyrics[artist][song_title] = {song_id: lyrics}
+                    else:
+                        song_lyrics[artist][song_title][song_id] = lyrics
+
         return song_lyrics
 
 # Initialize GetLyrics class with Spotify and Genius credentials
@@ -105,5 +125,43 @@ songs = GetLyrics(spotify_client_id, spotify_client_secret, spotify_user_id, spo
 song_lyrics = songs.get_lyrics()
 
 # Write artist-song-lyrics data to a JSON file
-with open("lyric_retrival\\lyrics.json", "w") as json_file:
-    json.dump(song_lyrics, json_file, indent=4)
+#with open("lyric_retrival\\lyrics.json", "w") as json_file:
+#    json.dump(song_lyrics, json_file, indent=4)
+
+def get_db_connection() -> MongoClient | None:
+    """Creates and returns db connection.
+
+    Returns:
+        MongoClient | None: MongoClient object, or None if connection fails.
+    """
+    dotenv.load_dotenv(os.path.join(__file__, ".env"))
+    mongo_user = dotenv.dotenv_values().get("MONGO_USER")
+    mongo_password = dotenv.dotenv_values().get("MONGO_PASSWORD")
+    mongo_uri = f"mongodb+srv://{mongo_user}:{mongo_password}@{MONGO_URL}/"
+    client = MongoClient(mongo_uri)
+    db = client.soundsmith
+    try:
+        db.command("ping")
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
+        return
+    return db
+
+def load_lyrics(db: MongoClient, id, lyrics):
+    track_query = {"track_id": id}
+
+    # Find or create track
+    mongo_track = db.lyrics.find_one_and_update(
+        track_query,
+        {"$set": {"lyrics": lyrics}},
+        upsert=True,
+        return_document=True,
+    )
+client = get_db_connection()
+
+for artist, artist_info in song_lyrics.items():
+    for song,tuple in artist_info.items():
+        for id, lyrics in tuple.items():
+            #print(id,lyrics)
+            load_lyrics(client, id, lyrics)
