@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 import uvicorn
+import certifi
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 # FastAPI routes
@@ -21,7 +22,9 @@ CONFIG = dotenv.dotenv_values("database/.env")
 
 # Connect to the MongoDB database
 uri = f"mongodb+srv://{CONFIG.get('MONGO_USER')}:{CONFIG.get('MONGO_PASSWORD')}@{MONGO_URL}/"
-mongodb_client = MongoClient(uri, tlsCAFile=certifi.where())
+
+mongodb_client = MongoClient(uri,tlsCAFile=certifi.where())
+
 
 
 # Handles startup and shutdown events
