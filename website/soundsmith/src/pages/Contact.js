@@ -1,24 +1,53 @@
-import '../App.css';
-import background from "../dj-background.jpg";
-import React from 'react';
-               
+import '../App.css'; // Import your existing CSS file
+import React, { useState } from 'react';
+import axios from 'axios';
 
 const Contact = () => {
-	return <div className="login" style={{ 
-    backgroundImage: `url(${background})`, backgroundPosition: 'center', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', width: '100vw', height: '100vh', }}>
-      <header className="App-header">
-        <h1 className="header-title">How are you feeling dawg</h1> 
-        <label className="header-label">You may put a few words or even a few sentences</label> 
-        <textarea id="moodinput" name="moodinput"></textarea>
-        <div className="Clickable-text" onClick={handleBeginClick}>Sign In</div>
-      </header>
-    </div>
-  };
+    const [emotionPredictions, setEmotionPredictions] = useState(null);
+    const [description, setDescription] = useState('');
 
-  function handleBeginClick() {
-    // Add code to handle click event (e.g., navigate to next page)
-    alert('Let sound adventure begin!');
-  }
-  
-  
-  export default Contact;
+    const handleInputChange = (event) => {
+        setDescription(event.target.value);
+    };
+
+    const handleBeginClick = async () => {
+        try {
+            const response = await fetch('http://localhost:8000/playlists/generate', {body:JSON.stringify({
+              "description": description,
+              "jwt": "66173c89b970969d7d8d5524",
+              "keywords": "list of keywords",
+              "mood": "Happy"
+            }),method:"POST",headers:{"Content-Type":"application/json","accept": "application/json"}});
+            if (!response.data) {
+                throw new Error('Failed to generate playlist');
+            }
+            setEmotionPredictions(response.data);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    return (
+        <div className="login">
+            <header className="App-header">
+                <h1 className="header-title">How are you feeling dawg</h1> 
+                <label className="header-label">You may put a few words or even a few sentences</label> 
+                <textarea
+                    id="moodinput"
+                    name="moodinput"
+                    value={description}
+                    onChange={handleInputChange}
+                ></textarea>
+                <div className="Clickable-text" onClick={handleBeginClick}>Generate Playlist</div>
+                {emotionPredictions && (
+                    <div>
+                        <h2>Emotion Predictions</h2>
+                        <pre>{JSON.stringify(emotionPredictions, null, 2)}</pre>
+                    </div>
+                )}
+            </header>
+        </div>
+    );
+};
+
+export default Contact;
