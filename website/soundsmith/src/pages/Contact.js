@@ -11,20 +11,21 @@ const Contact = () => {
     };
 
     const handleBeginClick = async () => {
+      let response;
         try {
-            const response = await fetch('http://localhost:8000/playlists/generate', {body:JSON.stringify({
+            response = await fetch('http://localhost:8000/playlists/generate', {body:JSON.stringify({
               "description": description,
               "jwt": "66173c89b970969d7d8d5524",
               "keywords": "list of keywords",
               "mood": "Happy"
             }),method:"POST",headers:{"Content-Type":"application/json","accept": "application/json"}});
-            if (!response.data) {
-                throw new Error('Failed to generate playlist');
-            }
-            setEmotionPredictions(response.data);
+            
+            setEmotionPredictions(await response.json());
+
         } catch (error) {
             console.error('Error:', error);
         }
+      console.log(emotionPredictions);
     };
 
     return (
@@ -41,7 +42,7 @@ const Contact = () => {
                 <div className="Clickable-text" onClick={handleBeginClick}>Generate Playlist</div>
                 {emotionPredictions && (
                     <div>
-                        <h2>Emotion Predictions</h2>
+                        <h2>Emotion Predictions below, now time to craft melodies</h2>
                         <pre>{JSON.stringify(emotionPredictions, null, 2)}</pre>
                     </div>
                 )}

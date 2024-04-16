@@ -51,8 +51,7 @@ def main():
     uvicorn.run(
         "api.main:app",
         host=f'{CONFIG.get("API_HOST")}',
-        port=f'{int(CONFIG.get("API_PORT"))}',
-        reload=True
+        port=f'{int(CONFIG.get("API_PORT"))}'
     )
     print("Running API Server on http://localhost:8000")
 
