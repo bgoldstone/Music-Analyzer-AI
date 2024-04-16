@@ -11,12 +11,6 @@ from pymongo import MongoClient
 
 MONGO_URL = "soundsmith.x5y65kb.mongodb.net"
 
-# DIRECTORY = "Daeshaun"  # Ex: "Daeshaun"
-# filename = (
-#     "Sad_Songs_track_details.json"  # "Lofi_Anime_Openings_track_details.json"
-# )
-# file_path = os.path.join("song_data", DIRECTORY, filename)
-
 song_info = []
 
 stand_vect_dict = {
@@ -57,6 +51,12 @@ def import_tracks(db: MongoClient):
     """
     return list(db.tracks.find({}))
 
+def import_standard_songs(db: MongoClient, emotion):
+
+    tracks = list(db.tracks.find({"standard": emotion}))
+    return [(track["vector"], track["spotify"]["track_id"]) for track in tracks]
+
+
 
 def cosine_similarity(vector1, vector2):
     """Calculate the cosine similarity between two vectors.
@@ -76,37 +76,9 @@ def cosine_similarity(vector1, vector2):
 
 
 def main():
-    # # Get the data(audio features from spotify) from the json
-    # if os.path.exists(file_path):
-    #     # Open the JSON file
-    #     with open(file_path, "r") as file:
-    #         # Parse the JSON objects one by one
-    #         parser = ijson.items(file, "item")
-
-    #         # Iterate over the JSON objects
-    #         for item in parser:
-    #             process_data(item)
-
-    #     for song in song_info:
-    #         print(f"Song name: {song[2]}")
-    #         print(f"Song dimensions: {song}")
-    #         P1 = np.array(list(song[0].values()))
-            
-    #         for quadrant in stand_vect_dict:
-    #             sum = 0
-    #             print(quadrant, end=": ")
-    #             for each_song in stand_vect_dict[quadrant]:
-    #                 P2 = np.array(list(each_song[0].values()))
-    #                 sum += cosine_similarity(P1, P2)
-    #             print(sum / len(stand_vect_dict[quadrant]))
-    #         print("-----------------------------")
-
-    # else:
-    #     print("File not found:", file_path)
-    #     return 0
-
     client = get_db_connection()
     dict_DB = import_tracks(client)
+    print(import_standard_songs(client, "sad"))
 
     for track in dict_DB:
         print(f"Song name: {track["track_name"]} by {track["artist_name"]}")
