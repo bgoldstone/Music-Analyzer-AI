@@ -73,6 +73,8 @@ def cosine_similarity(vector1, vector2):
     magnitude_vector2 = np.linalg.norm(vector2)
     return dot_product / (magnitude_vector1 * magnitude_vector2)
 
+
+
 def main():
     # # Get the data(audio features from spotify) from the json
     # if os.path.exists(file_path):
