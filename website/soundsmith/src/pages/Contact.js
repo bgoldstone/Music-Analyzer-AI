@@ -27,7 +27,7 @@ const Contact = () => {
               "description": description,
               "jwt": "66173c89b970969d7d8d5524",
               "keywords": "list of keywords",
-              "mood": "Happy"
+              "mood": " "
             }),method:"POST",headers:{"Content-Type":"application/json","accept": "application/json"}});
 
             setEmotionPredictions(await response.json());

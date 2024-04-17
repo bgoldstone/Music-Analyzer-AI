@@ -83,7 +83,7 @@ def generate_playlist(playlist: PlaylistGenerate) -> Dict:
     emotion_predictions = dict(zip(emotion_labels, emotion_scores))
 
     # Write the dictionary to a JSON file
-    output_file = "emotion_predictions.json"
+    output_file = "mood_estimators/emotion_predictions.json"
     with open(output_file, 'w') as f:
         json.dump(emotion_predictions, f, indent=4)
 
