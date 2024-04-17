@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import numpy as np
 import ijson
+import json
 import sys
 import matplotlib
 import matplotlib.pyplot as plt
@@ -62,7 +63,7 @@ def cosine_similarity(vector1, vector2):
     magnitude_vector2 = np.linalg.norm(vector2)
     return dot_product / (magnitude_vector1 * magnitude_vector2)
 
-def main():
+def main(group):
     client = get_db_connection()
     dict_DB = import_tracks(client)
     heap = MaxHeap()
@@ -88,7 +89,7 @@ def main():
             # print(sum / len(stand_vect_dict[quadrant]))
             # similarity = sum / len(stand_vect_dict[quadrant])
             # heap.insert((similarity))
-            if quadrant == "positive":
+            if quadrant == group:
                 sum = 0
                 print(quadrant, end=": ")
                 for each_song in stand_vect_dict[quadrant]:
@@ -96,10 +97,33 @@ def main():
                     sum += cosine_similarity(P1, P2)
                 print(sum / len(stand_vect_dict[quadrant]))
                 similarity = sum / len(stand_vect_dict[quadrant])
-                heap.insert((similarity, track["track_name"]))
+                heap.insert((similarity, track["track_name"], track["artist_name"]))
         print("-----------------------------")
 
-    heap.print_heap()
+    heap.print_sorted_heap()
+
+def import_emotions_predict(json_file_path):
+    try:
+        with open(json_file_path, 'r') as file:
+            data = json.load(file)
+            keys = list(data.keys())[:2]
+
+            if (keys[0] == "sadness") or (keys[0] == "disappointment") or (keys[0] == "grief") or (keys[0] == "remorse") or (keys[0] == "embarrassment"):
+                return "sad"
+            elif (keys[0] == "joy") or (keys[0] == "amusement") or (keys[0] == "surprise") or (keys[0] == "love") or (keys[0] == "excitement") or (keys[0] == "gratitude") or (keys[0] == "pride") or (keys[0] == "relief"):
+                return "happy"
+            elif (keys[0] == "neutral") or (keys[0] == "curiosity") or (keys[0] == "approval") or (keys[0] == "admiration") or (keys[0] == "realization") or (keys[0] == "optimism") or (keys[0] == "desire") or (keys[0] == "relief"):
+                return "chill"
+            elif (keys[0] == "anger") or (keys[0] == "annoyance") or (keys[0] == "disapproval") or (keys[0] == "disgust") or (keys[0] == "fear") or (keys[0] == "confusion") or (keys[0] == "caring") or (keys[0] == "nervousness"):
+                return "stressing"
+
+    except FileNotFoundError:
+        return "File not found"
+    except json.JSONDecodeError:
+        return "Invalid JSON format"
+    except Exception as e:
+        return f"An error occurred: {e}"
 
 if __name__ == "__main__":
-    main()
+    two_sentiments =  import_emotions_predict('mood_estimators\\emotion_predictions.json')
+    main(two_sentiments)
