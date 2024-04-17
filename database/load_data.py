@@ -13,6 +13,16 @@ def main():
     client = get_db_connection()
     load_playlists(client)
 
+def load_lyrics(db: MongoClient, id, lyrics):
+    track_query = {"track_id": id}
+
+    # Find or create track
+    mongo_track = db.tracks.find_one_and_update(
+        track_query,
+        {"$set": {"lyrics": lyrics, "id" : id}},
+        upsert=True,
+        return_document=True,
+    )
 
 def get_db_connection() -> MongoClient | None:
     """Creates and returns db connection.
@@ -33,7 +43,6 @@ def get_db_connection() -> MongoClient | None:
         print(e)
         return
     return db
-
 
 def load_playlists(db: MongoClient) -> None:
     # for each user
@@ -86,7 +95,6 @@ def load_playlists(db: MongoClient) -> None:
                 upsert=True,
             )
 
-
 def clean_track(track: dict) -> dict:
     """
     Function to clean up the given track dictionary by reorganizing and removing unnecessary fields.
@@ -121,7 +129,6 @@ def clean_track(track: dict) -> dict:
     del new_track["analysis"]["track_href"]
 
     return new_track
-
 
 if __name__ == "__main__":
     main()
