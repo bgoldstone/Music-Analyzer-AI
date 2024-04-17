@@ -66,7 +66,6 @@ def delete_playlist_by_id(playlist_id: str, request: Request) -> None:
 @playlist_router.post(
     "/generate",
     response_description="Generate a new playlist with AI",
-    response_model=PlaylistGenerate,
 )
 def generate_playlist(playlist: PlaylistGenerate) -> Dict:
     
@@ -93,4 +92,4 @@ def generate_playlist(playlist: PlaylistGenerate) -> Dict:
         json.dump(emotion_predictions, f, indent=4)
 
     print("Emotion predictions have been saved to", output_file)
-    return output_file
+    return emotion_predictions

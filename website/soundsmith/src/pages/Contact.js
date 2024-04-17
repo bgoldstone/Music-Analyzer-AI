@@ -1,7 +1,8 @@
-import '../App.css'; // Import your existing CSS file
+import '../App.css'; 
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, useSearchParams, useNavigate} from "react-router-dom";
 // import axios from 'axios';
+
 
 const Contact = () => {
     const queryString = window.location.href;
@@ -28,7 +29,7 @@ const Contact = () => {
               "keywords": "list of keywords",
               "mood": "Happy"
             }),method:"POST",headers:{"Content-Type":"application/json","accept": "application/json"}});
-            
+
             setEmotionPredictions(await response.json());
 
         } catch (error) {

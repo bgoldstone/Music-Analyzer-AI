@@ -67,5 +67,3 @@ def login_to_spotify(request: Request, response: Response):
         auth_url = sp_oauth.get_authorize_url()
         response = RedirectResponse(url=auth_url)
         return response
-    
-

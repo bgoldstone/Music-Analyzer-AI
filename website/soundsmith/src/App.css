@@ -49,6 +49,25 @@ body{
 
 }
 
+
+textarea[type="text"],
+textarea[id="moodinput"] {
+  cursor: text;
+  padding: 10px;
+  background-color: transparent; /* Make the background color transparent */
+  border: 1px solid #ccc; /* Add a border for clarity */
+  color: #eed15b; 
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px; 
+  height: 150px;
+  width: 300px;
+  vertical-align: top;
+  overflow-y: auto;
+  resize: None;
+}
+
 .Clickable-text:hover {
   background-color: #1f0136; /* Change background color on hover */
   color: #f3db7d;
