@@ -1,8 +1,17 @@
 import '../App.css'; // Import your existing CSS file
 import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route, useSearchParams, useNavigate} from "react-router-dom";
 // import axios from 'axios';
 
 const Contact = () => {
+    const queryString = window.location.href;
+    const sp = new URLSearchParams(queryString);
+    const navigate = useNavigate();
+    
+    if (sp.has("q") == false){
+        navigate("/Home");
+    }
+
     const [emotionPredictions, setEmotionPredictions] = useState(null);
     const [description, setDescription] = useState('');
 
@@ -49,6 +58,7 @@ const Contact = () => {
             </header>
         </div>
     );
+
 };
 
 export default Contact;
