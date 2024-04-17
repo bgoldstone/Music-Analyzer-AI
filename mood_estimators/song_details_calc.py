@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import bertai
 import dotenv
 from pymongo import MongoClient
+from max_heap import MaxHeap
 
 MONGO_URL = "soundsmith.x5y65kb.mongodb.net"
 
@@ -64,6 +65,7 @@ def cosine_similarity(vector1, vector2):
 def main():
     client = get_db_connection()
     dict_DB = import_tracks(client)
+    heap = MaxHeap()
 
     stand_vect_dict = {
         "positive" : import_standard_songs(client, "happy"),
@@ -78,13 +80,26 @@ def main():
         P1 = np.array(list(track["vector"].values()))
         
         for quadrant in stand_vect_dict:
-            sum = 0
-            print(quadrant, end=": ")
-            for each_song in stand_vect_dict[quadrant]:
-                P2 = np.array(list(each_song[0].values()))
-                sum += cosine_similarity(P1, P2)
-            print(sum / len(stand_vect_dict[quadrant]))
+            # sum = 0
+            # print(quadrant, end=": ")
+            # for each_song in stand_vect_dict[quadrant]:
+            #     P2 = np.array(list(each_song[0].values()))
+            #     sum += cosine_similarity(P1, P2)
+            # print(sum / len(stand_vect_dict[quadrant]))
+            # similarity = sum / len(stand_vect_dict[quadrant])
+            # heap.insert((similarity))
+            if quadrant == "positive":
+                sum = 0
+                print(quadrant, end=": ")
+                for each_song in stand_vect_dict[quadrant]:
+                    P2 = np.array(list(each_song[0].values()))
+                    sum += cosine_similarity(P1, P2)
+                print(sum / len(stand_vect_dict[quadrant]))
+                similarity = sum / len(stand_vect_dict[quadrant])
+                heap.insert((similarity, track["track_name"]))
         print("-----------------------------")
+
+    heap.print_heap()
 
 if __name__ == "__main__":
     main()
