@@ -69,12 +69,8 @@ def delete_playlist_by_id(playlist_id: str, request: Request) -> None:
 )
 def generate_playlist(playlist: PlaylistGenerate) -> Dict:
     
-
-
     # Initialize the text classification pipeline
     classifier = pipeline(task="text-classification", model="SamLowe/roberta-base-go_emotions", top_k=None)
-
-
 
     # Classify emotions for the given sentence
     predictions = classifier(playlist.description)
