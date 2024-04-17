@@ -59,7 +59,7 @@ def login_to_spotify(request: Request, response: Response):
             "username": user["username"],
         }    
         query_string = urlencode(response_data)
-        redirect_url = f"http://localhost:3000/Contact"
+        redirect_url = f"http://localhost:3000/Contact?{query_string}"
         return RedirectResponse(url=redirect_url)
         
     else:
