@@ -99,7 +99,7 @@ def scale_tempo(tempo):
     # 70-90 bpm is the range where it is unclear that a song is positive or negative based on tempo
     # Therefore, equation  output smaller values between that range
     # Outliners(60bpm or 120bpm) have exponentially higher outputs
-    return 0.0001 * (tempo - 90) ** 3
+    return 0.0004 * (tempo - 90) ** 3
 
 def scale_energy(energy):
     """Scale energy.
