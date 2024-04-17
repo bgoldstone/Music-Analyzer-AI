@@ -1,16 +1,15 @@
-import '../App.css'; 
+import '../App.css';
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, useSearchParams, useNavigate} from "react-router-dom";
+import { BrowserRouter, Routes, Route, useSearchParams, useNavigate } from "react-router-dom";
 // import axios from 'axios';
 
 
 const Contact = () => {
-    const queryString = window.location.href;
+    const queryString = window.location.search.replace("?", "");
     const sp = new URLSearchParams(queryString);
 
-    console.log(sp)
-    
-    if (!sp.has("jwt")){
+
+    if (!sp.has("jwt")) {
         window.location.replace("http://localhost:3000");
     }
 
@@ -22,28 +21,30 @@ const Contact = () => {
     };
 
     const handleBeginClick = async () => {
-      let response;
+        let response;
         try {
-            response = await fetch('http://localhost:8000/playlists/generate', {body:JSON.stringify({
-              "description": description,
-              "jwt": "66173c89b970969d7d8d5524",
-              "keywords": "list of keywords",
-              "mood": "Happy"
-            }),method:"POST",headers:{"Content-Type":"application/json","accept": "application/json"}});
+            response = await fetch('http://localhost:8000/playlists/generate', {
+                body: JSON.stringify({
+                    "description": description,
+                    "jwt": "66173c89b970969d7d8d5524",
+                    "keywords": "list of keywords",
+                    "mood": "Happy"
+                }), method: "POST", headers: { "Content-Type": "application/json", "accept": "application/json" }
+            });
 
             setEmotionPredictions(await response.json());
 
         } catch (error) {
             console.error('Error:', error);
         }
-      console.log(emotionPredictions);
+        console.log(emotionPredictions);
     };
 
     return (
         <div className="login">
             <header className="App-header">
-                <h1 className="header-title">How are you feeling dawg</h1> 
-                <label className="header-label">You may put a few words or even a few sentences</label> 
+                <h1 className="header-title">How are you feeling dawg</h1>
+                <label className="header-label">You may put a few words or even a few sentences</label>
                 <textarea
                     id="moodinput"
                     name="moodinput"
