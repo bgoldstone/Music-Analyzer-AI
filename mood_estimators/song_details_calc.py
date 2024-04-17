@@ -125,5 +125,5 @@ def import_emotions_predict(json_file_path):
         return f"An error occurred: {e}"
 
 if __name__ == "__main__":
-    two_sentiments =  import_emotions_predict('mood_estimators\\emotion_predictions.json')
+    two_sentiments = import_emotions_predict('mood_estimators\\emotion_predictions.json')
     main(two_sentiments)
