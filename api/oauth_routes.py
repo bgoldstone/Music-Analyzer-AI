@@ -5,6 +5,8 @@ from fastapi.responses import RedirectResponse, JSONResponse
 from requests import request
 from spotipy import oauth2, Spotify
 import dotenv
+from urllib.parse import urlencode
+
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from auth import tokens
@@ -55,8 +57,10 @@ def login_to_spotify(request: Request, response: Response):
             "jwt": jwt_token,
             "spotify_id": user["spotify_id"],
             "username": user["username"],
-        }
-        return JSONResponse(content=response_data, status_code=200), RedirectResponse(url="/Blogs.js")
+        }    
+        query_string = urlencode(response_data)
+        redirect_url = f"http://localhost:3000/Contact"
+        return RedirectResponse(url=redirect_url)
         
     else:
         print("No token found. Re-authenticating...")
