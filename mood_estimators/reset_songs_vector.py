@@ -58,7 +58,7 @@ def process_data(df):
     # Calculate vectors based on song properties
     song_info.append(calc_mood_from_details(float(tempo), float(valence), float(energy), track_id, emotion_dimensions))
 
-def process_data_DB(df, track_id, text):
+def process_data_DB(df, track_id, senti_analyis):
     """Process data from database for each track.
 
     Args:
@@ -68,11 +68,10 @@ def process_data_DB(df, track_id, text):
     """
     # Process each DataFrame. `df` is a dictionary of the song's properties. Ex: {"danceability": 0.647, "energy": 0.822,..."album_name": "G I R L"}.
     # For loop is used to access dict key and value
-    track_name = track_name
     track_id = track_id
-    tempo = df["tempo"]
-    valence = df["valence"]
-    energy = df["energy"]
+    tempo = float(df["tempo"])
+    valence = float(df["valence"])
+    energy = float(df["energy"])
     danceability = df["danceability"]
 
     emotion_dimensions = {
@@ -86,7 +85,7 @@ def process_data_DB(df, track_id, text):
     # Set danceabiltity
     emotion_dimensions["danceability"] = float(danceability)
     # Calculate vectors based on song properties
-    song_info.append(calc_mood_from_details(float(tempo), float(valence), float(energy), track_id, emotion_dimensions, text))
+    song_info.append(calc_mood_from_details(track_id, emotion_dimensions, senti_analyis, tempo, valence, energy))
 
 def scale_tempo(tempo):
     """Scale tempo.
@@ -100,7 +99,7 @@ def scale_tempo(tempo):
     # 70-90 bpm is the range where it is unclear that a song is positive or negative based on tempo
     # Therefore, equation  output smaller values between that range
     # Outliners(60bpm or 120bpm) have exponentially higher outputs
-    return 0.0001 * (tempo - 90) ** 3
+    return 0.0004 * (tempo - 90) ** 3
 
 def scale_energy(energy):
     """Scale energy.
@@ -140,10 +139,14 @@ def import_lyrics(db: MongoClient, spotify_id):
     Returns:
         A string representing the song's lyrics
     """
-    entry = (list(db.lyrics.find({"track_id": spotify_id}))[0])
-    return entry["lyrics"]
+    try:
+        entry = (list(db.lyrics.find({"track_id": spotify_id}))[0])
+        return entry["sentient_analysis"]
+    except:
+        return None
 
-def calc_mood_from_details(tempo, valence, energy, track_id, vectors, text):
+
+def calc_mood_from_details(track_id, vectors, sentiment_analyis, tempo, valence, energy):
     """Calculate mood vectors based on song details.
 
     Args:
@@ -173,23 +176,17 @@ def calc_mood_from_details(tempo, valence, energy, track_id, vectors, text):
     vectors["mild"] -= round(scale_tempo(tempo), 3)
 
     # Incorporates an analysis of lyrics using bertai; tuples: positive_percentage, negative_percentage, mixed_percentage, no_impact_percentage
-    # track_lyrics = import_lyrics(client)
-    # baseNum = 20
-    # lyrics_emotions = bertai.get_lyrics_mood()
-    # # Modify dimension values based on bert.ai sentiment analysis. 
-    # vectors["positive"] += (baseNum * (lyrics_emotions[0] / 100))
-    # vectors["negative"] += (baseNum * (lyrics_emotions[1] / 100))
-    # # Mixed percentage increases both dimensions
-    # vectors["positive"] += (baseNum * (lyrics_emotions[2] / 100))
-    # vectors["negative"] += (baseNum * (lyrics_emotions[2] / 100))
+    if sentiment_analyis != None:
+        print(sentiment_analyis, track_id)
+        baseNum = 20
+        # Modify dimension values based on bert.ai sentiment analysis. 
+        vectors["positive"] += (baseNum * sentiment_analyis[0])
+        vectors["negative"] += (baseNum * sentiment_analyis[1])
+        # Mixed percentage increases both dimensions
+        vectors["positive"] += (baseNum * sentiment_analyis[2])
+        vectors["negative"] += (baseNum * sentiment_analyis[2])
     
-    vectors["positive"] += (baseNum * (25 / 100))
-    vectors["negative"] += (baseNum * (50 / 100))
-    # Mixed percentage increases both dimensions
-    vectors["positive"] += (baseNum * (25 / 100))
-    vectors["negative"] += (baseNum * (25 / 100))
-    
-    return(vectors, track_id, name)
+    return(vectors, track_id)
 
 def get_db_connection() -> MongoClient | None:
     """Creates and returns db connection.
@@ -260,12 +257,12 @@ def main():
     #     return 0
     # Open the JSON file
     for item in dict_DB:
-        track_lyrics = import_lyrics(client, item["spotify"]["track_id"])
-        process_data_DB(item["analysis"], item["spotify"]["track_id"], import_lyrics(client, item["spotify"]["track_id"]))
+        sentiment_analyis = import_lyrics(client, item["spotify"]["track_id"])
+        process_data_DB(item["analysis"], item["spotify"]["track_id"], sentiment_analyis)
         # print(item["analysis"], item["spotify"]["track_id"], item["track_name"])
 
     for song in song_info:
-        print(f"Song name: {song[2]}")
+        print(f"Song ID: {song[1]}")
         print(f"Song dimensions: {song}")
         print("-----------------------------")
         load_vectors(client, song[0], song[1])
