@@ -7,10 +7,11 @@ import { BrowserRouter, Routes, Route, useSearchParams, useNavigate} from "react
 const Contact = () => {
     const queryString = window.location.href;
     const sp = new URLSearchParams(queryString);
-    const navigate = useNavigate();
+
+    console.log(sp)
     
-    if (sp.has("q") == false){
-        navigate("/Home");
+    if (!sp.has("jwt")){
+        window.location.replace("http://localhost:3000");
     }
 
     const [emotionPredictions, setEmotionPredictions] = useState(null);
