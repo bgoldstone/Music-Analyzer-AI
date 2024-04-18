@@ -1,4 +1,0 @@
-
-def get_standard_vectors():
-    stand_vect = [({'happy': 19.722225599999994, 'sad': -19.722225599999994, 'intense': 143.98899992674365, 'mild': -143.98899992674365, 'danceability': 0.647}, 'Happy - From "Despicable Me 2"', '60nZcImufyMA1MKQY3dcCH'), ({'happy': 0.029775400000000077, 'sad': -0.029775400000000077, 'intense': 14.442369133635204, 'mild': -14.442369133635204, 'danceability': 0.695}, 'Circles', '21jGcNKet2qwijlDFuPiPb'), ({'happy': -7.451940799999999, 'sad': 7.451940799999999, 'intense': -1.0585302068395999, 'mild': 1.0585302068395999, 'danceability': 0.467}, 'Everybody Hurts', '6PypGyiu0Y2lCDBN1XZEnP'), ({'happy': 0.006553600000000017, 'sad': -0.006553600000000017, 'intense': 10.637991392150001, 'mild': -10.637991392150001, 'danceability': 0.447}, 'Unholy Confessions', '78XFPcFYN8YFOHjtVwnPsl')]
-    return stand_vect
