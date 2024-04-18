@@ -81,14 +81,6 @@ def main(group):
         P1 = np.array(list(track["vector"].values()))
         
         for quadrant in stand_vect_dict:
-            # sum = 0
-            # print(quadrant, end=": ")
-            # for each_song in stand_vect_dict[quadrant]:
-            #     P2 = np.array(list(each_song[0].values()))
-            #     sum += cosine_similarity(P1, P2)
-            # print(sum / len(stand_vect_dict[quadrant]))
-            # similarity = sum / len(stand_vect_dict[quadrant])
-            # heap.insert((similarity))
             if quadrant == group:
                 sum = 0
                 # print(quadrant, end=": ")

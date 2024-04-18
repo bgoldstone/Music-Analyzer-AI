@@ -8,14 +8,14 @@ import time
 import os
 
 # output directory (change this to song_data/{your name})
-OUTPUT_DIRECTORY: str = "Sam"
+OUTPUT_DIRECTORY: str = "All_tracks_DB"
 OUTPUT_DIRECTORY: str = os.path.join("song_data", OUTPUT_DIRECTORY)
 # put playlsit url below
 PLAYLIST_URL: str = (
-    "https://open.spotify.com/playlist/3rO3hj9X3wSY2IafwpVZYS?si=be2efb3d779f423c"
+    "https://open.spotify.com/playlist/6nGT0PD7wEIyMM0XBEJmVc"
 )
 # put the name of the playlist here in snake(_) case
-PLAYLIST_NAME: str = "sam_playlist_one"
+PLAYLIST_NAME: str = "All_tracks_DB"
 # default number of songs, will change.
 PLAYLIST_NUMBER_OF_SONGS: int = 0
 
@@ -33,7 +33,9 @@ def main():
     # load the .env file with the Spotify API credentials
     # create '.env' file in spotifyDataRetrival directory
     # add SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET to .env file
-    # Ex. SPOTIFY_CLIENT_ID={your client id}
+    # Ex: 
+    # SPOTIFY_CLIENT_ID={your client id}
+    # SPOTIFY_CLIENT_SECRET = {your client secret}
     dotenv.load_dotenv(".env")
 
     # Set up Spotify API credentials
@@ -143,6 +145,7 @@ def get_track_details(
     # For each track subset call spotify api
     for track_subset in track_subsets:
         ids = [track_id["track_id"] for track_id in track_subset]
+        print(ids)
         tracks = sp.audio_features(ids)
 
         try:
