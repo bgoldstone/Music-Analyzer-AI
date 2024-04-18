@@ -12,9 +12,9 @@ OUTPUT_DIRECTORY: str = "All_tracks_DB"
 OUTPUT_DIRECTORY: str = os.path.join("song_data", OUTPUT_DIRECTORY)
 # put playlsit url below
 PLAYLIST_URL: str = (
-    "https://open.spotify.com/playlist/6nGT0PD7wEIyMM0XBEJmVc"
+    "https://open.spotify.com/playlist/04XPPkCP686B3SM4ROC1UR?si=76be79f9d4e4455a"
 )
-# put the name of the playlist here in snake(_) case
+# put the name of the playlist here in snake(_) cas
 PLAYLIST_NAME: str = "All_tracks_DB"
 # default number of songs, will change.
 PLAYLIST_NUMBER_OF_SONGS: int = 0
@@ -117,6 +117,7 @@ def get_playlist_tracks(
         ) as file:
             writer = json.dumps(tracks)
             file.write(writer)
+        print(i)
 
 
 def get_track_details(
