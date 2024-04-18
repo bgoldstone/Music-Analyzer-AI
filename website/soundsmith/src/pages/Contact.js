@@ -1,18 +1,8 @@
-import '../App.css';
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, useSearchParams, useNavigate } from "react-router-dom";
-// import axios from 'axios';
-
+import { Link } from 'react-router-dom'; // Import Link
+import axios from 'axios';
 
 const Contact = () => {
-    const queryString = window.location.search.replace("?", "");
-    const sp = new URLSearchParams(queryString);
-
-
-    if (!sp.has("jwt")) {
-        window.location.replace("http://localhost:3000");
-    }
-
     const [emotionPredictions, setEmotionPredictions] = useState(null);
     const [description, setDescription] = useState('');
 
@@ -21,21 +11,32 @@ const Contact = () => {
     };
 
     const handleBeginClick = async () => {
-        let response;
         try {
-            response = await fetch('http://localhost:8000/playlists/generate', {body:JSON.stringify({
-              "description": description,
-              "jwt": "66173c89b970969d7d8d5524",
-              "keywords": "list of keywords",
-              "mood": " "
-            }),method:"POST",headers:{"Content-Type":"application/json","accept": "application/json"}});
+            const response = await fetch('http://localhost:8000/playlists/generate', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "accept": "application/json"
+                },
+                body: JSON.stringify({
+                    "description": description,
+                    "jwt": "66173c89b970969d7d8d5524",
+                    "keywords": "list of keywords",
+                    "mood": " "
+                })
+            });
 
-            setEmotionPredictions(await response.json());
+            const data = await response.json();
+            setEmotionPredictions(data);
+
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            if(data)
+                window.location.href = '/vsm'
 
         } catch (error) {
             console.error('Error:', error);
         }
-        console.log(emotionPredictions);
     };
 
     return (
@@ -49,17 +50,11 @@ const Contact = () => {
                     value={description}
                     onChange={handleInputChange}
                 ></textarea>
-                <div className="Clickable-text" onClick={handleBeginClick}>Generate Playlist</div>
-                {emotionPredictions && (
-                    <div>
-                        <h2>Emotion Predictions below, now time to craft melodies</h2>
-                        <pre>{JSON.stringify(emotionPredictions, null, 2)}</pre>
-                    </div>
-                )}
+                {/* Use Link to navigate to VSM page */}
+                <Link to="/vsm" className="Clickable-text" onClick={handleBeginClick}>Generate Playlist</Link>
             </header>
         </div>
     );
-
 };
 
 export default Contact;
