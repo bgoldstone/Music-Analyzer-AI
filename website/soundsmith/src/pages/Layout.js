@@ -19,6 +19,10 @@ const Layout = () => {
           <li>
             <Link to="/loading">Loading</Link>
           </li>
+          <li>
+            <Link to="/VSM">VSM</Link>
+          </li>
+
         </ul>
       </nav>
 
