@@ -69,10 +69,10 @@ def main(group):
     heap = MaxHeap()
 
     stand_vect_dict = {
-        "positive" : import_standard_songs(client, "happy"),
+        "happy" : import_standard_songs(client, "happy"),
         "chill": import_standard_songs(client, "chill"),
         "stressing": import_standard_songs(client, "stressing"),
-        "negative": import_standard_songs(client, "sad"),
+        "sad": import_standard_songs(client, "sad"),
     }
 
     for track in dict_DB:
@@ -91,11 +91,11 @@ def main(group):
             # heap.insert((similarity))
             if quadrant == group:
                 sum = 0
-                print(quadrant, end=": ")
+                # print(quadrant, end=": ")
                 for each_song in stand_vect_dict[quadrant]:
                     P2 = np.array(list(each_song[0].values()))
                     sum += cosine_similarity(P1, P2)
-                print(sum / len(stand_vect_dict[quadrant]))
+                # print(sum / len(stand_vect_dict[quadrant]))
                 similarity = sum / len(stand_vect_dict[quadrant])
                 heap.insert((similarity, track["track_name"], track["artist_name"]))
         print("-----------------------------")
