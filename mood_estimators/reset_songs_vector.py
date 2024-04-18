@@ -29,35 +29,6 @@ def import_tracks(db: MongoClient):
     """
     return list(db.tracks.find({}))
 
-
-def process_data(df):
-    """Process data for each track.
-
-    Args:
-        df (dict): Dictionary containing song properties.
-    """
-    # Process each DataFrame. `df` is a dictionary of the song's properties. Ex: {"danceability": 0.647, "energy": 0.822,..."album_name": "G I R L"}.
-    # For loop is used to access dict key and value
-    track_name = df["track_name"]
-    track_id = df["track_id"]
-    tempo = df["tempo"]
-    valence = df["valence"]
-    energy = df["energy"]
-    danceability = df["danceability"]
-
-    emotion_dimensions = {
-    "positive": 0,
-    "negative": 0,
-    "intense": 0,
-    "mild": 0,
-    "danceability": 0,
-    }
-
-    # Set danceabiltity
-    emotion_dimensions["danceability"] = float(danceability)
-    # Calculate vectors based on song properties
-    song_info.append(calc_mood_from_details(float(tempo), float(valence), float(energy), track_id, emotion_dimensions))
-
 def process_data_DB(df, track_id, senti_analyis):
     """Process data from database for each track.
 
@@ -75,8 +46,8 @@ def process_data_DB(df, track_id, senti_analyis):
     danceability = df["danceability"]
 
     emotion_dimensions = {
-    "positive": 0,
-    "negative": 0,
+    "happy": 0,
+    "sad": 0,
     "intense": 0,
     "mild": 0,
     "danceability": 0,
@@ -96,7 +67,7 @@ def scale_tempo(tempo):
     Returns:
         float: Scaled tempo.
     """
-    # 70-90 bpm is the range where it is unclear that a song is positive or negative based on tempo
+    # 70-90 bpm is the range where it is unclear that a song is happy or sad based on tempo
     # Therefore, equation  output smaller values between that range
     # Outliners(60bpm or 120bpm) have exponentially higher outputs
     return 0.0004 * (tempo - 90) ** 3
@@ -110,7 +81,7 @@ def scale_energy(energy):
     Returns:
         float: Scaled energy.
     """
-    # 0.40 - 0.60 energy level is the range where it is unclear that a song is positive or negative
+    # 0.40 - 0.60 energy level is the range where it is unclear that a song is happy or sad
     # Therefore, equation  output smaller values between that range
     # Outliners(0.10 or 0.9) have exponentially higher outputs
     return (50 * (energy - 0.60) ** 3) * 40
@@ -124,7 +95,7 @@ def scale_valence(valence):
     Returns:
         float: Scaled valence.
     """
-    # 0.40 - 0.60 energy level is the range where it is unclear that a song is positive or negative
+    # 0.40 - 0.60 energy level is the range where it is unclear that a song is happy or sad
     # Therefore, equation  output smaller values between that range
     # Outliners(0.10 or 0.9) have exponentially higher outputs
     return (50 * (valence - 0.60) ** 3) * 40
@@ -161,9 +132,9 @@ def calc_mood_from_details(track_id, vectors, sentiment_analyis, tempo, valence,
         tuple: Mood vectors, track ID, and track name.
     """
     # Incorporating valence into mood vectors:
-    # Increase the "positive" vector component and decrease the "negative" vector component based on valence level.
-    vectors["positive"] += round(scale_valence(valence), 3)
-    vectors["negative"] -= round(scale_valence(valence), 3)
+    # Increase the "happy" vector component and decrease the "sad" vector component based on valence level.
+    vectors["happy"] += round(scale_valence(valence), 3)
+    vectors["sad"] -= round(scale_valence(valence), 3)
     #
     # Incorporating energy into mood vectors:
     # Increase the "intense" vector component and decrease the "mild" vector component based on energy level.
@@ -171,20 +142,20 @@ def calc_mood_from_details(track_id, vectors, sentiment_analyis, tempo, valence,
     vectors["mild"] -= round(scale_energy(energy) , 3)
     #
     # Incorporating tempo into mood vectors:
-    # Increase the "intense" vector component if tempo is high, else adjust "negative" based on the absolute value of scaled tempo.
+    # Increase the "intense" vector component if tempo is high, else adjust "sad" based on the absolute value of scaled tempo.
     vectors["intense"] += round(scale_tempo(tempo), 3) 
     vectors["mild"] -= round(scale_tempo(tempo), 3)
 
-    # Incorporates an analysis of lyrics using bertai; tuples: positive_percentage, negative_percentage, mixed_percentage, no_impact_percentage
+    # Incorporates an analysis of lyrics using bertai; tuples: happy_percentage, sad_percentage, mixed_percentage, no_impact_percentage
     if sentiment_analyis != None:
         print(sentiment_analyis, track_id)
         baseNum = 20
         # Modify dimension values based on bert.ai sentiment analysis. 
-        vectors["positive"] += (baseNum * sentiment_analyis[0])
-        vectors["negative"] += (baseNum * sentiment_analyis[1])
+        vectors["happy"] += (baseNum * sentiment_analyis[0])
+        vectors["sad"] += (baseNum * sentiment_analyis[1])
         # Mixed percentage increases both dimensions
-        vectors["positive"] += (baseNum * sentiment_analyis[2])
-        vectors["negative"] += (baseNum * sentiment_analyis[2])
+        vectors["happy"] += (baseNum * sentiment_analyis[2])
+        vectors["sad"] += (baseNum * sentiment_analyis[2])
     
     return(vectors, track_id)
 

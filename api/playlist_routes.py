@@ -69,12 +69,8 @@ def delete_playlist_by_id(playlist_id: str, request: Request) -> None:
 )
 def generate_playlist(playlist: PlaylistGenerate) -> Dict:
     
-
-
     # Initialize the text classification pipeline
     classifier = pipeline(task="text-classification", model="SamLowe/roberta-base-go_emotions", top_k=None)
-
-
 
     # Classify emotions for the given sentence
     predictions = classifier(playlist.description)
@@ -87,7 +83,7 @@ def generate_playlist(playlist: PlaylistGenerate) -> Dict:
     emotion_predictions = dict(zip(emotion_labels, emotion_scores))
 
     # Write the dictionary to a JSON file
-    output_file = "emotion_predictions.json"
+    output_file = "mood_estimators/emotion_predictions.json"
     with open(output_file, 'w') as f:
         json.dump(emotion_predictions, f, indent=4)
 

@@ -1,3 +1,5 @@
+import copy
+
 class MaxHeap:
     def __init__(self):
         self.heap = []
@@ -47,10 +49,9 @@ class MaxHeap:
 
     def print_sorted_heap(self):
         print("Sorted Heap:")
-        heap_copy = self.heap.copy()
-        while heap_copy:
-            max_element = self.extract_max()
-            print(max_element, end=" ")
+        sorted_heap = sorted(self.heap, reverse=True)
+        for item in sorted_heap:
+            print(item, end=" ")
         print()
 
 

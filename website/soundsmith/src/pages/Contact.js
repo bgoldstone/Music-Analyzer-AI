@@ -23,14 +23,12 @@ const Contact = () => {
     const handleBeginClick = async () => {
         let response;
         try {
-            response = await fetch('http://localhost:8000/playlists/generate', {
-                body: JSON.stringify({
-                    "description": description,
-                    "jwt": "66173c89b970969d7d8d5524",
-                    "keywords": "list of keywords",
-                    "mood": "Happy"
-                }), method: "POST", headers: { "Content-Type": "application/json", "accept": "application/json" }
-            });
+            response = await fetch('http://localhost:8000/playlists/generate', {body:JSON.stringify({
+              "description": description,
+              "jwt": "66173c89b970969d7d8d5524",
+              "keywords": "list of keywords",
+              "mood": " "
+            }),method:"POST",headers:{"Content-Type":"application/json","accept": "application/json"}});
 
             setEmotionPredictions(await response.json());
 
