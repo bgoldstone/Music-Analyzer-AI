@@ -1,42 +1,55 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Import Link
-import axios from 'axios';
+import Loading from './Loading'; // Import the Loading component
 
 const Contact = () => {
     const [emotionPredictions, setEmotionPredictions] = useState(null);
     const [description, setDescription] = useState('');
+    const [loading, setLoading] = useState(false); // Add loading state
 
     const handleInputChange = (event) => {
         setDescription(event.target.value);
     };
 
-    const handleBeginClick = async () => {
-        try {
-            const response = await fetch('http://localhost:8000/playlists/generate', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "accept": "application/json"
-                },
-                body: JSON.stringify({
-                    "description": description,
-                    "jwt": "66173c89b970969d7d8d5524",
-                    "keywords": "list of keywords",
-                    "mood": " "
-                })
-            });
+    const handleBeginClick = () => {
+        // Show loading page
+        setLoading(true);
 
-            const data = await response.json();
+        fetch('http://localhost:8000/playlists/generate', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "accept": "application/json"
+            },
+            body: JSON.stringify({
+                "description": description,
+                "jwt": "66173c89b970969d7d8d5524",
+                "keywords": "list of keywords",
+                "mood": " "
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('POST /playlists/generate HTTP/1.1', response.status);
+                return response.json();
+            } else {
+                throw new Error('Network response was not ok');
+            }
+        })
+        .then(data => {
+            // Update emotion predictions
             setEmotionPredictions(data);
 
-            await new Promise(resolve => setTimeout(resolve, 100));
-
-            if(data)
-                window.location.href = '/vsm'
-
-        } catch (error) {
+            // Simulate delay for 2 seconds before navigating to VSM.js
+            setTimeout(() => {
+                setLoading(false);
+                window.location.href = '/vsm';
+            }, 2000);
+        })
+        .catch(error => {
             console.error('Error:', error);
-        }
+            // Hide loading page in case of error
+            setLoading(false);
+        });
     };
 
     return (
@@ -50,8 +63,12 @@ const Contact = () => {
                     value={description}
                     onChange={handleInputChange}
                 ></textarea>
-                {/* Use Link to navigate to VSM page */}
-                <Link to="/vsm" className="Clickable-text" onClick={handleBeginClick}>Generate Playlist</Link>
+                {/* Render Link conditionally based on loading state */}
+                {loading ? (
+                    <Loading />
+                ) : (
+                    <button className="Clickable-text" onClick={handleBeginClick}>Generate Playlist</button>
+                )}
             </header>
         </div>
     );
