@@ -47,11 +47,12 @@ class MaxHeap:
             print(item, end=" ")
         print()
 
-    def print_sorted_heap(self):
+    def print_sorted_heap(self, max = float('inf')):
         print("Sorted Heap:")
         sorted_heap = sorted(self.heap, reverse=True)
-        for item in sorted_heap:
-            print(item, end=" ")
+        for count, item in enumerate(sorted_heap):
+            if count < max:
+                print(item, end=" | ")
         print()
 
 
