@@ -1,5 +1,3 @@
-import copy
-
 class MaxHeap:
     def __init__(self):
         self.heap = []
@@ -16,7 +14,7 @@ class MaxHeap:
     def insert(self, key):
         self.heap.append(key)
         i = len(self.heap) - 1
-        while i > 0 and self.heap[self.parent(i)][0] <= self.heap[i][0]:
+        while i > 0 and self.heap[self.parent(i)][:3] <= self.heap[i][:3]:
             self.heap[self.parent(i)], self.heap[i] = self.heap[i], self.heap[self.parent(i)]
             i = self.parent(i)
 
@@ -24,9 +22,9 @@ class MaxHeap:
         largest = i
         left = self.left_child(i)
         right = self.right_child(i)
-        if left < len(self.heap) and self.heap[left][0] >= self.heap[largest][0]:
+        if left < len(self.heap) and self.heap[left][:3] >= self.heap[largest][:3]:
             largest = left
-        if right < len(self.heap) and self.heap[right][0] >= self.heap[largest][0]:
+        if right < len(self.heap) and self.heap[right][:3] >= self.heap[largest][:3]:
             largest = right
         if largest != i:
             self.heap[i], self.heap[largest] = self.heap[largest], self.heap[i]
@@ -49,7 +47,7 @@ class MaxHeap:
 
     def print_sorted_heap(self, max = float('inf')):
         print("Sorted Heap:")
-        sorted_heap = sorted(self.heap, reverse=True)
+        sorted_heap = sorted(self.heap, key=lambda x: x[:3], reverse=True)
         for count, item in enumerate(sorted_heap):
             if count < max:
                 print(item, end=" | ")
@@ -58,11 +56,13 @@ class MaxHeap:
 
 if __name__ == "__main__":
     heap = MaxHeap()
-    heap.insert((5.0, "apple"))
-    heap.insert((3.5, "banana"))
-    heap.insert((-7.2, "orange"))
-    heap.insert((4.1, "grape"))
-    heap.insert((6.8, "melon"))
+    heap.insert((14, 9, 5, 'Dogs', 'Dodo'))
+    heap.insert((14, 19, 3, 'HI'))
+    heap.insert((5, 6, 2, 'apple'))
+    heap.insert((3, 7, 1, 'banana'))
+    heap.insert((7, 2, 4, 'orange'))
+    heap.insert((4, 5, 7, 'grape'))
+    heap.insert((6, 4, 6, 'melon'))
 
     heap.print_heap()
-    heap.print_sorted_heap()
+    heap.print_sorted_heap(1)

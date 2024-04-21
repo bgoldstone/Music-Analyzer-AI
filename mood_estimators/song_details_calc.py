@@ -70,9 +70,9 @@ def main(group):
 
     stand_vect_dict = {
         "happy" : import_standard_songs(client, "happy"),
+        "sad": import_standard_songs(client, "sad"),
         "chill": import_standard_songs(client, "chill"),
         "stressing": import_standard_songs(client, "stressing"),
-        "sad": import_standard_songs(client, "sad"),
     }
 
     for track in dict_DB:
@@ -80,17 +80,33 @@ def main(group):
         print(f"Song dimensions: {track["vector"]}")
         P1 = np.array(list(track["vector"].values()))
         
-        for quadrant in stand_vect_dict:
-            if quadrant == group:
-                sum = 0
-                # print(quadrant, end=": ")
-                for each_song in stand_vect_dict[quadrant]:
-                    P2 = np.array(list(each_song[0].values()))
-                    sum += cosine_similarity(P1, P2)
-                # print(sum / len(stand_vect_dict[quadrant]))
-                similarity = sum / len(stand_vect_dict[quadrant])
-                heap.insert((similarity, track["track_name"], track["artist_name"]))
-        print("-----------------------------")
+        # for quadrant in stand_vect_dict:
+        #     if quadrant == group:
+        #         sum = 0
+        #         # print(quadrant, end=": ")
+        #         for each_song in stand_vect_dict[quadrant]:
+        #             P2 = np.array(list(each_song[0].values()))
+        #             sum += cosine_similarity(P1, P2)
+                    
+        #         similarity = sum / len(stand_vect_dict[quadrant])
+        #         heap.insert((similarity, track["track_name"], track["artist_name"]))
+        # print("-----------------------------")
+        rank = []
+        for each_sentiment in group:
+            for quadrant in stand_vect_dict:
+                if quadrant == each_sentiment:
+                    sum = 0
+                    # print(quadrant, end=": ")
+                    for each_song in stand_vect_dict[quadrant]:
+                        P2 = np.array(list(each_song[0].values()))
+                        sum += cosine_similarity(P1, P2)
+                        
+                    similarity = sum / len(stand_vect_dict[quadrant])
+                    rank.append(similarity)
+            print("-----------------------------")
+
+        heap.insert((rank[0], rank[1], rank[2], track["track_name"], track["artist_name"]))
+
 
     heap.print_sorted_heap(20)
 
@@ -98,16 +114,21 @@ def import_emotions_predict(json_file_path):
     try:
         with open(json_file_path, 'r') as file:
             data = json.load(file)
-            keys = list(data.keys())[:2]
+            keys = list(data.keys())[:3]
 
-            if (keys[0] == "sadness") or (keys[0] == "disappointment") or (keys[0] == "grief") or (keys[0] == "remorse") or (keys[0] == "embarrassment"):
-                return "sad"
-            elif (keys[0] == "joy") or (keys[0] == "amusement") or (keys[0] == "surprise") or (keys[0] == "love") or (keys[0] == "excitement") or (keys[0] == "gratitude") or (keys[0] == "pride") or (keys[0] == "relief"):
-                return "happy"
-            elif (keys[0] == "neutral") or (keys[0] == "curiosity") or (keys[0] == "approval") or (keys[0] == "admiration") or (keys[0] == "realization") or (keys[0] == "optimism") or (keys[0] == "desire") or (keys[0] == "relief"):
-                return "chill"
-            elif (keys[0] == "anger") or (keys[0] == "annoyance") or (keys[0] == "disapproval") or (keys[0] == "disgust") or (keys[0] == "fear") or (keys[0] == "confusion") or (keys[0] == "caring") or (keys[0] == "nervousness"):
-                return "stressing"
+            top_three_emotions = []
+
+            for key in keys:
+                if (key == "joy") or (key == "amusement") or (key == "surprise") or (key == "love") or (key == "excitement") or (key == "gratitude") or (key == "pride") or (key == "relief"):
+                    top_three_emotions.append("happy")
+                elif (key == "sadness") or (key == "disappointment") or (key == "grief") or (key == "remorse") or (key == "embarrassment"):
+                    top_three_emotions.append("sad")
+                elif (key == "neutral") or (key == "curiosity") or (key == "approval") or (key == "admiration") or (key == "realization") or (key == "optimism") or (key == "desire") or (key == "relief"):
+                    top_three_emotions.append("chill")
+                elif (keys == "anger") or (keys == "annoyance") or (key == "disapproval") or (key == "disgust") or (key == "fear") or (key == "confusion") or (key == "caring") or (key == "nervousness"):
+                    top_three_emotions.append("stressing")
+
+        return(top_three_emotions)
 
     except FileNotFoundError:
         return "File not found"
@@ -117,7 +138,7 @@ def import_emotions_predict(json_file_path):
         return f"An error occurred: {e}"
 
 if __name__ == "__main__":
-    # two_sentiments = import_emotions_predict('mood_estimators\\emotion_predictions.json')
-    two_sentiments = "happy"
+    two_sentiments = import_emotions_predict('mood_estimators\\emotion_predictions.json')
+    # two_sentiments = "happy"
     # print(two_sentiments)
     main(two_sentiments)
