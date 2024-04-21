@@ -90,5 +90,6 @@ def generate_playlist(playlist: PlaylistGenerate) -> Dict:
     print("Emotion predictions have been saved to", output_file)
     return emotion_predictions
 
+
 #def generate_playlist_vsm():
     
