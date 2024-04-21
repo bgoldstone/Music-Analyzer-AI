@@ -117,7 +117,6 @@ def get_playlist_tracks(
         ) as file:
             writer = json.dumps(tracks)
             file.write(writer)
-        print(i)
 
 
 def get_track_details(
@@ -127,44 +126,47 @@ def get_track_details(
     gets track details and returns a dictionary
 
     Args:
-        track_id (List[Dict[str, str]]): Track ID to get details for
-        sp (spotipy.Spotify): Spotify object to use, must be authenticated.
+        tracks (List[Dict[str, str]]): Track details to fetch
+        sp (spotipy.Spotify): Authenticated Spotify object
     Returns:
-        Dict[str, Dict[str,str]]: A dictionary with track details, where the key is a string of the form
-        '{track name} - {artist name} - {album name}', and the value is a dictionary of audio features.
+        List[Dict[str, str]]: A list of dictionaries containing track details
     """
     track_details = []
-    i = 0
-    len_tracks = len(tracks)
-    track_subsets = []
 
-    # Subset tracks into smaller chunks for spotify api to process (caps aroung 100 tracks/request)
-    for j in range(0, len_tracks - 1):
-        track_subsets.append(tracks[j * 100 : (j + 1) * 100])
-    track_subsets.append(tracks[len_tracks * 100 :])
+    # Divide tracks into smaller subsets for Spotify API processing
+    chunk_size = 100
+    track_subsets = [tracks[i:i+chunk_size] for i in range(0, len(tracks), chunk_size)]
 
-    # For each track subset call spotify api
     for track_subset in track_subsets:
-        ids = [track_id["track_id"] for track_id in track_subset]
-        print(ids)
-        tracks = sp.audio_features(ids)
-
+        track_ids = [track["track_id"] for track in track_subset]
+        
         try:
-            # for each track get audio features
-            for index, track in enumerate(tracks):
-                track["track_id"] = track_subset[index]["track_id"]
-                track["track_name"] = track_subset[index]["track_name"]
-                track["artist_name"] = track_subset[index]["artist_name"]
-                track["album_name"] = track_subset[index]["album_name"]
-                track_details.append(track)
-        except IndexError as e:
-            return track_details
-        except KeyError as e:
-            break
-        time.sleep(2.5)  # wait 2.5 seconds before continuing
-        i += 1
+            # Fetch audio features from Spotify API
+            audio_features = sp.audio_features(track_ids)
+        except Exception as e:
+            print(f"Error fetching audio features: {e}")
+            continue
+        
+        for index, track_feature in enumerate(audio_features):
+            if track_feature is None:
+                # Skip tracks with missing audio features
+                continue
+            
+            # Construct track details dictionary
+            track_detail = {
+                "track_id": track_subset[index]["track_id"],
+                "track_name": track_subset[index]["track_name"],
+                "artist_name": track_subset[index]["artist_name"],
+                "album_name": track_subset[index]["album_name"],
+                # Add audio features to the track details
+                **track_feature
+            }
+            track_details.append(track_detail)
+        
+        # Pause before making the next request to avoid rate limiting
+        time.sleep(2.5)
+    
     return track_details
-
 
 def write_json(file_name: str, track_details: List[Dict[str, str]]) -> None:
     """

@@ -92,7 +92,7 @@ def main(group):
                 heap.insert((similarity, track["track_name"], track["artist_name"]))
         print("-----------------------------")
 
-    heap.print_sorted_heap()
+    heap.print_sorted_heap(20)
 
 def import_emotions_predict(json_file_path):
     try:
@@ -117,5 +117,7 @@ def import_emotions_predict(json_file_path):
         return f"An error occurred: {e}"
 
 if __name__ == "__main__":
-    two_sentiments = import_emotions_predict('mood_estimators\\emotion_predictions.json')
+    # two_sentiments = import_emotions_predict('mood_estimators\\emotion_predictions.json')
+    two_sentiments = "happy"
+    # print(two_sentiments)
     main(two_sentiments)

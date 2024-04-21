@@ -44,6 +44,7 @@ def process_data_DB(df, track_id, senti_analyis):
     valence = float(df["valence"])
     energy = float(df["energy"])
     danceability = df["danceability"]
+    speechiness = df["speechiness"]
 
     emotion_dimensions = {
     "happy": 0,
@@ -53,8 +54,9 @@ def process_data_DB(df, track_id, senti_analyis):
     "danceability": 0,
     }
 
-    # Set danceabiltity
+    # Set danceabiltity & speechiness
     emotion_dimensions["danceability"] = float(danceability)
+    emotion_dimensions["speechiness"] = float(speechiness)
     # Calculate vectors based on song properties
     song_info.append(calc_mood_from_details(track_id, emotion_dimensions, senti_analyis, tempo, valence, energy))
 
@@ -84,7 +86,7 @@ def scale_energy(energy):
     # 0.40 - 0.60 energy level is the range where it is unclear that a song is happy or sad
     # Therefore, equation  output smaller values between that range
     # Outliners(0.10 or 0.9) have exponentially higher outputs
-    return (50 * (energy - 0.60) ** 3) * 40
+    return (50 * (energy - 0.50) ** 3) * 40
 
 def scale_valence(valence):
     """Scale valence.
@@ -98,7 +100,7 @@ def scale_valence(valence):
     # 0.40 - 0.60 energy level is the range where it is unclear that a song is happy or sad
     # Therefore, equation  output smaller values between that range
     # Outliners(0.10 or 0.9) have exponentially higher outputs
-    return (50 * (valence - 0.60) ** 3) * 40
+    return (50 * (valence - 0.50) ** 3) * 40
 
 def import_lyrics(db: MongoClient, spotify_id):
     """Import lyrics from the database.
@@ -135,6 +137,8 @@ def calc_mood_from_details(track_id, vectors, sentiment_analyis, tempo, valence,
     # Increase the "happy" vector component and decrease the "sad" vector component based on valence level.
     vectors["happy"] += round(scale_valence(valence), 3)
     vectors["sad"] -= round(scale_valence(valence), 3)
+    vectors["happy"] += round(scale_tempo(tempo), 3) 
+    vectors["sad"] -= round(scale_tempo(tempo), 3)
     #
     # Incorporating energy into mood vectors:
     # Increase the "intense" vector component and decrease the "mild" vector component based on energy level.
