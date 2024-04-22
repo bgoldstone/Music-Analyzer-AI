@@ -7,6 +7,7 @@ import Blogs from "./pages/Blogs";
 import Contact from "./pages/Contact";
 import NoPage from "./pages/NoPage";
 import VSM from "./pages/VSM";
+import Loading from "./pages/Loading";
 
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
           <Route index element={<Home />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/loading" element={<Loading />} />
           <Route path="/VSM" element={<VSM />} />
           <Route path="*" element={<NoPage />} />
         {/* </Route> */}

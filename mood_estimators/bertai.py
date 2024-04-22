@@ -110,4 +110,85 @@ def get_lyrics_mood(text, printResults = False):
         return None
 
 if __name__ == "__main__":
-    get_lyrics_mood(True)
+    Text = """
+    Are you alright?
+I'm alright, I'm quite alright
+And my money's right
+8, yeah
+Countin' them bands all way to the top, 'til they be fallin' over
+Countin' them bands on my way to the top, 'til we fallin' over
+
+I don't really care if you cry
+On the real you should've never lied
+Should've saw the way she looked me in my eyes
+She said, "Baby, I am not afraid to, die"
+Push me to the edge
+All my friends are dead
+Push me to the edge
+All my friends are dead
+Push me to the edge
+All my friends are dead
+Push me to the edge
+
+Phantom that's all red
+Inside all white
+Like something you ride a sled down
+I just want that head
+My Brittany got mad
+I'm barely her man now
+Everybody got the same swag now
+Watch the way that I tear it down
+Stacking my bands all the way to the top
+All the way 'til my bands fallin' over
+Every time that you leave your spot
+Your girlfriend call me like "Come on over"
+I like the way that she treat me
+Gon' leave you, won't leave me
+I call it that Casanova
+She say I'm insane yeah
+I might blow my brain out
+Xanny help the pain, yeah
+Please, Xanny make it go away
+I'm committed, not addicted but it keep control of me
+All the pain, now I can't feel it, I swear that it's slowing me, yeah
+
+I don't really care if you cry
+On the real, you should've never lied
+Saw the way she looked me in my eyes
+She said, "I am not afraid to, die"
+All my friends are dead
+Push me to the edge
+All my friends are dead
+Push me to the edge
+All my friends are dead, yeah
+All my friends are dead, yeah
+
+That is not your swag, I swear you fake hard
+Now these niggas wanna take my cadence
+Rain on 'em, thunderstorm, rain on 'em
+Medicine, little nigga take some
+Fast car, Nascar, race 'em
+In the club, ain't got no ones, then we would beg them
+Clothes from overseas
+Got the racks and they all C-Notes
+You is not a G, though
+Looking at you stackin' all your money, it all green though
+I was counting that and these all twenties, that's a G-roll
+
+She say, "You're the worst, you're the worst"
+I cannot die, because this my universe
+
+I don't really care if you cry
+On the real, you should've never lied
+Should've saw the way she looked me in my eyes
+She said, "Baby, I am not afraid to, die"
+Push me to the edge
+All my friends are dead
+Push me to the edge
+All my friends are dead
+Push me to the edge
+All my friends are dead
+Push me to the edge
+
+    """
+    get_lyrics_mood(Text, True)
