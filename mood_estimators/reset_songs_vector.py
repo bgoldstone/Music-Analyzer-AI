@@ -153,7 +153,7 @@ def calc_mood_from_details(track_id, vectors, sentiment_analyis, tempo, valence,
     # Incorporates an analysis of lyrics using bertai; tuples: happy_percentage, sad_percentage, mixed_percentage, no_impact_percentage
     if sentiment_analyis != None:
         print(sentiment_analyis, track_id)
-        baseNum = 20
+        baseNum = 25
         # Modify dimension values based on bert.ai sentiment analysis. 
         vectors["happy"] += (baseNum * sentiment_analyis[0])
         vectors["sad"] += (baseNum * sentiment_analyis[1])

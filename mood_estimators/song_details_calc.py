@@ -101,7 +101,7 @@ def main(group):
                         P2 = np.array(list(each_song[0].values()))
                         sum += cosine_similarity(P1, P2)
                         
-                    similarity = sum / len(stand_vect_dict[quadrant])
+                    similarity = round((sum / len(stand_vect_dict[quadrant])), 2)
                     rank.append(similarity)
             print("-----------------------------")
 
@@ -140,5 +140,5 @@ def import_emotions_predict(json_file_path):
 if __name__ == "__main__":
     two_sentiments = import_emotions_predict('mood_estimators\\emotion_predictions.json')
     # two_sentiments = "happy"
-    # print(two_sentiments)
+    # If model suck, takes 
     main(two_sentiments)
