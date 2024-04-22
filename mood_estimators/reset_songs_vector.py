@@ -137,8 +137,6 @@ def calc_mood_from_details(track_id, vectors, sentiment_analyis, tempo, valence,
     # Increase the "happy" vector component and decrease the "sad" vector component based on valence level.
     vectors["happy"] += round(scale_valence(valence), 3)
     vectors["sad"] -= round(scale_valence(valence), 3)
-    vectors["happy"] += round(scale_tempo(tempo), 3) 
-    vectors["sad"] -= round(scale_tempo(tempo), 3)
     #
     # Incorporating energy into mood vectors:
     # Increase the "intense" vector component and decrease the "mild" vector component based on energy level.
