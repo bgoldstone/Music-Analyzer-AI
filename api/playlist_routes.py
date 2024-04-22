@@ -6,6 +6,7 @@ import sys
 import pathlib
 from transformers import pipeline
 import json
+from mood_estimators import song_details_calc
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from api.models import GetPlaylist, Playlist, PlaylistGenerate
@@ -88,6 +89,10 @@ def generate_playlist(playlist: PlaylistGenerate) -> Dict:
         json.dump(emotion_predictions, f, indent=4)
 
     print("Emotion predictions have been saved to", output_file)
+    emotions_predict = song_details_calc.import_emotions_predict('mood_estimators/emotion_predictions.json')
+    print(emotions_predict)
+    tracks = song_details_calc.main(emotions_predict)
+    print(tracks)
     return emotion_predictions
 
 
