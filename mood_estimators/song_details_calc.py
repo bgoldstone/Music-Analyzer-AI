@@ -3,7 +3,8 @@ import numpy as np
 import json
 import dotenv
 from pymongo import MongoClient
-from mood_estimators.max_heap import MaxHeap
+from max_heap import MaxHeap
+# from mood_estimators.max_heap import MaxHeap
 
 MONGO_URL = "soundsmith.x5y65kb.mongodb.net"
 
@@ -154,4 +155,5 @@ def import_emotions_predict(json_file_path):
 
 if __name__ == "__main__":
     sentiments = import_emotions_predict('mood_estimators\\emotion_predictions.json')
+    print(sentiments)
     main(sentiments)
