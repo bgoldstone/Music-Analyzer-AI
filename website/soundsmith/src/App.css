@@ -29,6 +29,19 @@ body{
   font-size: calc(10px + 2vmin);
   color: #f3db7d;
 }
+.loading-spinner {
+  width: 50px; /* Adjust the width */
+  height: 50px; /* Adjust the height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-message {
+  color: #eed15b;
+  font-size: 100xpx;
+  margin-top: 10px; /* Add margin to separate from the text box */
+}
 
 .backgroundDJ {
   background-image: "./dj-background.jpg";
@@ -47,7 +60,19 @@ body{
   font-size: 16px; /* Adjust font size */
   text-decoration: none;
 
+}.login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
+
+.App-header {
+  text-align: center;
+}
+
+
+
 
 
 textarea[type="text"],

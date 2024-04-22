@@ -2,10 +2,11 @@ import React from 'react';
 
 const Loading = () => {
     return (
-        <div className="Loading" style={{ width: '100vw', height: '100vh' }}>
-            <header className="Loading-screen">
-                <h1>Crafting...</h1>
-            </header>
+        <div className="Loading">
+            <div className="loading-spinner">
+                {/* Replace the rotating spinner with the "Crafting..." message */}
+                <span className="loading-message">Crafting...</span>
+            </div>
         </div>
     );
 }
