@@ -89,8 +89,8 @@ def main(group):
     }
 
     for track in dict_DB:
-        print(f"Song name: {track["track_name"]} by {track["artist_name"]}")
-        print(f"Song dimensions: {track["vector"]}")
+        # print(f"Song name: {track["track_name"]} by {track["artist_name"]}")
+        # print(f"Song dimensions: {track["vector"]}")
         P1 = np.array(list(track["vector"].values()))
         
         rank = []
@@ -106,10 +106,17 @@ def main(group):
                     similarity = round((sum / len(stand_vect_dict[quadrant])), 2)
                     rank.append(similarity)
 
-        heap.insert((rank[0], rank[1], rank[2], rank[3], track["track_name"], track["artist_name"]))
+        heap.insert((rank[0], rank[1], rank[2], rank[3], track["spotify"]["track_id"], track["track_name"], track["artist_name"]))
 
-    heap.print_sorted_heap(20)
-    # return []
+    # heap.print_sorted_heap(20)
+    top_songs = []
+    for i in range(21):
+        print(heap.extract_max())
+        each_track = (heap.extract_max())
+        top_songs.append({"track_id": each_track[4], "track_name":each_track[5], "artist_name": each_track[6]})
+
+        # top_songs.append({"track_id": track["spotify"]["track_id"], "track_name": track["track_name"], "artist_name": track["artist_name"]})
+    return top_songs
 
 def import_emotions_predict(json_file_path):
     """Import predicted emotions from a JSON file.
