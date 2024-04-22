@@ -1,11 +1,7 @@
-import pandas as pd
 import os
 import numpy as np
 import json
 import sys
-import matplotlib
-import matplotlib.pyplot as plt
-import bertai
 import dotenv
 from pymongo import MongoClient
 from max_heap import MaxHeap
@@ -37,6 +33,7 @@ def import_tracks(db: MongoClient, query = {}):
 
     Args:
         db (MongoClient): The MongoDB client.
+        query (dict, optional): The query to filter tracks. Defaults to {}.
 
     Returns:
         list: List of tracks.
@@ -44,6 +41,15 @@ def import_tracks(db: MongoClient, query = {}):
     return list(db.tracks.find(query))
 
 def import_standard_songs(db: MongoClient, emotion):
+    """Import standard songs from the database based on emotion.
+
+    Args:
+        db (MongoClient): The MongoDB client.
+        emotion (str): The emotion to filter standard songs.
+
+    Returns:
+        list: List of tuples containing song vectors and track IDs.
+    """
     tracks = list(db.tracks.find({"standard": emotion}))
     return [(track["vector"], track["spotify"]["track_id"]) for track in tracks]
 
@@ -63,6 +69,14 @@ def cosine_similarity(vector1, vector2):
     return dot_product / (magnitude_vector1 * magnitude_vector2)
 
 def main(group):
+    """Main function to calculate similarity rankings of songs based on emotions.
+
+    Args:
+        group (list): List of emotions.
+
+    Returns:
+        None
+    """
     client = get_db_connection()
     dict_DB = import_tracks(client)
     heap = MaxHeap()
@@ -95,10 +109,17 @@ def main(group):
         heap.insert((rank[0], rank[1], rank[2], rank[3], track["track_name"], track["artist_name"]))
 
     heap.print_sorted_heap(20)
-
-
+    # return []
 
 def import_emotions_predict(json_file_path):
+    """Import predicted emotions from a JSON file.
+
+    Args:
+        json_file_path (str): Path to the JSON file.
+
+    Returns:
+        list | str: List of top predicted emotions or error message.
+    """
     try:
         with open(json_file_path, 'r') as file:
             data = json.load(file)
@@ -116,7 +137,7 @@ def import_emotions_predict(json_file_path):
                 elif (keys == "anger") or (keys == "annoyance") or (key == "disapproval") or (key == "disgust") or (key == "fear") or (key == "confusion") or (key == "caring") or (key == "nervousness"):
                     top_emotions.append("stressing")
 
-        return(top_emotions)
+        return top_emotions
 
     except FileNotFoundError:
         return "File not found"
@@ -127,6 +148,4 @@ def import_emotions_predict(json_file_path):
 
 if __name__ == "__main__":
     sentiments = import_emotions_predict('mood_estimators\\emotion_predictions.json')
-    # two_sentiments = "happy"
-    # If model suck, takes 
     main(sentiments)
