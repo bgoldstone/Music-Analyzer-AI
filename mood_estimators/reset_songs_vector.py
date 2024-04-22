@@ -150,7 +150,7 @@ def calc_mood_from_details(track_id, vectors, sentiment_analyis, tempo, valence,
 
     # Incorporates an analysis of lyrics using bertai; tuples: happy_percentage, sad_percentage, mixed_percentage, no_impact_percentage
     if sentiment_analyis != None:
-        print(sentiment_analyis, track_id)
+        print("Success: ", sentiment_analyis, track_id)
         baseNum = 25
         # Modify dimension values based on bert.ai sentiment analysis. 
         vectors["happy"] += (baseNum * sentiment_analyis[0])
@@ -206,38 +206,15 @@ client = get_db_connection()
 dict_DB = import_tracks(client)
 
 def main():
-    # # Get the data(audio features from spotify) from the json
-    # if os.path.exists(file_path):
-    #     # Open the JSON file
-    #     with open(file_path, "r") as file:
-    #         # Parse the JSON objects one by one
-    #         parser = ijson.items(file, "item")
-
-    #         # Iterate over the JSON objects
-    #         for item in parser:
-    #             process_data(item)
-
-    #     for song in song_info:
-    #         print(f"Song name: {song[2]}")
-    #         print(f"Song dimensions: {song}")
-    #         print("-----------------------------")
-    #         #
-    #         client = get_db_connection()
-    #         load_vectors(client, song[0], song[1])
-
-    # else:
-    #     print("File not found:", file_path)
-    #     return 0
-    # Open the JSON file
     for item in dict_DB:
         sentiment_analyis = import_lyrics(client, item["spotify"]["track_id"])
         process_data_DB(item["analysis"], item["spotify"]["track_id"], sentiment_analyis)
         # print(item["analysis"], item["spotify"]["track_id"], item["track_name"])
 
     for song in song_info:
-        print(f"Song ID: {song[1]}")
-        print(f"Song dimensions: {song}")
-        print("-----------------------------")
+        # print(f"Song ID: {song[1]}")
+        # print(f"Song dimensions: {song}")
+        # print("-----------------------------")
         load_vectors(client, song[0], song[1])
 
 if __name__ == "__main__":
