@@ -59,8 +59,11 @@ def main():
     lyrics = import_lyrics(client)
 
     for each_lyric in lyrics:
-        sentient_analysis = bertai.get_lyrics_mood(each_lyric["lyrics"])
-        load_analysis(client, each_lyric["track_id"], sentient_analysis)
+        try:
+            sentient_analysis = bertai.get_lyrics_mood(each_lyric["lyrics"])
+            load_analysis(client, each_lyric["track_id"], sentient_analysis)
+        except Exception as e:
+            print(e)
 
 if __name__ == "__main__":
     main()
