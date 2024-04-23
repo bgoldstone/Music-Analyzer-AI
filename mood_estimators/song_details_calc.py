@@ -129,7 +129,7 @@ def import_emotions_predict(json_file_path):
     try:
         with open(json_file_path, 'r') as file:
             data = json.load(file)
-            keys = list(data.keys())[:4]
+            keys = list(data.keys())[:5]
 
             top_emotions = []
 

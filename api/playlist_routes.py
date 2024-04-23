@@ -92,8 +92,7 @@ def generate_playlist(playlist: PlaylistGenerate) -> Dict:
     emotions_predict = song_details_calc.import_emotions_predict('mood_estimators/emotion_predictions.json')
     print(emotions_predict)
     tracks = song_details_calc.main(emotions_predict)
-    print(tracks)
-    return emotion_predictions
+    return {'tracks': tracks}
 
 
 #def generate_playlist_vsm():
