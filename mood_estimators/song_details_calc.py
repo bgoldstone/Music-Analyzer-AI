@@ -3,8 +3,8 @@ import numpy as np
 import json
 import dotenv
 from pymongo import MongoClient
-from max_heap import MaxHeap
-# from mood_estimators.max_heap import MaxHeap
+# from max_heap import MaxHeap
+from mood_estimators.max_heap import MaxHeap
 
 MONGO_URL = "soundsmith.x5y65kb.mongodb.net"
 
@@ -102,8 +102,9 @@ def main(group):
                     for each_song in stand_vect_dict[quadrant]:
                         P2 = np.array(list(each_song[0].values()))
                         sum += cosine_similarity(P1, P2)
-                        
-                    similarity = round((sum / len(stand_vect_dict[quadrant])), 2)
+
+                    # similarity = round((sum / len(stand_vect_dict[quadrant])), 3)
+                    similarity = (sum / len(stand_vect_dict[quadrant]))
                     rank.append(similarity)
 
         heap.insert((rank[0], rank[1], rank[2], rank[3], track["spotify"]["track_id"], track["track_name"], track["artist_name"]))
@@ -155,5 +156,4 @@ def import_emotions_predict(json_file_path):
 
 if __name__ == "__main__":
     sentiments = import_emotions_predict('mood_estimators\\emotion_predictions.json')
-    print(sentiments)
     main(sentiments)
