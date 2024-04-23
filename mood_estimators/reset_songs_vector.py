@@ -153,11 +153,11 @@ def calc_mood_from_details(track_id, vectors, sentiment_analyis, tempo, valence,
         print("Success: ", sentiment_analyis, track_id)
         baseNum = 25
         # Modify dimension values based on bert.ai sentiment analysis. 
-        vectors["happy"] += (baseNum * sentiment_analyis[0])
-        vectors["sad"] += (baseNum * sentiment_analyis[1])
+        vectors["happy"] += (baseNum * sentiment_analyis["positive_percentage"])
+        vectors["sad"] += (baseNum * sentiment_analyis["negative_percentage"])
         # Mixed percentage increases both dimensions
-        vectors["happy"] += (baseNum * sentiment_analyis[2])
-        vectors["sad"] += (baseNum * sentiment_analyis[2])
+        vectors["happy"] += (baseNum * sentiment_analyis["mixed_percentage"])
+        vectors["sad"] += (baseNum * sentiment_analyis["mixed_percentage"])
     
     return(vectors, track_id)
 

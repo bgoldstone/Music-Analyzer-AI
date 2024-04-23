@@ -105,7 +105,7 @@ def get_lyrics_mood(text, printResults = False):
         print("{0}% positive, {1}% negative, {2}% mixed, {3}% no impact".format(positive_percentege, negative_percentege, mixed_percentage, no_impact_percentage))
         
     if (text.strip() != None) or (text.strip() != ""): 
-        return(positive_percentege / 100, negative_percentege / 100, mixed_percentage/ 100, no_impact_percentage / 100)
+        return {"positive_percentage": round(positive_percentege / 100, 2), "negative_percentage": round(negative_percentege / 100, 2), "mixed_percentage": round(mixed_percentage / 100, 2), "no_impact_percentage": round(no_impact_percentage / 100, 2)}
     else:
         return None
 
