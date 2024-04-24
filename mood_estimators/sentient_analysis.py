@@ -34,7 +34,8 @@ def import_lyrics(db: MongoClient):
     Returns:
         list: List of tracks.
     """
-    return list(db.lyrics.find({}))
+    return list(db.lyrics.find({"sentient_analysis": {"$exists": False}}))
+
 
 def load_analysis(db: MongoClient, id, percentage) -> None:
     """Load vectors into the database.
@@ -64,6 +65,10 @@ def main():
             load_analysis(client, each_lyric["track_id"], sentient_analysis)
         except Exception as e:
             print(e)
+            # If error, set default values
+            sentient_analysis = {"positive_percentage": 0, "negative_percentage": 0, "mixed_percentage": 0, "no_impact_percentage": 0}
+            load_analysis(client, each_lyric["track_id"], sentient_analysis)
+
 
 if __name__ == "__main__":
     main()
