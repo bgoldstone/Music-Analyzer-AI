@@ -3,6 +3,7 @@ import dotenv
 import os
 import time
 import lyricsgenius
+import certifi
 import re
 import json
 
@@ -22,7 +23,7 @@ def get_db_connection() -> MongoClient | None:
     mongo_user = dotenv.dotenv_values().get("MONGO_USER")
     mongo_password = dotenv.dotenv_values().get("MONGO_PASSWORD")
     mongo_uri = f"mongodb+srv://{mongo_user}:{mongo_password}@{MONGO_URL}/"
-    client = MongoClient(mongo_uri)
+    client = MongoClient(mongo_uri,tlsCAFile=certifi.where())
     db = client.soundsmith
     try:
         db.command("ping")

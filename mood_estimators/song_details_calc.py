@@ -1,9 +1,10 @@
 import os
+import certifi
 import numpy as np
 import json
 import dotenv
 from pymongo import MongoClient
-# from max_heap import MaxHeap
+#from max_heap import MaxHeap
 from mood_estimators.max_heap import MaxHeap
 
 MONGO_URL = "soundsmith.x5y65kb.mongodb.net"
@@ -18,7 +19,7 @@ def get_db_connection() -> MongoClient | None:
     mongo_user = dotenv.dotenv_values().get("MONGO_USER")
     mongo_password = dotenv.dotenv_values().get("MONGO_PASSWORD")
     mongo_uri = f"mongodb+srv://{mongo_user}:{mongo_password}@{MONGO_URL}/"
-    client = MongoClient(mongo_uri)
+    client = MongoClient(mongo_uri,tlsCAFile=certifi.where())
     db = client.soundsmith
     try:
         db.command("ping")
@@ -38,6 +39,7 @@ def import_tracks(db: MongoClient, query = {}):
     Returns:
         list: List of tracks.
     """
+    print(db.is_mongos)
     return list(db.tracks.find(query))
 
 def import_standard_songs(db: MongoClient, emotion):

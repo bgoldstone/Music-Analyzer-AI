@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import Loading from './Loading'; // Import the Loading component
+import '../App.css'
 
 const Contact = () => {
-    const [emotionPredictions, setEmotionPredictions] = useState(null);
+    const [playlist, setPlaylist] = useState(null);
     const [description, setDescription] = useState('');
     const [loading, setLoading] = useState(false); // Add loading state
 
@@ -29,21 +30,17 @@ const Contact = () => {
         })
         .then(response => {
             if (response.ok) {
-                console.log('POST /playlists/generate HTTP/1.1', response.status);
                 return response.json();
             } else {
                 throw new Error('Network response was not ok');
             }
         })
         .then(data => {
-            // Update emotion predictions
-            setEmotionPredictions(data);
+            // Update playlist
+            setPlaylist(data);
 
-            // Simulate delay for 2 seconds before navigating to VSM.js
-            setTimeout(() => {
-                setLoading(false);
-                window.location.href = '/vsm';
-            }, 2000);
+            // Hide loading page
+            setLoading(false);
         })
         .catch(error => {
             console.error('Error:', error);
@@ -67,7 +64,21 @@ const Contact = () => {
                 {loading ? (
                     <Loading />
                 ) : (
-                    <button className="Clickable-text" onClick={handleBeginClick}>Generate Playlist</button>
+                    <div>
+                        <button className="Clickable-text" onClick={handleBeginClick}>Generate Playlist</button>
+                        {playlist && (
+                            <div>
+                                <h2>Generated Playlist</h2>
+                                {playlist.tracks.map(track => (
+                                    <div key={track.track_id}>
+                                        <p>Track Name: {track.track_name}</p>
+                                        <p>Artist Name: {track.artist_name}</p>
+                                        <br />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 )}
             </header>
         </div>

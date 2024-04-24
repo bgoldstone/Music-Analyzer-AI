@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 import os
 from pymongo import MongoClient
+import certifi
 
 MONGO_URL = "soundsmith.x5y65kb.mongodb.net"
 SONG_DATA_DIRECTORY = "song_data"
@@ -34,7 +35,7 @@ def get_db_connection() -> MongoClient | None:
     mongo_user = dotenv.dotenv_values().get("MONGO_USER")
     mongo_password = dotenv.dotenv_values().get("MONGO_PASSWORD")
     mongo_uri = f"mongodb+srv://{mongo_user}:{mongo_password}@{MONGO_URL}/"
-    client = MongoClient(mongo_uri)
+    client = MongoClient(mongo_uri,tlsCAFile=certifi.where())
     db = client.soundsmith
     try:
         db.command("ping")
