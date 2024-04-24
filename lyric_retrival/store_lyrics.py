@@ -5,6 +5,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import lyricsgenius
 import time
 import json
+import certifi
 import dotenv
 import os
 from pymongo import MongoClient
@@ -140,7 +141,7 @@ def get_db_connection() -> MongoClient | None:
     mongo_user = dotenv.dotenv_values().get("MONGO_USER")
     mongo_password = dotenv.dotenv_values().get("MONGO_PASSWORD")
     mongo_uri = f"mongodb+srv://{mongo_user}:{mongo_password}@{MONGO_URL}/"
-    client = MongoClient(mongo_uri)
+    client = MongoClient(mongo_uri,tlsCAFile=certifi.where())
     db = client.soundsmith
     try:
         db.command("ping")

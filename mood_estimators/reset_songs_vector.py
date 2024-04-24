@@ -7,6 +7,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import bertai
 import dotenv
+import certifi
 from pymongo import MongoClient
 
 MONGO_URL = "soundsmith.x5y65kb.mongodb.net"
@@ -171,7 +172,7 @@ def get_db_connection() -> MongoClient | None:
     mongo_user = dotenv.dotenv_values().get("MONGO_USER")
     mongo_password = dotenv.dotenv_values().get("MONGO_PASSWORD")
     mongo_uri = f"mongodb+srv://{mongo_user}:{mongo_password}@{MONGO_URL}/"
-    client = MongoClient(mongo_uri)
+    client = MongoClient(mongo_uri,tlsCAFile=certifi.where())
     db = client.soundsmith
     try:
         db.command("ping")
