@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Loading from './Loading'; // Import the Loading component
-
+import VSM from './VSM';
 const Contact = () => {
     const [emotionPredictions, setEmotionPredictions] = useState(null);
     const [description, setDescription] = useState('');
