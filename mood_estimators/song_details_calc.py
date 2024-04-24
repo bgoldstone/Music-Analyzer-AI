@@ -2,7 +2,6 @@ import os
 import certifi
 import numpy as np
 import json
-import certifi
 import dotenv
 from pymongo import MongoClient
 #from max_heap import MaxHeap
