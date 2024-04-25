@@ -4,8 +4,8 @@ import numpy as np
 import json
 import dotenv
 from pymongo import MongoClient
-#from max_heap import MaxHeap
-from mood_estimators.max_heap import MaxHeap
+from max_heap import MaxHeap
+# from mood_estimators.max_heap import MaxHeap
 
 MONGO_URL = "soundsmith.x5y65kb.mongodb.net"
 
@@ -97,6 +97,7 @@ def main(group):
         
         rank = []
         for each_sentiment in group:
+            print(each_sentiment)
             for quadrant in stand_vect_dict:
                 if quadrant == each_sentiment:
                     sum = 0
@@ -109,6 +110,7 @@ def main(group):
                     similarity = (sum / len(stand_vect_dict[quadrant]))
                     rank.append(similarity)
 
+        print(rank)
         heap.insert((rank[0], rank[1], rank[2], rank[3], track["spotify"]["track_id"], track["track_name"], track["artist_name"]))
 
     # heap.print_sorted_heap(20)
@@ -130,21 +132,22 @@ def import_emotions_predict(json_file_path):
     Returns:
         list | str: List of top predicted emotions or error message.
     """
+    top_emotions = []
     try:
         with open(json_file_path, 'r') as file:
             data = json.load(file)
-            keys = list(data.keys())[:5]
+            keys = list(data.keys())[:4]
+            print(keys)
 
-            top_emotions = []
 
             for key in keys:
                 if (key == "joy") or (key == "amusement") or (key == "surprise") or (key == "love") or (key == "excitement") or (key == "gratitude") or (key == "pride") or (key == "relief"):
                     top_emotions.append("happy")
                 elif (key == "sadness") or (key == "disappointment") or (key == "grief") or (key == "remorse") or (key == "embarrassment"):
                     top_emotions.append("sad")
-                elif (key == "neutral") or (key == "curiosity") or (key == "approval") or (key == "admiration") or (key == "realization") or (key == "optimism") or (key == "desire") or (key == "relief"):
+                elif (key == "neutral") or (key == "curiosity") or (key == "approval") or (key == "admiration") or (key == "realization") or (key == "optimism") or (key == "desire"):
                     top_emotions.append("chill")
-                elif (keys == "anger") or (keys == "annoyance") or (key == "disapproval") or (key == "disgust") or (key == "fear") or (key == "confusion") or (key == "caring") or (key == "nervousness"):
+                elif (key == "anger") or (key == "annoyance") or (key == "disapproval") or (key == "disgust") or (key == "fear") or (key == "confusion") or (key == "caring") or (key == "nervousness"):
                     top_emotions.append("stressing")
 
         return top_emotions
@@ -158,4 +161,5 @@ def import_emotions_predict(json_file_path):
 
 if __name__ == "__main__":
     sentiments = import_emotions_predict('mood_estimators\\emotion_predictions.json')
+    print(sentiments)
     main(sentiments)
