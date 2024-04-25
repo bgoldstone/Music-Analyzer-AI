@@ -23,8 +23,8 @@ const Contact = () => {
             },
             body: JSON.stringify({
                 "description": description,
-                "jwt": "66173c89b970969d7d8d5524",
-                "keywords": "list of keywords",
+                "jwt": " ",
+                "keywords": " ",
                 "mood": " "
             })
         })
@@ -71,8 +71,8 @@ const Contact = () => {
                                 <h2>Generated Playlist</h2>
                                 {playlist.tracks.map(track => (
                                     <div key={track.track_id}>
-                                        <p>Track Name: {track.track_name}</p>
-                                        <p>Artist Name: {track.artist_name}</p>
+                                        <p>Song: {track.track_name}</p>
+                                        <p>Artist: {track.artist_name}</p>
                                         <br />
                                     </div>
                                 ))}
