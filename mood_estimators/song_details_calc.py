@@ -70,7 +70,7 @@ def cosine_similarity(vector1, vector2):
     magnitude_vector2 = np.linalg.norm(vector2)
     return dot_product / (magnitude_vector1 * magnitude_vector2)
 
-def main(group):
+def main(group, numReturned = 500):
     """Main function to calculate similarity rankings of songs based on emotions.
 
     Args:
@@ -115,7 +115,7 @@ def main(group):
 
     # heap.print_sorted_heap(20)
     top_songs = []
-    for i in range(21):
+    for i in range(numReturned):
         print(heap.extract_max())
         each_track = (heap.extract_max())
         top_songs.append({"track_id": each_track[4], "track_name":each_track[5], "artist_name": each_track[6]})
