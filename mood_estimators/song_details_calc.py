@@ -4,8 +4,11 @@ import numpy as np
 import json
 import dotenv
 from pymongo import MongoClient
-from max_heap import MaxHeap
-# from mood_estimators.max_heap import MaxHeap
+
+try:
+    from max_heap import MaxHeap
+except ImportError:
+    from mood_estimators.max_heap import MaxHeap
 
 MONGO_URL = "soundsmith.x5y65kb.mongodb.net"
 
