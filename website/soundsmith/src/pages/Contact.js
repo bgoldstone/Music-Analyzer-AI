@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Loading from './Loading'; // Import the Loading component
 import '../App.css'
+import background from "../dj-background.jpg";
 
 const Contact = () => {
     const [playlist, setPlaylist] = useState(null);
@@ -87,7 +88,8 @@ const Contact = () => {
         return uniqueTracks;
     };
     return (
-        <div className="login">
+        <div className="login" style={{ 
+                  backgroundImage: `url(${background})`, backgroundPosition: 'center', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', width: '100vw', height: '100vh', backgroundAttachment: 'fixed', overflowY: 'scroll'}}>
             <header className="App-header">
                 <h1 className="header-title">How are you feeling dawg</h1>
                 <label className="header-label">You may put a few words or even a few sentences</label>

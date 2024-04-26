@@ -29,13 +29,7 @@ body{
   font-size: calc(10px + 2vmin);
   color: #f3db7d;
 }
-.loading-spinner {
-  width: 50px; /* Adjust the width */
-  height: 50px; /* Adjust the height */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+
 
 .loading-message {
   color: #eed15b;
@@ -47,7 +41,17 @@ body{
   background-image: "./dj-background.jpg";
   background-size: "cover";
   /* height: 100vh; */
-  background-repeat: no-repeat;
+  background-repeat: repeat;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+  overflow-y: scroll;
 }
 
 .Clickable-text {
@@ -65,13 +69,14 @@ body{
   justify-content: center;
   align-items: center;
   height: 100vh;
+  position: relative;
+  
+  
 }
 
 .App-header {
   text-align: center;
 }
-
-
 
 
 
