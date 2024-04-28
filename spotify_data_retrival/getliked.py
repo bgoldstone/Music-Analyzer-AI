@@ -2,11 +2,9 @@ import spotipy
 import spotipy.util as util
 import os
 import json
+from dotenv import load_dotenv
 
-# Set Spotify API credentials as environment variables
-os.environ['SPOTIPY_CLIENT_ID'] = 'b4abe2c820d64044814fe27f031a18ca'
-os.environ['SPOTIPY_CLIENT_SECRET'] = '4bb08416052741658147d3c0419b8e24'
-os.environ['SPOTIPY_REDIRECT_URI'] = 'http://localhost:7777/callback'
+load_dotenv()
 
 client_id = os.environ.get('SPOTIPY_CLIENT_ID')
 client_secret = os.environ.get('SPOTIPY_CLIENT_SECRET')
