@@ -150,7 +150,7 @@ def calc_mood_from_details(track_id, vectors, sentiment_analyis, tempo, valence,
     vectors["mild"] -= round(scale_tempo(tempo), 3)
 
     # Incorporates an analysis of lyrics using bertai; tuples: happy_percentage, sad_percentage, mixed_percentage, no_impact_percentage
-    if sentiment_analyis != None:
+    if sentiment_analyis["no_impact_percentage"] != 0:
         print("Success: ", sentiment_analyis, track_id)
         baseNum = 25
         # Modify dimension values based on bert.ai sentiment analysis. 
@@ -181,8 +181,6 @@ def get_db_connection() -> MongoClient | None:
         print(e)
         return
     return db
-
-
 
 def load_vectors(db: MongoClient, vector, id) -> None:
     """Load vectors into the database.
