@@ -4,13 +4,14 @@ import os
 import json
 from dotenv import load_dotenv
 
+# Load environment variables from .env file
 load_dotenv()
 
-client_id = os.environ.get('SPOTIPY_CLIENT_ID')
-client_secret = os.environ.get('SPOTIPY_CLIENT_SECRET')
-redirect_uri = os.environ.get('SPOTIPY_REDIRECT_URI')
-
-scope = 'user-library-read'
+# Set up Spotify API credentials
+client_id = os.getenv("SPOTIFY_CLIENT_ID")
+client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
+redirect_uri = os.getenv("SPOTIFY_REDIRECT_URI")
+scope = os.getenv("SPOTIFY_SCOPE")
 username = 'DAL' 
 
 token = util.prompt_for_user_token(username,
