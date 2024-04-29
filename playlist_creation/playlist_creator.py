@@ -51,9 +51,14 @@ def add_songs_to_playlist(playlist_id, db):
     # Grab songs from DB to populate song_ids
     db_tracks = list(db.tracks.find({}))
 
-    for _ in range(5):
+    # loads SONGS_FOR_TESTING songs into playlist
+    SONGS_FOR_TESTING = 5
+    for _ in range(SONGS_FOR_TESTING):
+        # random track from dictionary
         rand_track_id = random.randrange(0,len(db_tracks))
         print(db_tracks[rand_track_id]['track_name'])
+
+        # appends spotify track id to song_ids
         song_ids.append(db_tracks[rand_track_id]['spotify']['track_id'])
     
     # Add songs to the playlist
@@ -63,7 +68,7 @@ def main():
     db = get_db_connection()
 
     # Create a new playlist
-    playlist_id = create_playlist('SongSmith playlist', 'A playlist created using Python')
+    playlist_id = create_playlist('SoundSmith playlist', 'A playlist created using Python')
 
     # Add songs to the playlist
     add_songs_to_playlist(playlist_id, db)
