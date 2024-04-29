@@ -108,8 +108,9 @@ def main(group, numReturned = 500):
                         sum += cosine_similarity(P1, P2)
 
                     # similarity = round((sum / len(stand_vect_dict[quadrant])), 3)
-                    similarity = (sum / len(stand_vect_dict[quadrant]))
-                    print(quadrant, ":" , similarity)
+                    similarity = round((sum / len(stand_vect_dict[quadrant])), 4)
+                    # similarity = (sum / len(stand_vect_dict[quadrant]))
+                    # print(quadrant, ":" , similarity)
                     rank.append(similarity)
 
         heap.insert((rank[0], rank[1], rank[2], rank[3], track["spotify"]["track_id"], track["track_name"], track["artist_name"]))
@@ -117,7 +118,7 @@ def main(group, numReturned = 500):
     # heap.print_sorted_heap(20)
     top_songs = []
     for i in range(numReturned):
-        print(heap.extract_max())
+        print(i, ") ",heap.extract_max())
         each_track = (heap.extract_max())
         top_songs.append({"track_id": each_track[4], "track_name":each_track[5], "artist_name": each_track[6]})
 
@@ -160,4 +161,5 @@ def import_emotions_predict(json_file_path):
 
 if __name__ == "__main__":
     sentiments = import_emotions_predict('mood_estimators\\emotion_predictions.json')
+    sentiments = ["sad", "sad", "chill", "chill"]
     main(sentiments)
