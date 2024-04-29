@@ -1,13 +1,12 @@
 import pathlib
 import sys
-from fastapi import APIRouter, Request, Response, WebSocket, FastAPI, Query
+from fastapi import APIRouter, Request, Response, WebSocket, FastAPI
 from fastapi.responses import RedirectResponse, JSONResponse
+from requests import request
 from spotipy import oauth2, Spotify
 import dotenv
 from urllib.parse import urlencode
-import spotipy
-import os
-import json
+
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from auth import tokens
@@ -68,29 +67,3 @@ def login_to_spotify(request: Request, response: Response):
         auth_url = sp_oauth.get_authorize_url()
         response = RedirectResponse(url=auth_url)
         return response
-    
-# New route to retrieve liked songs
-@app.get("/liked-songs")
-def retrieve_liked_songs(token: str = Query(...)):
-    sp = spotipy.Spotify(auth=token)
-    
-    # Get the first batch of saved tracks
-    results = sp.current_user_saved_tracks(limit=50)
-    saved_tracks = results['items']
-    
-    # Continue retrieving tracks until all tracks are fetched
-    while results['next']:
-        results = sp.next(results)
-        saved_tracks.extend(results['items'])
-
-    # Extract track information
-    tracks_info = []
-    for item in saved_tracks:
-        track_info = {
-            "id": item['track']['id'],
-            "name": item['track']['name'],
-            "artist": item['track']['artists'][0]['name']
-        }
-        tracks_info.append(track_info)
-
-    return tracks_info
