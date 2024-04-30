@@ -66,9 +66,11 @@ def clean_lyrics(txt):
 def grab_lyrics(tracks):
     song_lyrics = {}
 
-    for i in range(len(tracks)):
-        if(i==6):
-            break
+    START_INDEX = 3900
+    FINISH_INDEX = 4300
+
+    for i in range(START_INDEX, FINISH_INDEX):
+        
         cur_artist = tracks[i][0]
         song_title = tracks[i][1]
         song_id = tracks[i][2]
@@ -114,6 +116,17 @@ def grab_lyrics(tracks):
     return song_lyrics
 
 def load_lyrics(db: MongoClient, id, lyrics):
+    """
+    Upsert lyrics for a track in the specified MongoDB database.
+
+    Args:
+        db (MongoClient): The MongoClient instance connected to the MongoDB database.
+        id: The unique identifier of the track.
+        lyrics: The lyrics to be inserted or updated for the track.
+
+    Returns:
+        dict: The document representing the track after the update or insertion.
+    """
     track_query = {"track_id": id}
 
     # Find or create track

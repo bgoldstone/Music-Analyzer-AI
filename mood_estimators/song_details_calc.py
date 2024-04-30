@@ -42,7 +42,6 @@ def import_tracks(db: MongoClient, query = {}):
     Returns:
         list: List of tracks.
     """
-    print(db.is_mongos)
     return list(db.tracks.find(query))
 
 def import_standard_songs(db: MongoClient, emotion):
@@ -100,7 +99,6 @@ def main(group, numReturned = 500):
         
         rank = []
         for each_sentiment in group:
-            print(each_sentiment)
             for quadrant in stand_vect_dict:
                 if quadrant == each_sentiment:
                     sum = 0
@@ -110,16 +108,17 @@ def main(group, numReturned = 500):
                         sum += cosine_similarity(P1, P2)
 
                     # similarity = round((sum / len(stand_vect_dict[quadrant])), 3)
-                    similarity = (sum / len(stand_vect_dict[quadrant]))
+                    similarity = round((sum / len(stand_vect_dict[quadrant])), 4)
+                    # similarity = (sum / len(stand_vect_dict[quadrant]))
+                    # print(quadrant, ":" , similarity)
                     rank.append(similarity)
 
-        print(rank)
         heap.insert((rank[0], rank[1], rank[2], rank[3], track["spotify"]["track_id"], track["track_name"], track["artist_name"]))
 
     # heap.print_sorted_heap(20)
     top_songs = []
     for i in range(numReturned):
-        print(heap.extract_max())
+        print(i, ") ",heap.extract_max())
         each_track = (heap.extract_max())
         top_songs.append({"track_id": each_track[4], "track_name":each_track[5], "artist_name": each_track[6]})
 
@@ -140,8 +139,6 @@ def import_emotions_predict(json_file_path):
         with open(json_file_path, 'r') as file:
             data = json.load(file)
             keys = list(data.keys())[:4]
-            print(keys)
-
 
             for key in keys:
                 if (key == "joy") or (key == "amusement") or (key == "surprise") or (key == "love") or (key == "excitement") or (key == "gratitude") or (key == "pride") or (key == "relief"):
@@ -164,5 +161,5 @@ def import_emotions_predict(json_file_path):
 
 if __name__ == "__main__":
     sentiments = import_emotions_predict('mood_estimators\\emotion_predictions.json')
-    print(sentiments)
+    sentiments = ["sad", "sad", "chill", "chill"]
     main(sentiments)
