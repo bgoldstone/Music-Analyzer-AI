@@ -64,18 +64,27 @@ def clean_lyrics(txt):
     return no_artist
 
 def grab_lyrics(tracks):
+    """
+    Retrieve lyrics for specified tracks using the Genius API.
+
+    Args:
+        tracks (list): A list of tuples containing track information (artist, title, ID).
+
+    Returns:
+        dict: A nested dictionary containing retrieved lyrics organized by artist, song title, and ID.
+    """
     song_lyrics = {}
 
-    START_INDEX = 3900
-    FINISH_INDEX = 4300
+
+    START_INDEX = 4100
+    FINISH_INDEX = 4400
 
     for i in range(START_INDEX, FINISH_INDEX):
-        
         cur_artist = tracks[i][0]
         song_title = tracks[i][1]
         song_id = tracks[i][2]
         # the delay for each API call. Initialized to 3 and increased if there's a time out.
-        delay = 3
+        delay = 2
 
         time.sleep(delay)
         print('\n', f"Working on track {i}: {cur_artist} {song_title}.")
@@ -151,11 +160,7 @@ def main():
     for artist, artist_info in lyrics_dict.items():
         for song,tuple in artist_info.items():
             for id, lyrics in tuple.items():
-                print(song)
-                print("id",id)
-                print("lyrics",lyrics)
-                print()
-                #load_lyrics(db, id, lyrics)
+                load_lyrics(db, id, lyrics)
 
 if __name__ == "__main__":
     main()

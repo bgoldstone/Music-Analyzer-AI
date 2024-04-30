@@ -150,15 +150,18 @@ def calc_mood_from_details(track_id, vectors, sentiment_analyis, tempo, valence,
     vectors["mild"] -= round(scale_tempo(tempo), 3)
 
     # Incorporates an analysis of lyrics using bertai; tuples: happy_percentage, sad_percentage, mixed_percentage, no_impact_percentage
-    if sentiment_analyis["no_impact_percentage"] != 0:
-        print("Success: ", sentiment_analyis, track_id)
-        baseNum = 25
-        # Modify dimension values based on bert.ai sentiment analysis. 
-        vectors["happy"] += (baseNum * sentiment_analyis["positive_percentage"])
-        vectors["sad"] += (baseNum * sentiment_analyis["negative_percentage"])
-        # Mixed percentage increases both dimensions
-        vectors["happy"] += (baseNum * sentiment_analyis["mixed_percentage"])
-        vectors["sad"] += (baseNum * sentiment_analyis["mixed_percentage"])
+    try:
+        if (sentiment_analysis["no_impact_percentage"] != 0) or (sentiment_analysis != None):
+            print("Success: ", sentiment_analysis, track_id)
+            baseNum = 25
+            # Modify dimension values based on bert.ai sentiment analysis. 
+            vectors["happy"] += (baseNum * sentiment_analysis["positive_percentage"])
+            vectors["sad"] += (baseNum * sentiment_analysis["negative_percentage"])
+            # Mixed percentage increases both dimensions
+            vectors["happy"] += (baseNum * sentiment_analysis["mixed_percentage"])
+            vectors["sad"] += (baseNum * sentiment_analysis["mixed_percentage"])
+    except:
+        pass
     
     return(vectors, track_id)
 
