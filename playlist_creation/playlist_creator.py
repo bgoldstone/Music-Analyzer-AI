@@ -54,11 +54,12 @@ def add_songs_to_playlist(playlist_id, db):
     # loads SONGS_FOR_TESTING songs into playlist
     SONGS_FOR_TESTING = 5
     for _ in range(SONGS_FOR_TESTING):
-        # random track from dictionary
+        # random track from database
         rand_track_id = random.randrange(0,len(db_tracks))
-        print(db_tracks[rand_track_id]['track_name'])
+        #print(db_tracks[rand_track_id]['track_name'])
 
         # appends spotify track id to song_ids
+        print(db_tracks[rand_track_id]['spotify']['track_id'])
         song_ids.append(db_tracks[rand_track_id]['spotify']['track_id'])
     
     # Add songs to the playlist
