@@ -36,8 +36,12 @@ const Contact = () => {
             return response.json();
         })
         .then(data => {
+            // Get all tracks from the response
+            const allTracks = data.tracks;
+    
+    
             // Update playlist
-            setPlaylist(data.playlist);
+            setPlaylist({ tracks: allTracks });
 
             // Hide loading page
             setLoading(false);
@@ -47,37 +51,9 @@ const Contact = () => {
             // Hide loading page in case of error
             setLoading(false);
         });
-};
+    };
 
-    // Function to shuffle array elements randomly
-    const shuffleArray = (array) => {
-        const shuffledArray = [...array]; // Make a copy of the original array
-        
-        for (let i = shuffledArray.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1)); // Pick a random index from 0 to i
-            [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]]; // Swap elements
-        }
-        
-        return shuffledArray;
-    };
-    
-    // Function to select unique tracks while limiting the count
-    const selectUniqueTracks = (tracks, count) => {
-        const uniqueTracks = [];
-        const trackIds = new Set();
-    
-        for (let track of tracks) {
-            if (uniqueTracks.length === count) {
-                break;
-            }
-            if (!trackIds.has(track.track_id)) {
-                uniqueTracks.push(track);
-                trackIds.add(track.track_id);
-            }
-        }
-    
-        return uniqueTracks;
-    };
+
     return (
         <div className="login" style={{ 
                   backgroundImage: `url(${background})`, backgroundPosition: 'center', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', width: '100vw', height: '100vh', backgroundAttachment: 'fixed', overflowY: 'scroll'}}>
