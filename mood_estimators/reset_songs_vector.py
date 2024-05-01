@@ -73,7 +73,7 @@ def scale_tempo(tempo):
     # 70-90 bpm is the range where it is unclear that a song is happy or sad based on tempo
     # Therefore, equation  output smaller values between that range
     # Outliners(60bpm or 120bpm) have exponentially higher outputs
-    return 0.0004 * (tempo - 90) ** 3
+    return 0.00004 * (tempo - 90) ** 3
 
 def scale_energy(energy):
     """Scale energy.
@@ -87,7 +87,7 @@ def scale_energy(energy):
     # 0.40 - 0.60 energy level is the range where it is unclear that a song is happy or sad
     # Therefore, equation  output smaller values between that range
     # Outliners(0.10 or 0.9) have exponentially higher outputs
-    return (50 * (energy - 0.50) ** 3) * 40
+    return (20 * (energy - 0.50) ** 3) * 40
 
 def scale_valence(valence):
     """Scale valence.
@@ -101,7 +101,7 @@ def scale_valence(valence):
     # 0.40 - 0.60 energy level is the range where it is unclear that a song is happy or sad
     # Therefore, equation  output smaller values between that range
     # Outliners(0.10 or 0.9) have exponentially higher outputs
-    return (50 * (valence - 0.50) ** 3) * 40
+    return (20 * (valence - 0.50) ** 3) * 40
 
 def import_lyrics(db: MongoClient, spotify_id):
     """Import lyrics from the database.
