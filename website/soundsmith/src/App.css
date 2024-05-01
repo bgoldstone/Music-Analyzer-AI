@@ -28,6 +28,7 @@ body{
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: #f3db7d;
+  text-align: center;
 }
 
 
@@ -70,13 +71,9 @@ body{
   align-items: center;
   height: 100vh;
   position: relative;
-  
-  
 }
 
-.App-header {
-  text-align: center;
-}
+
 
 
 

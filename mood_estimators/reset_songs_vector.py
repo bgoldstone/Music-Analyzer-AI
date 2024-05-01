@@ -120,7 +120,7 @@ def import_lyrics(db: MongoClient, spotify_id):
         return None
 
 
-def calc_mood_from_details(track_id, vectors, sentiment_analysis, tempo, valence, energy):
+def calc_mood_from_details(track_id, vectors, sentiment_analyis, tempo, valence, energy):
     """Calculate mood vectors based on song details.
 
     Args:
@@ -209,8 +209,8 @@ dict_DB = import_tracks(client)
 
 def main():
     for item in dict_DB:
-        sentiment_analysis = import_lyrics(client, item["spotify"]["track_id"])
-        process_data_DB(item["analysis"], item["spotify"]["track_id"], sentiment_analysis)
+        sentiment_analyis = import_lyrics(client, item["spotify"]["track_id"])
+        process_data_DB(item["analysis"], item["spotify"]["track_id"], sentiment_analyis)
         # print(item["analysis"], item["spotify"]["track_id"], item["track_name"])
 
     for song in song_info:
