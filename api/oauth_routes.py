@@ -11,6 +11,7 @@ import os
 import json
 import spotipy
 
+
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from auth import tokens
 from database.crud import create_spotify_user, create_user, get_spotify_user
@@ -28,6 +29,7 @@ sp_oauth = oauth2.SpotifyOAuth(
     cache_path=CONFIG.get("SPOTIFY_CACHE_PATH"),
 )
 
+'''
 def grab_liked_songs(access_token):
     sp = spotipy.Spotify(auth=access_token)
     results = sp.current_user_saved_tracks(limit=50)
@@ -45,11 +47,16 @@ def grab_liked_songs(access_token):
             "artist": item['track']['artists'][0]['name']
         }
         tracks_info.append(track_info)
-
     
+        # Define the directory to save the JSON file
+    song_data_dir = 'song_data'
+    if not os.path.exists(song_data_dir):
+        os.makedirs(song_data_dir)
     
-
-
+    # Save the JSON file into the song_data folder
+    with open(os.path.join(song_data_dir, 'track_details.json'), 'w') as json_file:
+        json.dump(tracks_info, json_file, indent=4)
+'''
 # WebSocket endpoint
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -79,19 +86,18 @@ def login_to_spotify(request: Request, response: Response):
         # Generate JWT token
         jwt_token = tokens.create_spotify_token(
             token["access_token"], token["expires_at"], token["scope"]
-        )
-        # Grab liked songs for the user
-        liked_songs = grab_liked_songs(token["access_token"])
-        print(liked_songs)
+        )        
+        
         # Prepare response data
         response_data = {
             "jwt": jwt_token,
             "spotify_id": user["spotify_id"],
-            "username": user["username"],
-            "liked_songs": liked_songs  # Include liked songs in the response
+            "username": user["username"]  # Include liked songs in the response
         }    
         query_string = urlencode(response_data)
         redirect_url = f"http://localhost:3000/Contact?{query_string}"
+
+
         return RedirectResponse(url=redirect_url)
         
     else:
