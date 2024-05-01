@@ -68,10 +68,13 @@ def cosine_similarity(vector1, vector2):
     Returns:
         float: The cosine similarity between the two vectors.
     """
-    dot_product = np.dot(vector1, vector2)
-    magnitude_vector1 = np.linalg.norm(vector1)
-    magnitude_vector2 = np.linalg.norm(vector2)
-    return dot_product / (magnitude_vector1 * magnitude_vector2)
+    try:
+        dot_product = np.dot(vector1, vector2)
+        magnitude_vector1 = np.linalg.norm(vector1)
+        magnitude_vector2 = np.linalg.norm(vector2)
+        return dot_product / (magnitude_vector1 * magnitude_vector2)
+    except Exception as e:
+        print(e)
 
 def main(group, numReturned = 500, playlistNum = 40):
     """Main function to calculate similarity rankings of songs based on emotions.
@@ -116,17 +119,12 @@ def main(group, numReturned = 500, playlistNum = 40):
 
         heap.insert((rank[0], rank[1], rank[2], rank[3], track["spotify"]["track_id"], track["track_name"], track["artist_name"]))
 
-    # heap.print_sorted_heap(20)
     top_songs = []
     for i in range(numReturned):
-        print(i, ") ",heap.extract_max())
         each_track = (heap.extract_max())
         top_songs.append({"track_id": each_track[4], "track_name":each_track[5], "artist_name": each_track[6]})
-
-        # top_songs.append({"track_id": track["spotify"]["track_id"], "track_name": track["track_name"], "artist_name": track["artist_name"]})
+        print(i, ") ", each_track)
     
-    
-
     # print(random.sample(top_songs, playlistNum))
     return random.sample(top_songs, playlistNum)
 
@@ -166,5 +164,6 @@ def import_emotions_predict(json_file_path):
 
 if __name__ == "__main__":
     sentiments = import_emotions_predict('mood_estimators\\emotion_predictions.json')
-    sentiments = ["stressing", "stressing", "chill", "chill"]
+    # sentiments = ["stressing", "stressing", "chill", "chill"]
+    sentiments = ["chill", "chill", "chill", "chill"]
     main(sentiments)
