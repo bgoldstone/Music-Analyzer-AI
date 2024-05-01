@@ -78,6 +78,7 @@ const Contact = () => {
                                 {playlist.tracks.map(track => (
                                     <div key={track.track_id}>
                                         <br />
+                                        <br />
                                         <p>Song: {track.track_name}</p>
                                         <p>Artist: {track.artist_name}</p>
                                         <br />
