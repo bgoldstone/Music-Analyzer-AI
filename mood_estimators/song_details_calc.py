@@ -5,6 +5,17 @@ import json
 import random
 import dotenv
 from pymongo import MongoClient
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
+
+client_id = '5c787e0eccd246ba9c4500f755bff00b'
+client_secret = 'a9b2fc8b4eac4f219aaa8dd852e98b1c'
+redirect_uri = 'http://localhost:8000/oauth/spotify'
+
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id= client_id,
+                                               client_secret= client_secret,
+                                               redirect_uri= redirect_uri,
+                                               scope='playlist-modify-public'))
 
 try:
     from max_heap import MaxHeap
@@ -119,7 +130,7 @@ def main(group, numReturned = 500, playlistNum = 40):
     # heap.print_sorted_heap(20)
     top_songs = []
     for i in range(numReturned):
-        print(i, ") ",heap.extract_max())
+        #print(i, ") ",heap.extract_max())
         each_track = (heap.extract_max())
         top_songs.append({"track_id": each_track[4], "track_name":each_track[5], "artist_name": each_track[6]})
 
@@ -164,7 +175,24 @@ def import_emotions_predict(json_file_path):
     except Exception as e:
         return f"An error occurred: {e}"
 
+def generate_playlist_data_struct(name,description):
+    playlist = sp.user_playlist_create(sp.me()['id'], name, public=True, description=description)
+    return playlist['id']
+
+def create_playlist(songs_dict):
+    # list of song IDs
+    song_ids = [id['track_id'] for id in songs_dict]
+
+    playlist_id = generate_playlist_data_struct('SoundSmith test','Stop making playlists, Chris')
+
+    for track in song_ids:
+        song_ids.append(track['spotify']['track_id'])
+    
+    sp.playlist_add_items(playlist_id, song_ids)
+
+
 if __name__ == "__main__":
     sentiments = import_emotions_predict('mood_estimators\\emotion_predictions.json')
     sentiments = ["stressing", "stressing", "chill", "chill"]
-    main(sentiments)
+    songs_dict = main(sentiments)
+    create_playlist(songs_dict)
