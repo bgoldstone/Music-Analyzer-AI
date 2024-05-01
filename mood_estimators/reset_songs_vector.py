@@ -73,7 +73,7 @@ def scale_tempo(tempo):
     # 70-90 bpm is the range where it is unclear that a song is happy or sad based on tempo
     # Therefore, equation  output smaller values between that range
     # Outliners(60bpm or 120bpm) have exponentially higher outputs
-    return 0.0004 * (tempo - 90) ** 3
+    return 0.00004 * (tempo - 90) ** 3
 
 def scale_energy(energy):
     """Scale energy.
@@ -87,7 +87,7 @@ def scale_energy(energy):
     # 0.40 - 0.60 energy level is the range where it is unclear that a song is happy or sad
     # Therefore, equation  output smaller values between that range
     # Outliners(0.10 or 0.9) have exponentially higher outputs
-    return (50 * (energy - 0.50) ** 3) * 40
+    return (20 * (energy - 0.50) ** 3) * 40
 
 def scale_valence(valence):
     """Scale valence.
@@ -101,7 +101,7 @@ def scale_valence(valence):
     # 0.40 - 0.60 energy level is the range where it is unclear that a song is happy or sad
     # Therefore, equation  output smaller values between that range
     # Outliners(0.10 or 0.9) have exponentially higher outputs
-    return (50 * (valence - 0.50) ** 3) * 40
+    return (20 * (valence - 0.50) ** 3) * 40
 
 def import_lyrics(db: MongoClient, spotify_id):
     """Import lyrics from the database.
@@ -150,15 +150,18 @@ def calc_mood_from_details(track_id, vectors, sentiment_analyis, tempo, valence,
     vectors["mild"] -= round(scale_tempo(tempo), 3)
 
     # Incorporates an analysis of lyrics using bertai; tuples: happy_percentage, sad_percentage, mixed_percentage, no_impact_percentage
-    if sentiment_analyis["no_impact_percentage"] != 0:
-        print("Success: ", sentiment_analyis, track_id)
-        baseNum = 25
-        # Modify dimension values based on bert.ai sentiment analysis. 
-        vectors["happy"] += (baseNum * sentiment_analyis["positive_percentage"])
-        vectors["sad"] += (baseNum * sentiment_analyis["negative_percentage"])
-        # Mixed percentage increases both dimensions
-        vectors["happy"] += (baseNum * sentiment_analyis["mixed_percentage"])
-        vectors["sad"] += (baseNum * sentiment_analyis["mixed_percentage"])
+    try:
+        if (sentiment_analysis["no_impact_percentage"] != 0) or (sentiment_analysis != None):
+            print("Success: ", sentiment_analysis, track_id)
+            baseNum = 25
+            # Modify dimension values based on bert.ai sentiment analysis. 
+            vectors["happy"] += (baseNum * sentiment_analysis["positive_percentage"])
+            vectors["sad"] += (baseNum * sentiment_analysis["negative_percentage"])
+            # Mixed percentage increases both dimensions
+            vectors["happy"] += (baseNum * sentiment_analysis["mixed_percentage"])
+            vectors["sad"] += (baseNum * sentiment_analysis["mixed_percentage"])
+    except:
+        pass
     
     return(vectors, track_id)
 

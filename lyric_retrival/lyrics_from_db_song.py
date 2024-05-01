@@ -75,11 +75,12 @@ def grab_lyrics(tracks):
     """
     song_lyrics = {}
 
+
+
     START_INDEX = 4900
     FINISH_INDEX = 5100
 
     for i in range(START_INDEX, FINISH_INDEX):
-
         cur_artist = tracks[i][0]
         song_title = tracks[i][1]
         song_id = tracks[i][2]

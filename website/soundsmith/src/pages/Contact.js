@@ -36,17 +36,8 @@ const Contact = () => {
             return response.json();
         })
         .then(data => {
-            // Get all tracks from the response
-            const allTracks = data.tracks;
-    
-            // Shuffle the array of tracks randomly
-            const shuffledTracks = shuffleArray(allTracks);
-    
-            // Select unique tracks (avoiding duplicates)
-            const uniqueTracks = selectUniqueTracks(shuffledTracks, 30);
-    
             // Update playlist
-            setPlaylist({ tracks: uniqueTracks });
+            setPlaylist(data.playlist);
 
             // Hide loading page
             setLoading(false);
@@ -56,8 +47,8 @@ const Contact = () => {
             // Hide loading page in case of error
             setLoading(false);
         });
-    };
-    
+};
+
     // Function to shuffle array elements randomly
     const shuffleArray = (array) => {
         const shuffledArray = [...array]; // Make a copy of the original array
