@@ -75,8 +75,8 @@ def grab_lyrics(tracks):
     """
     song_lyrics = {}
 
-    START_INDEX = 4100
-    FINISH_INDEX = 4400
+    START_INDEX = 4900
+    FINISH_INDEX = 5100
 
     for i in range(START_INDEX, FINISH_INDEX):
 
@@ -97,6 +97,8 @@ def grab_lyrics(tracks):
                 song = genius.search_song(song_title, artist=cur_artist)
                 if song is not None and song.lyrics is not None:
                     break  # If song is found and lyrics are available, exit the loop
+                else:
+                    time.sleep(1)
             except Exception as e:
                 print(f"Error occurred: {e}")
                 print("Retrying...")
