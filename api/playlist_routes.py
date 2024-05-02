@@ -93,8 +93,22 @@ def generate_playlist(playlist: PlaylistGenerate) -> Dict:
     emotions_predict = song_details_calc.import_emotions_predict('mood_estimators/emotion_predictions.json')
     print(emotions_predict)
     tracks = song_details_calc.main(emotions_predict)
+
+    playlist_output_file = "playlist_generated/finished_playlist.json"
+    with open(playlist_output_file, 'w') as f:
+        finished_playlist =  json.dump(tracks, f, indent=4)
+    print(f"Generated finished list: \n {finished_playlist}")
+
     return {'tracks': tracks}
 
+
+@playlist_router.put(
+    "jwt_token/{jwt_token}",
+    response_description="Grabs users Oauth access token from the frontend"              
+)
+def get_jwt(jwt_token: str, request: Request) -> Dict:
+    jwt_user = {'jwt_token': jwt_token}
+    return jwt_user
 
 #def generate_playlist_vsm():
     

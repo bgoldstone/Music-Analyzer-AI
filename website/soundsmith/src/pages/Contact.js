@@ -19,7 +19,6 @@ const Contact = () => {
         // Show loading indicator
         setLoading(true);
     
-        // Fetch data from the backend
         fetch('http://localhost:8000/playlists/generate', {
             method: "POST",
             headers: {
