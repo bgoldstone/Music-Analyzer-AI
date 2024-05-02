@@ -16,6 +16,12 @@ const Contact = () => {
         // Show loading page
         setLoading(true);
     
+        const urlParams = new URLSearchParams(window.location.search);
+
+        var jwt_token = urlParams.get('jwt');
+        console.log(jwt_token);
+
+
         fetch('http://localhost:8000/playlists/generate', {
             method: "POST",
             headers: {
