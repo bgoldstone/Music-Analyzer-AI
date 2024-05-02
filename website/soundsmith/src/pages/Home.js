@@ -8,7 +8,7 @@ import { Outlet, Link } from "react-router-dom"; // Import Outlet and Link from 
 const Home = () => {
   return (
     // Render the Home component
-    <div className="Home" style={{ 
+    <div className="App-header" style={{ 
       backgroundImage: `url(${background})`, backgroundPosition: 'center', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', width: '100vw', height: '100vh', }}>
         {/* Header section */}
         <header className="App-header">
