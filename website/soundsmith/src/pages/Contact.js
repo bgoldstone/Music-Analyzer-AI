@@ -86,7 +86,6 @@ const Contact = () => {
                                     <div key={track.track_id}>
                                         <br />
                                         <br />
-                                        <h2>Generated Playlist</h2>
                                         <p>Song: {track.track_name}</p>
                                         <p>Artist: {track.artist_name}</p>
                                         <br />
