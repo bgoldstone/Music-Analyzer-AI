@@ -1,29 +1,32 @@
-import logo from '../musicnotelogo.svg';
-import '../App.css';
-import background from "../dj-background.jpg";
+import logo from '../musicnotelogo.svg'; // Import the logo image
+import '../App.css'; // Import the CSS file
+import background from "../dj-background.jpg"; // Import the background image
 import React from 'react';
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom"; // Import Outlet and Link from react-router-dom
 
-
+// Define the Home component
 const Home = () => {
   return (
-    <div className="Home" style={{ 
+    // Render the Home component
+    <div className="App-header" style={{ 
       backgroundImage: `url(${background})`, backgroundPosition: 'center', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', width: '100vw', height: '100vh', }}>
+        {/* Header section */}
         <header className="App-header">
-          <h1>Welcome to SoundSmith</h1>
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>Crafting Melodies</p>
-          {handleBeginClick()}
+          <h1>Welcome to SoundSmith</h1> {/* Display the welcome message */}
+          <img src={logo} className="App-logo" alt="logo" /> {/* Display the logo */}
+          <p>Crafting Melodies</p> {/* Display the slogan */}
+          {handleBeginClick()} {/* Call the handleBeginClick function */}
         </header>
     </div>
   );
 }
 
+// Function to handle the "Click to Begin" link click event
 function handleBeginClick() {
   // Add code to handle click event, navigate to next page
-  return(
-  <div className="Clickable-text"><Link to="http://localhost:8000/oauth/spotify">Click to Begin</Link></div>)
-  
+  return (
+    <div className="Clickable-text"><Link to="http://localhost:8000/oauth/spotify">Click to Begin</Link></div> // Render the link
+  );
 }
 
-export default Home;
+export default Home; // Export the Home component

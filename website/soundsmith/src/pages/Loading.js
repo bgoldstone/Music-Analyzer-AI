@@ -1,14 +1,16 @@
 import React from 'react';
 
+// Define the Loading component
 const Loading = () => {
     return (
+        // Render the Loading component
         <div className="Loading">
             <div className="loading-spinner">
-                {/* Replace the rotating spinner with the "Crafting..." message */}
+                {/* Display the "Crafting..." message instead of the rotating spinner */}
                 <span className="loading-message">Crafting...</span>
             </div>
         </div>
     );
 }
 
-export default Loading;
+export default Loading; // Export the Loading component
