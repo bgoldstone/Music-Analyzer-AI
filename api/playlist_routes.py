@@ -24,6 +24,7 @@ playlist_router = APIRouter(prefix="/playlists", tags=["playlists"])
     "/{playlist_name}",
     response_description="Get a single playlist by name",
 )
+
 def get_playlist(playlist_name: str, request: Request) -> Dict:
     playlist = get_playlist_with_tracks(playlist_name, request.app.database)
     if playlist is None:
