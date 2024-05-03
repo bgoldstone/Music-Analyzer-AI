@@ -59,7 +59,7 @@ const Contact = () => {
     return (
         <div className="login" style={{ 
                   backgroundImage: `url(${background})`, backgroundPosition: 'center', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', width: '100vw', height: '100vh', backgroundAttachment: 'fixed', overflowY: 'scroll'}}>
-            <header className="App-header">
+            <header className="Contact-header">
                 <h1 className="header-title">How are you feeling dawg</h1>
                 <label className="header-label">You may put a few words or even a few sentences</label>
                 {/* Textarea for user input */}
@@ -84,6 +84,7 @@ const Contact = () => {
                                 {/* Iterate over playlist tracks and display them */}
                                 {playlist.tracks.map(track => (
                                     <div key={track.track_id}>
+                                        <br />
                                         <br />
                                         <br />
                                         <p>Song: {track.track_name}</p>
