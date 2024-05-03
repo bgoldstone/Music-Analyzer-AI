@@ -8,13 +8,10 @@ lyricsgenius
 matplotlib
 nltk
 pandas
-Pyarrow
 PyJWT
 pymongo
 python-dotenv
 requests
 spotipy
-SQLAlchemy
-torch
 transformers
 uvicorn
