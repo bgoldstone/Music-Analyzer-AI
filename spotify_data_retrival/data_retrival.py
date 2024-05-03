@@ -132,7 +132,6 @@ def get_track_details(
         List[Dict[str, str]]: A list of dictionaries containing track details
     """
     track_details = []
-
     # Divide tracks into smaller subsets for Spotify API processing
     chunk_size = 100
     track_subsets = [tracks[i:i+chunk_size] for i in range(0, len(tracks), chunk_size)]

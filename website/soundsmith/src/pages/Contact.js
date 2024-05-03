@@ -4,16 +4,19 @@ import '../App.css'
 import background from "../dj-background.jpg";
 
 const Contact = () => {
-    const [playlist, setPlaylist] = useState(null);
-    const [description, setDescription] = useState('');
-    const [loading, setLoading] = useState(false); // Add loading state
+    // State variables
+    const [playlist, setPlaylist] = useState(null); // State to hold the generated playlist
+    const [description, setDescription] = useState(''); // State to hold the user's input description
+    const [loading, setLoading] = useState(false); // State to manage loading state
 
+    // Function to handle textarea input change
     const handleInputChange = (event) => {
         setDescription(event.target.value);
     };
 
+    // Function to handle "Generate Playlist" button click
     const handleBeginClick = () => {
-        // Show loading page
+        // Show loading indicator
         setLoading(true);
     
         fetch('http://localhost:8000/playlists/generate', {
@@ -24,9 +27,9 @@ const Contact = () => {
             },
             body: JSON.stringify({
                 "description": description,
-                "jwt": " ",
-                "keywords": " ",
-                "mood": " "
+                "jwt": " ", // Placeholder for JWT token
+                "keywords": " ", // Placeholder for keywords
+                "mood": " " // Placeholder for mood
             })
         })
         .then(response => {
@@ -36,45 +39,49 @@ const Contact = () => {
             return response.json();
         })
         .then(data => {
-            // Get all tracks from the response
+            // Extract playlist tracks from the response
             const allTracks = data.tracks;
     
-    
-            // Update playlist
+            // Update the playlist state with the fetched tracks
             setPlaylist({ tracks: allTracks });
 
-            // Hide loading page
+            // Hide loading indicator after fetching data
             setLoading(false);
         })
         .catch(error => {
             console.error('Error:', error);
-            // Hide loading page in case of error
+            // Hide loading indicator in case of error
             setLoading(false);
         });
     };
 
-
+    // JSX rendering
     return (
         <div className="login" style={{ 
                   backgroundImage: `url(${background})`, backgroundPosition: 'center', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', width: '100vw', height: '100vh', backgroundAttachment: 'fixed', overflowY: 'scroll'}}>
             <header className="App-header">
                 <h1 className="header-title">How are you feeling dawg</h1>
                 <label className="header-label">You may put a few words or even a few sentences</label>
+                {/* Textarea for user input */}
                 <textarea
                     id="moodinput"
                     name="moodinput"
                     value={description}
                     onChange={handleInputChange}
                 ></textarea>
-                {/* Render Link conditionally based on loading state */}
+                {/* Conditionally render loading indicator or button based on loading state */}
                 {loading ? (
+                    // Display loading component while fetching data
                     <Loading />
                 ) : (
+                    // Button to trigger playlist generation
                     <div>
                         <button className="Clickable-text" onClick={handleBeginClick}>Generate Playlist</button>
+                        {/* Render playlist if it exists */}
                         {playlist && (
                             <div>
-                                <h2>Generated Playlist</h2>
+
+                                {/* Iterate over playlist tracks and display them */}
                                 {playlist.tracks.map(track => (
                                     <div key={track.track_id}>
                                         <br />

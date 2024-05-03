@@ -10,15 +10,14 @@ import spotipy.util as util
 import os
 import json
 import spotipy
-
+from spotify_data_retrival.data_retrival import get_track_details
+from database.load_data import load_playlists
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from auth import tokens
 from database.crud import create_spotify_user, create_user, get_spotify_user
 
 CONFIG = dotenv.dotenv_values("spotify_data_retrival/.env")
-
-app = FastAPI()
 
 oauth_router = APIRouter(prefix="/oauth", tags=["oauth"])
 sp_oauth = oauth2.SpotifyOAuth(
@@ -30,7 +29,7 @@ sp_oauth = oauth2.SpotifyOAuth(
 )
 
 '''
-def grab_liked_songs(access_token):
+def grab_liked_songs(access_token, db):
     sp = spotipy.Spotify(auth=access_token)
     results = sp.current_user_saved_tracks(limit=50)
     saved_tracks = results['items']
@@ -41,30 +40,27 @@ def grab_liked_songs(access_token):
 
     tracks_info = []
     for item in saved_tracks:
-        track_info = {
-            "id": item['track']['id'],
-            "name": item['track']['name'],
-            "artist": item['track']['artists'][0]['name']
+        track_info = {    
+            "track_id": item["track"]["id"],
+            "track_name": item["track"]["name"],
+            "artist_name": item["track"]["artists"][0]["name"],
+            "album_name": item["track"]["album"]["name"],
         }
         tracks_info.append(track_info)
-    
-        # Define the directory to save the JSON file
-    song_data_dir = 'song_data'
-    if not os.path.exists(song_data_dir):
-        os.makedirs(song_data_dir)
-    
-    # Save the JSON file into the song_data folder
-    with open(os.path.join(song_data_dir, 'track_details.json'), 'w') as json_file:
-        json.dump(tracks_info, json_file, indent=4)
-'''
-# WebSocket endpoint
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(f"Message text was: {data}")
+    track_details = get_track_details(tracks_info,sp)    
 
+        # Define the directory to save the JSON file
+    
+    song_data_dir = os.path.join(os.getcwd(),"song_data",sp.current_user()["id"])
+    if not os.path.isdir(song_data_dir):
+        os.makedirs(song_data_dir)
+    file_path = os.path.join(song_data_dir, "liked_songs_track_details.json")
+    if not os.path.exists(file_path):
+        # Save the JSON file into the song_data folder
+        with open(file_path, 'w') as json_file:
+            json.dump(track_details, json_file, indent=4)
+        load_playlists(db)
+'''
 # OAuth route for Spotify login
 @oauth_router.get("/spotify")
 def login_to_spotify(request: Request, response: Response):
@@ -96,7 +92,7 @@ def login_to_spotify(request: Request, response: Response):
         }    
         query_string = urlencode(response_data)
         redirect_url = f"http://localhost:3000/Contact?{query_string}"
-
+        #grab_liked_songs(token['access_token'],request.app.database)
 
         return RedirectResponse(url=redirect_url)
         

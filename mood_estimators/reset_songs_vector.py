@@ -12,14 +12,7 @@ from pymongo import MongoClient
 
 MONGO_URL = "soundsmith.x5y65kb.mongodb.net"
 
-# DIRECTORY = "Daeshaun"  # Ex: "Daeshaun"
-# filename = (
-#     "Standard_songs_track_details.json"  # "Lofi_Anime_Openings_track_details.json"
-# )
-
-# file_path = os.path.join("song_data", DIRECTORY, filename)
-
-def import_tracks(db: MongoClient):
+def import_tracks(db: MongoClient, updateAll = False):
     """Import tracks from the database.
 
     Args:
@@ -28,7 +21,11 @@ def import_tracks(db: MongoClient):
     Returns:
         list: List of tracks.
     """
-    return list(db.tracks.find({}))
+    if updateAll:
+        return list(db.tracks.find({}))
+    else:
+        # print(list(db.tracks.find({"vector": {"$exists": False}})))
+        return list(db.tracks.find({"vector": {"$exists": False}}))
 
 def process_data_DB(df, track_id, senti_analyis):
     """Process data from database for each track.
@@ -205,7 +202,8 @@ def load_vectors(db: MongoClient, vector, id) -> None:
 
 song_info = []
 client = get_db_connection()
-dict_DB = import_tracks(client)
+# Change to True if all song vector
+dict_DB = import_tracks(client, True)
 
 def main():
     for item in dict_DB:
