@@ -8,12 +8,12 @@ import { Outlet, Link } from "react-router-dom"; // Import Outlet and Link from 
 const Home = () => {
   return (
     // Render the Home component
-    <div className="App-header" style={{ 
+    <div className="Home-container" style={{ 
       backgroundImage: `url(${background})`, backgroundPosition: 'center', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', width: '100vw', height: '100vh', }}>
         {/* Header section */}
-        <header className="App-header">
+        <header className="Home-header">
           <h1>Welcome to SoundSmith</h1> {/* Display the welcome message */}
-          <img src={logo} className="App-logo" alt="logo" /> {/* Display the logo */}
+          <img src={logo} className="Home-logo" alt="logo" /> {/* Display the logo */}
           <p>Crafting Melodies</p> {/* Display the slogan */}
           {handleBeginClick()} {/* Call the handleBeginClick function */}
         </header>

@@ -5,8 +5,12 @@ from fastapi.encoders import jsonable_encoder
 import sys
 import pathlib
 from transformers import pipeline
-import json
 from mood_estimators import song_details_calc
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
+import os
+from dotenv import load_dotenv
+import json
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from api.models import GetPlaylist, Playlist, PlaylistGenerate
@@ -110,5 +114,44 @@ def get_jwt(jwt_token: str, request: Request) -> Dict:
     jwt_user = {'jwt_token': jwt_token}
     return jwt_user
 
-#def generate_playlist_vsm():
+
+def store_playlist(playlist_name, playlist_description, json_file_path):
+    # Initialize Spotipy client with Authorization Code Flow
+    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.getenv("SPOTIFY_CLIENT_ID"),
+                                                   client_secret=os.getenv("SPOTIFY_CLIENT_SECRET"),
+                                                   redirect_uri=os.getenv("SPOTIFY_REDIRECT_URI"),
+                                                   scope="playlist-modify-public"))
+
+    def create_playlist(name, description=None, public=True):
+        user_id = sp.me()['id']  # Retrieve the authenticated user's ID
+        playlist = sp.user_playlist_create(user=user_id, name=name, public=public, description=description)
+        return playlist['id']
+
+    def add_tracks_to_playlist(playlist_id, track_ids):
+        sp.playlist_add_items(playlist_id, track_ids)
+
+    # Create playlist
+    playlist_id = create_playlist(playlist_name, playlist_description)
+
+    # Load track information from JSON
+    with open(json_file_path) as f:
+        track_info = json.load(f)
+
+    # Extract track IDs
+    track_ids = [track['track_id'] for track in track_info]
+
+    # Add tracks to the playlist
+    add_tracks_to_playlist(playlist_id, track_ids)
     
+    return playlist_id
+
+def store_playlist_run():
+        # Load environment variables from .env file
+    load_dotenv()
+
+    playlist_name = 'SoundSmithPlaylist'
+    playlist_description = 'test'  # Optional
+    json_file_path = 'finished_playlist.json'
+
+    playlist_id = store_playlist(playlist_name, playlist_description, json_file_path)
+    print(f"Playlist '{playlist_name}' created with ID: {playlist_id}")
