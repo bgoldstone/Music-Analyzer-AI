@@ -203,7 +203,7 @@ def load_vectors(db: MongoClient, vector, id) -> None:
 song_info = []
 client = get_db_connection()
 # Change to True if all song vector
-dict_DB = import_tracks(client, True)
+dict_DB = import_tracks(client)
 
 def main():
     for item in dict_DB:
