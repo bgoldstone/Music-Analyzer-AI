@@ -8,8 +8,8 @@ from transformers import pipeline
 from mood_estimators import song_details_calc
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-import os
-from dotenv import load_dotenv
+
+
 import json
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
@@ -114,7 +114,7 @@ def get_jwt(jwt_token: str, request: Request) -> Dict:
     jwt_user = {'jwt_token': jwt_token}
     return jwt_user
 
-
+'''
 def store_playlist(playlist_name, playlist_description, json_file_path):
     # Initialize Spotipy client with Authorization Code Flow
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.getenv("SPOTIFY_CLIENT_ID"),
@@ -155,3 +155,4 @@ def store_playlist_run():
 
     playlist_id = store_playlist(playlist_name, playlist_description, json_file_path)
     print(f"Playlist '{playlist_name}' created with ID: {playlist_id}")
+'''
