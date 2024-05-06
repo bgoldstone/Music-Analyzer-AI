@@ -8,11 +8,8 @@ from transformers import pipeline
 import json
 from mood_estimators import song_details_calc
 from spotipy import oauth2, Spotify
-import os
 from dotenv import load_dotenv
 import json
-import pathlib
-import sys
 from fastapi import APIRouter, Request, Response, WebSocket, FastAPI, HTTPException
 from fastapi.responses import RedirectResponse, JSONResponse
 from requests import request
@@ -99,8 +96,9 @@ def delete_playlist_by_id(playlist_id: str, request: Request) -> None:
     "/generate",
     response_description="Generate a new playlist with AI",
 )
+
+
 def generate_playlist(playlist: PlaylistGenerate) -> Dict:
-    
     # Initialize the text classification pipeline
     classifier = pipeline(task="text-classification", model="SamLowe/roberta-base-go_emotions", top_k=None)
 
@@ -120,8 +118,12 @@ def generate_playlist(playlist: PlaylistGenerate) -> Dict:
         json.dump(emotion_predictions, f, indent=4)
 
     print("Emotion predictions have been saved to", output_file)
+    
+    # Import emotion predictions
     emotions_predict = song_details_calc.import_emotions_predict('mood_estimators/emotion_predictions.json')
     print(emotions_predict)
+    
+    # Generate tracks based on emotion predictions
     tracks = song_details_calc.main(emotions_predict)
 
     # Create Spotify playlist using stored emotion predictions
@@ -133,18 +135,27 @@ def generate_playlist(playlist: PlaylistGenerate) -> Dict:
         cache_path=CONFIG["SPOTIFY_CACHE_PATH"]
     ))
 
+    # Function to create a new playlist on Spotify
     def create_playlist(name, description=None, public=True):
         user_id = sp.me()['id']
         playlist = sp.user_playlist_create(user=user_id, name=name, public=public, description=description)
         return playlist['id']
 
+    # Function to add tracks to a Spotify playlist
     def add_tracks_to_playlist(playlist_id, tracks):
         # Extract track IDs from the tracks dictionary
         track_ids = [track['track_id'] for track in tracks]
         # Add tracks to the playlist
         sp.playlist_add_items(playlist_id, track_ids)
+    
+    # Load generated playlist from JSON file
+    with open("playlist_generated/finished_playlist.json", "r") as f:
+        tracks = json.load(f)
 
+    # Create playlist on Spotify
     playlist_id = create_playlist("SoundSmith Playlist", playlist.description)
+    
+    # Add tracks to the playlist
     add_tracks_to_playlist(playlist_id, tracks)
 
     print(f"Playlist 'SoundSmith Playlist' created with ID: {playlist_id}")
