@@ -76,12 +76,12 @@ def login_to_spotify(request: Request, response: Response):
     Route for handling Spotify OAuth login.
 
     Parameters:
-    - request (Request): The incoming request object.
-    - response (Response): The outgoing response object.
+        request (Request): The incoming request object.
+        response (Response): The outgoing response object.
 
     Returns:
-    - RedirectResponse: A redirect response to the specified URL if the code is present in the query parameters.
-    - RedirectResponse: A redirect response to the Spotify authorization URL if the code is not present.
+        RedirectResponse: A redirect response to the specified URL if the code is present in the query parameters.
+        RedirectResponse: A redirect response to the Spotify authorization URL if the code is not present.
 
     This function handles the Spotify OAuth login process. It first checks if the code parameter is present in the query parameters. If it is, it exchanges the code for an access token using the `sp_oauth.get_access_token` function. It then creates a Spotify client using the access token.
 

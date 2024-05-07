@@ -1,3 +1,4 @@
+from typing import Any, Dict
 import dotenv
 from datetime import datetime
 import json
@@ -46,6 +47,16 @@ def get_db_connection() -> MongoClient | None:
     return db
 
 def load_playlists(db: MongoClient) -> None:
+    """
+    A function to load playlists into the database for each user.
+    
+    Parameters:
+        db (MongoClient): The MongoDB client object.
+        
+    Returns:
+        None
+    """
+
     # for each user
     for user_folder in os.listdir(SONG_DATA_DIRECTORY_PATH):
         if(not os.path.isdir(os.path.join(SONG_DATA_DIRECTORY_PATH, user_folder))):
@@ -96,16 +107,16 @@ def load_playlists(db: MongoClient) -> None:
                 upsert=True,
             )
 
-def clean_track(track: dict) -> dict:
+def clean_track(track: Dict[Any, Any]) -> Dict[Any,Any]:
     """
     Function to clean up the given track dictionary by reorganizing and removing unnecessary fields.
     Takes a dictionary representing a track and returns a new cleaned-up dictionary.
 
     Args:
-        track (dict): A dictionary representing a track.
+        track (Dict[Any, Any]): A dictionary representing a track.
 
     Returns:
-        dict: A cleaned-up dictionary representing a track.
+        Dict[Any, Any]: A cleaned-up dictionary representing a track.
     """
     new_track = {}
     # Move analsis to separate field

@@ -8,7 +8,19 @@ from pymongo import MongoClient
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from auth import hasher
 
-def get_lyrics(artist, title, db: MongoClient):
+def get_lyrics(artist:str, title:str, db: MongoClient)->str:
+    """
+    Get lyrics from database from artist and title asyncrously
+
+    Args:
+        artist (str): Artist
+        title (str): Title
+        db (MongoClient): The MongoClient instance connected to the MongoDB database.
+
+    Returns:
+        str: Lyrics
+    """
+
     artist_tracks = db["lyrics"].find_one({"artist" : artist})
     lyrics = artist_tracks[title]
     if(lyrics is None):

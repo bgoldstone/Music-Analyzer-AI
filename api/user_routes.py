@@ -1,7 +1,7 @@
 from datetime import datetime
 from fastapi import APIRouter, Body, Request, Response, HTTPException, status
 from fastapi.encoders import jsonable_encoder
-from typing import Dict
+from typing import Any, Dict
 import sys
 import pathlib
 
@@ -24,19 +24,19 @@ user_router = APIRouter(prefix="/users", tags=["users"])
     "/{username}",
     response_description="Get a single user",
 )
-def get_user_by_username(username: str, request: Request):
+def get_user_by_username(username: str, request: Request)-> Dict[Any,Any]:
     """
     Retrieves a single user from the database based on the provided username.
 
     Parameters:
-        - username (str): The username of the user to retrieve.
-        - request (Request): The incoming request object.
+        username (str): The username of the user to retrieve.
+        request (Request): The incoming request object.
 
     Returns:
-        - dict: A dictionary representing the user with the "_id" field converted to a string.
+        Dict[Any, Any]: A dictionary containing the user object.
 
     Raises:
-        - HTTPException: If the user with the provided username is not found.
+        HTTPException: If the user with the provided username is not found.
     """
     user = get_user(username, request.app.database)
     if user is None:
@@ -57,11 +57,11 @@ def create_new_user(user: CreateUser, request: Request) -> Dict[str, str]:
     Create a new user in the database based on the provided user object.
 
     Parameters:
-        - user (CreateUser): The object containing the username and password of the new user.
-        - request (Request): The incoming request object.
+        user (CreateUser): The object containing the username and password of the new user.
+        request (Request): The incoming request object.
     
     Returns:
-        - Dict[str, str]: A dictionary containing the user_id of the newly created user.
+        Dict[str, str]: A dictionary containing the user_id of the newly created user.
     """
     user = create_user(user.username, user.password, request.app.database)
     if user is None:
@@ -81,9 +81,9 @@ def update_user_by_id(user_id: str, user: UserUpdate, request: Request) -> None:
     Update a user by their ID.
 
     Parameters:
-        - user_id (str): The ID of the user to update.
-        - user (UserUpdate): The updated user object.
-        - request (Request): The incoming request object.
+        user_id (str): The ID of the user to update.
+        user (UserUpdate): The updated user object.
+        request (Request): The incoming request object.
 
     Returns:
         None
@@ -108,8 +108,8 @@ def delete_user_by_username(username: str, request: Request) -> None:
     Delete a user by their username.
 
     Parameters:
-        - username (str): The username of the user to delete.
-        - request (Request): The incoming request object.
+        username (str): The username of the user to delete.
+        request (Request): The incoming request object.
 
     Returns:
         None
@@ -123,15 +123,15 @@ def get_token(user: CreateUser, request: Request, response: Response):
     Get a login token for a user.
 
     Parameters:
-        - user (CreateUser): The user object containing the username and password.
-        - request (Request): The incoming request object.
-        - response (Response): The outgoing response object.
+        user (CreateUser): The user object containing the username and password.
+        request (Request): The incoming request object.
+        response (Response): The outgoing response object.
 
     Returns:
-        - str: The login token if the credentials are valid.
+        str: The login token if the credentials are valid.
 
     Raises:
-        - HTTPException: If the credentials are invalid.
+        HTTPException: If the credentials are invalid.
     """
     password = get_hashed_password(user.username, request.app.database)
     validCredentials = hasher.verify_password(user.password, password)
