@@ -70,6 +70,5 @@ def main():
             sentient_analysis = {"positive_percentage": 0, "negative_percentage": 0, "mixed_percentage": 0, "no_impact_percentage": 0}
             load_analysis(client, each_lyric["track_id"], sentient_analysis)
 
-
 if __name__ == "__main__":
     main()

@@ -14,6 +14,12 @@ const Contact = () => {
         setDescription(event.target.value);
     };
 
+    const uploadPlaylist = () => {
+        fetch('http://localhost:8000/generate',{})
+        
+
+    }
+
     // Function to handle "Generate Playlist" button click
     const handleBeginClick = () => {
         // Show loading indicator
@@ -47,7 +53,7 @@ const Contact = () => {
 
             // Hide loading indicator after fetching data
             setLoading(false);
-            
+             setPlaylistUpload(true)
         })
         .catch(error => {
             console.error('Error:', error);
@@ -81,7 +87,6 @@ const Contact = () => {
                         {/* Render playlist if it exists */}
                         {playlist && (
                             <div>
-
                                 {/* Iterate over playlist tracks and display them */}
                                 {playlist.tracks.map(track => (
                                     <div key={track.track_id}>
@@ -93,6 +98,11 @@ const Contact = () => {
                                         <br />
                                     </div>
                                 ))}
+                                <div>
+                                    <h3>Would you like to add this playlist to your Spotify?</h3>
+                                    <button className="Clickable-text" onClick={uploadPlaylist}>Yes</button>
+                                    <div className="Clickable-text-link"><Link to="http://localhost:3000">No</Link></div>
+                                </div>
                             </div>
                         )}
                     </div>

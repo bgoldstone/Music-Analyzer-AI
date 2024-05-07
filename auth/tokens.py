@@ -1,5 +1,5 @@
 import time
-from typing import Dict
+from typing import Any, Dict
 import jwt
 
 # FOR DEVELOPMENT USE ONLY
@@ -13,10 +13,7 @@ DAY = HOUR * 24
 TOKEN_EXPIRATION = DAY
 
 
-def create_token(
-    user_id: str,
-    username: str,
-) -> Dict[str, str]:
+def create_token(user_id: str,username: str,) -> Dict[str, str]:
     """Create a new token from the given token
 
     Args:
@@ -57,13 +54,13 @@ def create_spotify_token(
     return token
 
 
-def decode_token(token: str) -> dict:
+def decode_token(token: str) -> Any:
     """Decode a token.
     Args:
         token (str): The token to decode.
 
     Returns:
-        dict: The decoded token.
+        Any: The decoded token.
     """
     return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
 

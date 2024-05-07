@@ -72,6 +72,28 @@ def grab_liked_songs(access_token, db):
 # OAuth route for Spotify login
 @oauth_router.get("/spotify")
 def login_to_spotify(request: Request, response: Response):
+    """
+    Route for handling Spotify OAuth login.
+
+    Parameters:
+        request (Request): The incoming request object.
+        response (Response): The outgoing response object.
+
+    Returns:
+        RedirectResponse: A redirect response to the specified URL if the code is present in the query parameters.
+        RedirectResponse: A redirect response to the Spotify authorization URL if the code is not present.
+
+    This function handles the Spotify OAuth login process. It first checks if the code parameter is present in the query parameters. If it is, it exchanges the code for an access token using the `sp_oauth.get_access_token` function. It then creates a Spotify client using the access token.
+
+    Next, it retrieves or creates a user in the database using the `get_spotify_user` function. If the user does not exist, it creates a new user using the `create_spotify_user` function. It generates a JWT token using the `tokens.create_spotify_token` function.
+
+    After that, it prepares the response data, which includes the JWT token, Spotify ID, and username. It encodes the response data as a query string and constructs a redirect URL. Finally, it returns a redirect response to the specified URL.
+
+    If the code parameter is not present in the query parameters, it prints a message and returns a redirect response to the Spotify authorization URL.
+
+    Note: This function assumes the presence of the `sp_oauth` object and the `get_spotify_user`, `create_spotify_user`, and `tokens.create_spotify_token` functions.
+    """
+
     code = request.query_params.get("code")
 
     if code:
