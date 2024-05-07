@@ -47,6 +47,7 @@ const Contact = () => {
 
             // Hide loading indicator after fetching data
             setLoading(false);
+            
         })
         .catch(error => {
             console.error('Error:', error);
