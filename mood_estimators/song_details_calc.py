@@ -88,55 +88,6 @@ def cosine_similarity(vector1: np.ndarray, vector2: np.ndarray) -> float:
     except Exception as e:
         print(e)
 
-def main(group: List[str], numReturned: int = 500, playlistNum: int = 40) -> List[Dict[str, str]]:
-    """Main function to calculate similarity rankings of songs based on emotions.
-
-    Args:
-        group (list): List of emotions.
-        numReturned (int): Number of top songs to return. Defaults to 500.
-        playlistNum (int): Number of songs in the playlist. Defaults to 40.
-
-    Returns:
-        list: List of dictionaries containing top songs.
-    """
-    client: Union[MongoClient, None] = get_db_connection()
-    dict_DB: List[Dict[str, Any]] = import_tracks(client)
-    heap: MaxHeap = MaxHeap()
-
-    stand_vect_dict: Dict[str, List[Tuple[Dict[str, Any], str]]] = {
-        "happy" : import_standard_songs(client, "happy"),
-        "sad": import_standard_songs(client, "sad"),
-        "chill": import_standard_songs(client, "chill"),
-        "stressing": import_standard_songs(client, "stressing"),
-    }
-
-    for track in dict_DB:
-        P1: np.ndarray = np.array(list(track["vector"].values()))
-        
-        rank: List[float] = []
-        for each_sentiment in group:
-            for quadrant in stand_vect_dict:
-                if quadrant == each_sentiment:
-                    sum_: float = 0
-
-                    for each_song in stand_vect_dict[quadrant]:
-                        P2: np.ndarray = np.array(list(each_song[0].values()))
-                        sum_ += cosine_similarity(P1, P2)
-
-                    similarity: float = round((sum_ / len(stand_vect_dict[quadrant])), 4)
-                    rank.append(similarity)
-
-        heap.insert((rank[0], rank[1], rank[2], rank[3], track["spotify"]["track_id"], track["track_name"], track["artist_name"]))
-
-    top_songs: List[Dict[str, str]] = []
-    
-    for i in range(numReturned):
-        each_track: Tuple[float, float, float, float, str, str, str] = heap.extract_max()
-        top_songs.append({"track_id": each_track[4], "track_name":each_track[5], "artist_name": each_track[6]})
-        print(i, ") ", each_track)
-    
-    return random.sample(top_songs, playlistNum)
-
 def import_emotions_predict(json_file_path: str) -> List[str] | str:
     """Import predicted emotions from a JSON file.
 
@@ -203,6 +154,54 @@ def create_playlist(songs_dict: List[Dict[str, str]]) -> None:
     
     sp.playlist_add_items(playlist_id, song_ids)
 
+def main(group: List[str], numReturned: int = 500, playlistNum: int = 40) -> List[Dict[str, str]]:
+    """Main function to calculate similarity rankings of songs based on emotions.
+
+    Args:
+        group (list): List of emotions.
+        numReturned (int): Number of top songs to return. Defaults to 500.
+        playlistNum (int): Number of songs in the playlist. Defaults to 40.
+
+    Returns:
+        list: List of dictionaries containing top songs.
+    """
+    client: Union[MongoClient, None] = get_db_connection()
+    dict_DB: List[Dict[str, Any]] = import_tracks(client)
+    heap: MaxHeap = MaxHeap()
+
+    stand_vect_dict: Dict[str, List[Tuple[Dict[str, Any], str]]] = {
+        "happy" : import_standard_songs(client, "happy"),
+        "sad": import_standard_songs(client, "sad"),
+        "chill": import_standard_songs(client, "chill"),
+        "stressing": import_standard_songs(client, "stressing"),
+    }
+
+    for track in dict_DB:
+        P1: np.ndarray = np.array(list(track["vector"].values()))
+        
+        rank: List[float] = []
+        for each_sentiment in group:
+            for quadrant in stand_vect_dict:
+                if quadrant == each_sentiment:
+                    sum_: float = 0
+
+                    for each_song in stand_vect_dict[quadrant]:
+                        P2: np.ndarray = np.array(list(each_song[0].values()))
+                        sum_ += cosine_similarity(P1, P2)
+
+                    similarity: float = round((sum_ / len(stand_vect_dict[quadrant])), 4)
+                    rank.append(similarity)
+
+        heap.insert((rank[0], rank[1], rank[2], rank[3], track["spotify"]["track_id"], track["track_name"], track["artist_name"]))
+
+    top_songs: List[Dict[str, str]] = []
+    
+    for i in range(numReturned):
+        each_track: Tuple[float, float, float, float, str, str, str] = heap.extract_max()
+        top_songs.append({"track_id": each_track[4], "track_name":each_track[5], "artist_name": each_track[6]})
+        print(i, ") ", each_track)
+    
+    return random.sample(top_songs, playlistNum)
 
 if __name__ == "__main__":
     sentiments = import_emotions_predict('mood_estimators\\emotion_predictions.json')
