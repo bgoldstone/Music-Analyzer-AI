@@ -104,7 +104,7 @@ const Contact = () => {
                                 <div>
                                     <h3>Would you like to add this playlist to your Spotify?</h3>
                                     <button className="Clickable-text" onClick={uploadPlaylist}>Yes</button>
-                                    <div className="Clickable-text"><Link to="http://localhost:8000/Home">No</Link></div>
+                                    <div className="Clickable-text-link"><Link to="http://localhost:3000">No</Link></div>
                                 </div>
                             </div>
                         )}
