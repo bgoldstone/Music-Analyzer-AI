@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import Loading from './Loading'; // Import the Loading component
 import '../App.css'
 import background from "../dj-background.jpg";
+import {Link} from "react-router-dom"; // Import Outlet and Link from react-router-dom
+
+
 
 const Contact = () => {
     // State variables
     const [playlist, setPlaylist] = useState(null); // State to hold the generated playlist
     const [description, setDescription] = useState(''); // State to hold the user's input description
     const [loading, setLoading] = useState(false); // State to manage loading state
-
+    const [playlist_upload, setPlaylistUpload] = useState(false)
     // Function to handle textarea input change
     const handleInputChange = (event) => {
         setDescription(event.target.value);
@@ -100,8 +103,12 @@ const Contact = () => {
                                 ))}
                                 <div>
                                     <h3>Would you like to add this playlist to your Spotify?</h3>
-                                    <button className="Clickable-text" onClick={uploadPlaylist}>Yes</button>
-                                    <div className="Clickable-text-link"><Link to="http://localhost:3000">No</Link></div>
+                                    <button className="Clickable-text" onClick={uploadPlaylist}>
+                                    <Link to="http://localhost:3000">Yes</Link>
+                                    </button>
+                                    <div className="Clickable-text-link">
+                                    <Link to="http://localhost:3000">No</Link>
+                                    </div>
                                 </div>
                             </div>
                         )}

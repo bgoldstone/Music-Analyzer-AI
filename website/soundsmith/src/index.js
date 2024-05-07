@@ -7,7 +7,6 @@ import Contact from "./pages/Contact";
 import NoPage from "./pages/NoPage";
 import VSM from "./pages/VSM";
 import Loading from "./pages/Loading";
-import PlaylistUpload from "./pages/PlaylistUpload"
 
 
 export default function App() {
@@ -18,7 +17,6 @@ export default function App() {
           <Route index element={<Home />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/loading" element={<Loading />} />
-          <Route path="/playlistupload" element={<PlaylistUpload />} />
           <Route path="/VSM" element={<VSM />} />
           <Route path="*" element={<NoPage />} />
         {/* </Route> */}
