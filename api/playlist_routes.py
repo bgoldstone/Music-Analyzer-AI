@@ -144,6 +144,7 @@ def delete_playlist_by_id(playlist_id: str, request: Request) -> None:
 def generate_playlist(playlist: PlaylistGenerate) -> Dict:
     # Initialize the text classification pipeline
     classifier = pipeline(task="text-classification", model="SamLowe/roberta-base-go_emotions", top_k=None)
+
     """
     Generate a new playlist with AI based on the provided PlaylistGenerate object.
 
@@ -164,12 +165,12 @@ def generate_playlist(playlist: PlaylistGenerate) -> Dict:
     # Combine emotion labels and scores into a dictionary
     emotion_predictions = dict(zip(emotion_labels, emotion_scores))
 
-    # Write the dictionary to a JSON file
-    output_file = "mood_estimators/emotion_predictions.json"
-    with open(output_file, 'w') as f:
+    # Write the emotion predictions to a JSON file
+    output_file_emotion = "mood_estimators/emotion_predictions.json"
+    with open(output_file_emotion, 'w') as f:
         json.dump(emotion_predictions, f, indent=4)
 
-    print("Emotion predictions have been saved to", output_file)
+    print("Emotion predictions have been saved to", output_file_emotion)
     
     # Import emotion predictions
     emotions_predict = song_details_calc.import_emotions_predict('mood_estimators/emotion_predictions.json')
@@ -177,8 +178,19 @@ def generate_playlist(playlist: PlaylistGenerate) -> Dict:
     
     # Generate tracks based on emotion predictions
     tracks = song_details_calc.main(emotions_predict)
+    
+    # Write the tracks dictionary to a JSON file
+    output_file_tracks = "playlist_generated/finished_playlist.json"
+    with open(output_file_tracks, 'w') as f:
+        json.dump(tracks, f, indent=4)
 
-    # Create Spotify playlist using stored emotion predictions
+    print("Generated tracks have been saved to", output_file_tracks)
+
+    # Load the generated playlist from the JSON file
+    with open(output_file_tracks, 'r') as f:
+        tracks = json.load(f)
+
+    # Initialize the Spotify client
     sp = Spotify(auth_manager=oauth2.SpotifyOAuth(
         client_id=CONFIG["SPOTIFY_CLIENT_ID"],
         client_secret=CONFIG["SPOTIFY_CLIENT_SECRET"],
@@ -199,19 +211,15 @@ def generate_playlist(playlist: PlaylistGenerate) -> Dict:
         track_ids = [track['track_id'] for track in tracks]
         # Add tracks to the playlist
         sp.playlist_add_items(playlist_id, track_ids)
-    
-    # Load generated playlist from JSON file
-    with open("playlist_generated/finished_playlist.json", "r") as f:
-        tracks = json.load(f)
 
-    # Create playlist on Spotify
+    # Create a playlist on Spotify
     playlist_id = create_playlist("SoundSmith Playlist", playlist.description)
     
     # Add tracks to the playlist
     add_tracks_to_playlist(playlist_id, tracks)
 
     print(f"Playlist 'SoundSmith Playlist' created with ID: {playlist_id}")
-
+    
     return {'tracks': tracks}
 
 @playlist_router.put(
@@ -221,6 +229,21 @@ def generate_playlist(playlist: PlaylistGenerate) -> Dict:
 def get_jwt(jwt_token: str, request: Request) -> Dict:
     jwt_user = {'jwt_token': jwt_token}
     return jwt_user
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 '''
 def store_playlist(playlist_name, playlist_description, json_file_path):
