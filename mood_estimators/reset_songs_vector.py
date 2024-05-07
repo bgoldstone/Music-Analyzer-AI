@@ -117,7 +117,7 @@ def import_lyrics(db: MongoClient, spotify_id):
         return None
 
 
-def calc_mood_from_details(track_id, vectors, sentiment_analyis, tempo, valence, energy):
+def calc_mood_from_details(track_id, vectors, sentiment_analysis, tempo, valence, energy):
     """Calculate mood vectors based on song details.
 
     Args:
