@@ -27,7 +27,7 @@ def import_tracks(db: MongoClient, updateAll = False):
         # print(list(db.tracks.find({"vector": {"$exists": False}})))
         return list(db.tracks.find({"vector": {"$exists": False}}))
 
-def process_data_DB(df, track_id, senti_analyis):
+def process_data_DB(df, track_id, sentiment_analysis):
     """Process data from database for each track.
 
     Args:
@@ -56,7 +56,7 @@ def process_data_DB(df, track_id, senti_analyis):
     emotion_dimensions["danceability"] = float(danceability)
     emotion_dimensions["speechiness"] = float(speechiness)
     # Calculate vectors based on song properties
-    song_info.append(calc_mood_from_details(track_id, emotion_dimensions, senti_analyis, tempo, valence, energy))
+    song_info.append(calc_mood_from_details(track_id, emotion_dimensions, sentiment_analysis, tempo, valence, energy))
 
 def scale_tempo(tempo):
     """Scale tempo.
@@ -108,12 +108,15 @@ def import_lyrics(db: MongoClient, spotify_id):
         id: The spotify song ID
 
     Returns:
-        A string representing the song's lyrics
+        A dictionary representing the song's sentiment percentages for the lyrics. 
+        Or `None` if there isn't any
     """
     try:
         entry = (list(db.lyrics.find({"track_id": spotify_id}))[0])
         return entry["sentient_analysis"]
-    except:
+    except IndexError:
+        return None
+    except KeyError:
         return None
 
 
