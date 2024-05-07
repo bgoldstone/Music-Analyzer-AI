@@ -13,10 +13,7 @@ DAY = HOUR * 24
 TOKEN_EXPIRATION = DAY
 
 
-def create_token(
-    user_id: str,
-    username: str,
-) -> Dict[str, str]:
+def create_token(user_id: str,username: str,) -> Dict[str, str]:
     """Create a new token from the given token
 
     Args:
