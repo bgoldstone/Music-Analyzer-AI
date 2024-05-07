@@ -2,16 +2,12 @@ import React, { useState } from 'react';
 import Loading from './Loading'; // Import the Loading component
 import '../App.css'
 import background from "../dj-background.jpg";
-import {Link} from "react-router-dom"; // Import Outlet and Link from react-router-dom
-import PlaylistUpload from './PlaylistUpload';
-
 
 const Contact = () => {
     // State variables
     const [playlist, setPlaylist] = useState(null); // State to hold the generated playlist
     const [description, setDescription] = useState(''); // State to hold the user's input description
     const [loading, setLoading] = useState(false); // State to manage loading state
-    const [playlist_upload, setPlaylistUpload] = useState(false); // State to manage Playlist upload state
 
     // Function to handle textarea input change
     const handleInputChange = (event) => {
@@ -22,7 +18,6 @@ const Contact = () => {
     const handleBeginClick = () => {
         // Show loading indicator
         setLoading(true);
-        
     
         fetch('http://localhost:8000/playlists/generate', {
             method: "POST",
@@ -52,15 +47,13 @@ const Contact = () => {
 
             // Hide loading indicator after fetching data
             setLoading(false);
-             setPlaylistUpload(true)
+            
         })
         .catch(error => {
             console.error('Error:', error);
             // Hide loading indicator in case of error
             setLoading(false);
-            setPlaylistUpload(false)
         });
-
     };
 
     // JSX rendering
@@ -103,11 +96,6 @@ const Contact = () => {
                             </div>
                         )}
                     </div>
-                )}
-                {playlist_upload ? (
-                    <PlaylistUpload />
-                ) : (
-                    <div></div>
                 )}
             </header>
         </div>
