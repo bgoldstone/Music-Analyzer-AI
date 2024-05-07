@@ -1,4 +1,5 @@
 import os
+from typing import Union, List, Dict, Any
 import bertai
 import dotenv
 from pymongo import MongoClient
@@ -6,11 +7,11 @@ import certifi
 
 MONGO_URL = "soundsmith.x5y65kb.mongodb.net"
 
-def get_db_connection() -> MongoClient | None:
+def get_db_connection() -> Union[MongoClient, None]:
     """Creates and returns db connection.
 
     Returns:
-        MongoClient | None: MongoClient object, or None if connection fails.
+        Union[MongoClient, None]: MongoClient object, or None if connection fails.
     """
     dotenv.load_dotenv(os.path.join(__file__, ".env"))
     mongo_user = dotenv.dotenv_values().get("MONGO_USER")
@@ -26,25 +27,24 @@ def get_db_connection() -> MongoClient | None:
         return
     return db
 
-def import_lyrics(db: MongoClient):
+def import_lyrics(db: MongoClient) -> List[Dict[str, Any]]:
     """Import lyrics from the database.
 
     Args:
         db (MongoClient): The MongoDB client.
 
     Returns:
-        list: List of tracks.
+        List[Dict[str, Any]]: List of tracks.
     """
     return list(db.lyrics.find({"sentient_analysis": {"$exists": False}}))
 
-
-def load_analysis(db: MongoClient, id, percentage) -> None:
+def load_analysis(db: MongoClient, id: str, percentage: Dict[str, Any]) -> None:
     """Load vectors into the database.
 
     Args:
         db (MongoClient): The MongoDB client.
-        vector (dict): The vector to be loaded.
         id (str): The ID of the track.
+        percentage (Dict[str, Any]): The sentiment analysis percentage to be loaded.
     """
     track_query = {"track_id": id}
 
@@ -56,7 +56,8 @@ def load_analysis(db: MongoClient, id, percentage) -> None:
         return_document=True,
     )
 
-def main():
+def main() -> None:
+    """Main function for processing lyrics and loading sentiment analysis into the database."""
     client = get_db_connection()
     lyrics = import_lyrics(client)
 
