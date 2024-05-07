@@ -3,7 +3,6 @@ import Loading from './Loading'; // Import the Loading component
 import '../App.css'
 import background from "../dj-background.jpg";
 import {Link} from "react-router-dom"; // Import Outlet and Link from react-router-dom
-import PlaylistUpload from './PlaylistUpload';
 
 
 const Contact = () => {
@@ -11,12 +10,17 @@ const Contact = () => {
     const [playlist, setPlaylist] = useState(null); // State to hold the generated playlist
     const [description, setDescription] = useState(''); // State to hold the user's input description
     const [loading, setLoading] = useState(false); // State to manage loading state
-    const [playlist_upload, setPlaylistUpload] = useState(false); // State to manage Playlist upload state
 
     // Function to handle textarea input change
     const handleInputChange = (event) => {
         setDescription(event.target.value);
     };
+
+    const uploadPlaylist = () => {
+        fetch('http://localhost:8000/generate',{})
+        
+
+    }
 
     // Function to handle "Generate Playlist" button click
     const handleBeginClick = () => {
@@ -52,13 +56,11 @@ const Contact = () => {
 
             // Hide loading indicator after fetching data
             setLoading(false);
-             setPlaylistUpload(true)
         })
         .catch(error => {
             console.error('Error:', error);
             // Hide loading indicator in case of error
             setLoading(false);
-            setPlaylistUpload(false)
         });
 
     };
@@ -88,7 +90,6 @@ const Contact = () => {
                         {/* Render playlist if it exists */}
                         {playlist && (
                             <div>
-
                                 {/* Iterate over playlist tracks and display them */}
                                 {playlist.tracks.map(track => (
                                     <div key={track.track_id}>
@@ -100,14 +101,14 @@ const Contact = () => {
                                         <br />
                                     </div>
                                 ))}
+                                <div>
+                                    <h3>Would you like to add this playlist to your Spotify?</h3>
+                                    <button className="Clickable-text" onClick={uploadPlaylist}>Yes</button>
+                                    <div className="Clickable-text"><Link to="http://localhost:8000/Home">No</Link></div>
+                                </div>
                             </div>
                         )}
                     </div>
-                )}
-                {playlist_upload ? (
-                    <PlaylistUpload />
-                ) : (
-                    <div></div>
                 )}
             </header>
         </div>
