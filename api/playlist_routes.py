@@ -52,6 +52,21 @@ playlist_router = APIRouter(prefix="/playlists", tags=["playlists"])
 )
 
 def get_playlist(playlist_name: str, request: Request) -> Dict:
+    """
+    Get a single playlist by name.
+
+    Args:
+        playlist_name (str): The name of the playlist to retrieve.
+        request (Request): The request object containing the application database.
+
+    Returns:
+        Dict: The playlist with the specified name, including the "_id" and "user_id" fields converted to strings.
+
+    Raises:
+        HTTPException: If the playlist with the specified name is not found.
+
+    """
+
     playlist = get_playlist_with_tracks(playlist_name, request.app.database)
     if playlist is None:
         raise HTTPException(
@@ -70,6 +85,16 @@ def get_playlist(playlist_name: str, request: Request) -> Dict:
     response_description="Create a new playlist",
 )
 def create_new_playlist(playlist: Playlist, request: Request) -> Dict:
+    """
+    Create a new playlist.
+
+    Args:
+        playlist (Playlist): The playlist object containing the details of the new playlist.
+        request (Request): The request object containing the application database.
+
+    Returns:
+        Dict: The created playlist with the "_id" and "user_id" fields converted to strings.
+    """
     playlist = create_playlist(jsonable_encoder(playlist), request.app.database)
     return playlist
 
@@ -79,6 +104,17 @@ def create_new_playlist(playlist: Playlist, request: Request) -> Dict:
     response_description="Update a playlist",
 )
 def update_playlist(playlist_id: str, playlist: Dict, request: Request) -> Dict:
+    """
+    A function to update a playlist by its ID using the provided playlist data and request information.
+
+    Args:
+        playlist_id (str): The ID of the playlist to update.
+        playlist (Dict): The updated playlist data.
+        request (Request): The request object containing the application database.
+
+    Returns:
+        Dict: The updated playlist after the changes are applied.
+    """
     playlist = update_playlist_by_id(playlist_id, playlist, request.app.database)
     return playlist
 
@@ -88,6 +124,16 @@ def update_playlist(playlist_id: str, playlist: Dict, request: Request) -> Dict:
     response_description="Delete a playlist",
 )
 def delete_playlist_by_id(playlist_id: str, request: Request) -> None:
+    """
+    A function to delete a playlist by its ID using the provided playlist ID and request information.
+    
+    Args:
+        playlist_id (str): The ID of the playlist to delete.
+        request (Request): The request object containing the application database.
+
+    Returns:
+        None
+    """
     delete_playlist(playlist_id, request.app.database)
 
 
@@ -95,11 +141,18 @@ def delete_playlist_by_id(playlist_id: str, request: Request) -> None:
     "/generate",
     response_description="Generate a new playlist with AI",
 )
-
-
 def generate_playlist(playlist: PlaylistGenerate) -> Dict:
     # Initialize the text classification pipeline
     classifier = pipeline(task="text-classification", model="SamLowe/roberta-base-go_emotions", top_k=None)
+    """
+    Generate a new playlist with AI based on the provided PlaylistGenerate object.
+
+    Args:
+        playlist (PlaylistGenerate): The PlaylistGenerate object containing the description.
+
+    Returns:
+        Dict: A dictionary containing the generated tracks for the playlist.
+    """
 
     # Classify emotions for the given sentence
     predictions = classifier(playlist.description)

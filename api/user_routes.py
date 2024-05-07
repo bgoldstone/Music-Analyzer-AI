@@ -25,6 +25,19 @@ user_router = APIRouter(prefix="/users", tags=["users"])
     response_description="Get a single user",
 )
 def get_user_by_username(username: str, request: Request):
+    """
+    Retrieves a single user from the database based on the provided username.
+
+    Parameters:
+        - username (str): The username of the user to retrieve.
+        - request (Request): The incoming request object.
+
+    Returns:
+        - dict: A dictionary representing the user with the "_id" field converted to a string.
+
+    Raises:
+        - HTTPException: If the user with the provided username is not found.
+    """
     user = get_user(username, request.app.database)
     if user is None:
         raise HTTPException(
@@ -40,6 +53,16 @@ def get_user_by_username(username: str, request: Request):
     response_description="Create a new user",
 )
 def create_new_user(user: CreateUser, request: Request) -> Dict[str, str]:
+    """
+    Create a new user in the database based on the provided user object.
+
+    Parameters:
+        - user (CreateUser): The object containing the username and password of the new user.
+        - request (Request): The incoming request object.
+    
+    Returns:
+        - Dict[str, str]: A dictionary containing the user_id of the newly created user.
+    """
     user = create_user(user.username, user.password, request.app.database)
     if user is None:
         raise HTTPException(
@@ -54,6 +77,20 @@ def create_new_user(user: CreateUser, request: Request) -> Dict[str, str]:
     response_description="Update a user",
 )
 def update_user_by_id(user_id: str, user: UserUpdate, request: Request) -> None:
+    """
+    Update a user by their ID.
+
+    Parameters:
+        - user_id (str): The ID of the user to update.
+        - user (UserUpdate): The updated user object.
+        - request (Request): The incoming request object.
+
+    Returns:
+        None
+
+    Raises:
+        HTTPException: If the user with the given ID is not found.
+    """
     user = update_user(user_id, request.app.database, username=user.username)
     if user is None:
         raise HTTPException(
@@ -67,11 +104,35 @@ def update_user_by_id(user_id: str, user: UserUpdate, request: Request) -> None:
     response_description="Delete a user",
 )
 def delete_user_by_username(username: str, request: Request) -> None:
+    """
+    Delete a user by their username.
+
+    Parameters:
+        - username (str): The username of the user to delete.
+        - request (Request): The incoming request object.
+
+    Returns:
+        None
+    """
     delete_user(username, request.app.database)
 
 
 @user_router.post("/auth", response_description="Get Login Token")
 def get_token(user: CreateUser, request: Request, response: Response):
+    """
+    Get a login token for a user.
+
+    Parameters:
+        - user (CreateUser): The user object containing the username and password.
+        - request (Request): The incoming request object.
+        - response (Response): The outgoing response object.
+
+    Returns:
+        - str: The login token if the credentials are valid.
+
+    Raises:
+        - HTTPException: If the credentials are invalid.
+    """
     password = get_hashed_password(user.username, request.app.database)
     validCredentials = hasher.verify_password(user.password, password)
     if validCredentials:
