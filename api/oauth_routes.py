@@ -27,17 +27,21 @@ sp_oauth = oauth2.SpotifyOAuth(
     scope=CONFIG.get("SPOTIFY_SCOPE").split(","),
     cache_path=CONFIG.get("SPOTIFY_CACHE_PATH"),
 )
-
 '''
 def grab_liked_songs(access_token, db):
+    # Initialize Spotipy client with the provided access token
     sp = spotipy.Spotify(auth=access_token)
+    
+    # Retrieve the user's saved tracks from Spotify, limit to 50 tracks per request
     results = sp.current_user_saved_tracks(limit=50)
     saved_tracks = results['items']
     
+    # Fetch all saved tracks by paging through the results until there are no more tracks left
     while results['next']:
         results = sp.next(results)
         saved_tracks.extend(results['items'])
 
+    # Extract relevant information for each saved track
     tracks_info = []
     for item in saved_tracks:
         track_info = {    
@@ -47,18 +51,22 @@ def grab_liked_songs(access_token, db):
             "album_name": item["track"]["album"]["name"],
         }
         tracks_info.append(track_info)
-    track_details = get_track_details(tracks_info,sp)    
-
-        # Define the directory to save the JSON file
     
-    song_data_dir = os.path.join(os.getcwd(),"song_data",sp.current_user()["id"])
+    # Fetch additional details for each track
+    track_details = get_track_details(tracks_info, sp)
+
+    # Define the directory to save the JSON file
+    song_data_dir = os.path.join(os.getcwd(), "song_data", sp.current_user()["id"])
     if not os.path.isdir(song_data_dir):
         os.makedirs(song_data_dir)
     file_path = os.path.join(song_data_dir, "liked_songs_track_details.json")
+    
+    # Save the JSON file into the song_data folder if it doesn't already exist
     if not os.path.exists(file_path):
-        # Save the JSON file into the song_data folder
         with open(file_path, 'w') as json_file:
             json.dump(track_details, json_file, indent=4)
+        
+        # Load playlists into the database after saving the JSON file
         load_playlists(db)
 '''
 # OAuth route for Spotify login

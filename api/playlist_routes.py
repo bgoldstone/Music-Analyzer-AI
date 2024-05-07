@@ -6,11 +6,22 @@ import sys
 import pathlib
 from transformers import pipeline
 from mood_estimators import song_details_calc
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
-
-
+from spotipy import oauth2, Spotify
+from dotenv import load_dotenv
 import json
+from fastapi import APIRouter, Request, Response, WebSocket, FastAPI, HTTPException
+from fastapi.responses import RedirectResponse, JSONResponse
+from requests import request
+from spotipy import oauth2, Spotify
+import dotenv
+from urllib.parse import urlencode
+import spotipy.util as util
+import os
+import json
+import spotipy
+from spotify_data_retrival.data_retrival import get_track_details
+from database.load_data import load_playlists
+
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from api.models import GetPlaylist, Playlist, PlaylistGenerate
@@ -19,6 +30,17 @@ from database.crud import (
     delete_playlist,
     get_playlist_with_tracks,
     update_playlist_by_id,
+)
+
+CONFIG = dotenv.dotenv_values("spotify_data_retrival/.env")
+
+oauth_router = APIRouter(prefix="/oauth", tags=["oauth"])
+sp_oauth = oauth2.SpotifyOAuth(
+    CONFIG.get("SPOTIFY_CLIENT_ID"),
+    CONFIG.get("SPOTIFY_CLIENT_SECRET"),
+    CONFIG.get("SPOTIFY_REDIRECT_URI"),
+    scope=CONFIG.get("SPOTIFY_SCOPE").split(","),
+    cache_path=CONFIG.get("SPOTIFY_CACHE_PATH"),
 )
 
 playlist_router = APIRouter(prefix="/playlists", tags=["playlists"])
@@ -73,8 +95,9 @@ def delete_playlist_by_id(playlist_id: str, request: Request) -> None:
     "/generate",
     response_description="Generate a new playlist with AI",
 )
+
+
 def generate_playlist(playlist: PlaylistGenerate) -> Dict:
-    
     # Initialize the text classification pipeline
     classifier = pipeline(task="text-classification", model="SamLowe/roberta-base-go_emotions", top_k=None)
 
@@ -94,17 +117,49 @@ def generate_playlist(playlist: PlaylistGenerate) -> Dict:
         json.dump(emotion_predictions, f, indent=4)
 
     print("Emotion predictions have been saved to", output_file)
+    
+    # Import emotion predictions
     emotions_predict = song_details_calc.import_emotions_predict('mood_estimators/emotion_predictions.json')
     print(emotions_predict)
+    
+    # Generate tracks based on emotion predictions
     tracks = song_details_calc.main(emotions_predict)
 
-    playlist_output_file = "playlist_generated/finished_playlist.json"
-    with open(playlist_output_file, 'w') as f:
-        finished_playlist =  json.dump(tracks, f, indent=4)
-    print(f"Generated finished list: \n {finished_playlist}")
+    # Create Spotify playlist using stored emotion predictions
+    sp = Spotify(auth_manager=oauth2.SpotifyOAuth(
+        client_id=CONFIG["SPOTIFY_CLIENT_ID"],
+        client_secret=CONFIG["SPOTIFY_CLIENT_SECRET"],
+        redirect_uri=CONFIG["SPOTIFY_REDIRECT_URI"],
+        scope=CONFIG["SPOTIFY_SCOPE"].split(","),
+        cache_path=CONFIG["SPOTIFY_CACHE_PATH"]
+    ))
+
+    # Function to create a new playlist on Spotify
+    def create_playlist(name, description=None, public=True):
+        user_id = sp.me()['id']
+        playlist = sp.user_playlist_create(user=user_id, name=name, public=public, description=description)
+        return playlist['id']
+
+    # Function to add tracks to a Spotify playlist
+    def add_tracks_to_playlist(playlist_id, tracks):
+        # Extract track IDs from the tracks dictionary
+        track_ids = [track['track_id'] for track in tracks]
+        # Add tracks to the playlist
+        sp.playlist_add_items(playlist_id, track_ids)
+    
+    # Load generated playlist from JSON file
+    with open("playlist_generated/finished_playlist.json", "r") as f:
+        tracks = json.load(f)
+
+    # Create playlist on Spotify
+    playlist_id = create_playlist("SoundSmith Playlist", playlist.description)
+    
+    # Add tracks to the playlist
+    add_tracks_to_playlist(playlist_id, tracks)
+
+    print(f"Playlist 'SoundSmith Playlist' created with ID: {playlist_id}")
 
     return {'tracks': tracks}
-
 
 @playlist_router.put(
     "jwt_token/{jwt_token}",
