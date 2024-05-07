@@ -59,9 +59,7 @@ def main():
     write_json(TRACK_DETAILS_FILE_PATH, track_details)
 
 
-def read_json(
-    file_name: str,
-) -> List[Dict[str, str]]:
+def read_json(file_name: str) -> List[Dict[str, str]]:
     """read CSV file as a dictionary
 
     Args:
@@ -76,9 +74,7 @@ def read_json(
     return song_list
 
 
-def get_playlist_tracks(
-    playlist_url: str, sp: spotipy.Spotify, playlist_file_path: str
-) -> None:
+def get_playlist_tracks(playlist_url: str, sp: spotipy.Spotify, playlist_file_path: str) -> None:
     """
     gets playlist tracks and writes to a file
 
@@ -119,9 +115,7 @@ def get_playlist_tracks(
             file.write(writer)
 
 
-def get_track_details(
-    tracks: List[Dict[str, str]], sp: spotipy.Spotify
-) -> List[Dict[str, str]]:
+def get_track_details(tracks: List[Dict[str, str]], sp: spotipy.Spotify) -> List[Dict[str, str]]:
     """
     gets track details and returns a dictionary
 
