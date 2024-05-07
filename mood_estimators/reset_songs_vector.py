@@ -120,8 +120,8 @@ def import_lyrics(db: MongoClient, spotify_id):
         return None
 
 
-def calc_mood_from_details(track_id, vectors, sentiment_analysis, tempo, valence, energy):
-    """Calculate mood vectors based on song details.
+def calc_mood_from_details(track_id, vector, sentiment_analysis, tempo, valence, energy):
+    """Calculate mood vector based on song details.
 
     Args:
         tempo (float): Tempo value.
@@ -129,41 +129,42 @@ def calc_mood_from_details(track_id, vectors, sentiment_analysis, tempo, valence
         energy (float): Energy value.
         name (str): Track name.
         track_id (str): Track ID.
-        vectors (dict): Emotion vectors.
+        vector (dict): Emotion vector.
 
     Returns:
-        tuple: Mood vectors, track ID, and track name.
+        tuple: Mood vector, track ID, and track name.
     """
-    # Incorporating valence into mood vectors:
+    # Incorporating valence into mood vector:
     # Increase the "happy" vector component and decrease the "sad" vector component based on valence level.
-    vectors["happy"] += round(scale_valence(valence), 3)
-    vectors["sad"] -= round(scale_valence(valence), 3)
+    vector["happy"] += round(scale_valence(valence), 3)
+    vector["sad"] -= round(scale_valence(valence), 3)
     #
-    # Incorporating energy into mood vectors:
+    # Incorporating energy into mood vector:
     # Increase the "intense" vector component and decrease the "mild" vector component based on energy level.
-    vectors["intense"] += round(scale_energy(energy) , 3)
-    vectors["mild"] -= round(scale_energy(energy) , 3)
+    vector["intense"] += round(scale_energy(energy) , 3)
+    vector["mild"] -= round(scale_energy(energy) , 3)
     #
-    # Incorporating tempo into mood vectors:
+    # Incorporating tempo into mood vector:
     # Increase the "intense" vector component if tempo is high, else adjust "sad" based on the absolute value of scaled tempo.
-    vectors["intense"] += round(scale_tempo(tempo), 3) 
-    vectors["mild"] -= round(scale_tempo(tempo), 3)
+    vector["intense"] += round(scale_tempo(tempo), 3) 
+    vector["mild"] -= round(scale_tempo(tempo), 3)
 
     # Incorporates an analysis of lyrics using bertai; tuples: happy_percentage, sad_percentage, mixed_percentage, no_impact_percentage
     try:
         if (sentiment_analysis["no_impact_percentage"] != 0) or (sentiment_analysis != None):
-            print("Success: ", sentiment_analysis, track_id)
+            # print("Success: ", sentiment_analysis, track_id)
             baseNum = 25
             # Modify dimension values based on bert.ai sentiment analysis. 
-            vectors["happy"] += (baseNum * sentiment_analysis["positive_percentage"])
-            vectors["sad"] += (baseNum * sentiment_analysis["negative_percentage"])
+            vector["happy"] += (baseNum * sentiment_analysis["positive_percentage"])
+            vector["sad"] += (baseNum * sentiment_analysis["negative_percentage"])
             # Mixed percentage increases both dimensions
-            vectors["happy"] += (baseNum * sentiment_analysis["mixed_percentage"])
-            vectors["sad"] += (baseNum * sentiment_analysis["mixed_percentage"])
+            vector["happy"] += (baseNum * sentiment_analysis["mixed_percentage"])
+            vector["sad"] += (baseNum * sentiment_analysis["mixed_percentage"])
+    # Ignore `sentiment_analysis` does not exist: 1) sentiment_analysis  is None/null 2) It has Default value given to incorrect lyrics ("no_impact_percentage" == 0)
     except:
         pass
     
-    return(vectors, track_id)
+    return(vector, track_id)
 
 def get_db_connection() -> MongoClient | None:
     """Creates and returns db connection.
@@ -226,7 +227,7 @@ def main():
     client = get_db_connection()
     
     # Retrieve tracks from the database
-    dict_DB = import_tracks(client)
+    dict_DB = import_tracks(client, True)
 
     # Iterate through each track
     for item in dict_DB:
