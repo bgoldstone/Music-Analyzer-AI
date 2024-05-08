@@ -1,10 +1,4 @@
-import pandas as pd
 import os
-import numpy as np
-import ijson
-import sys
-import matplotlib
-import matplotlib.pyplot as plt
 import bertai
 import dotenv
 import certifi
@@ -206,28 +200,13 @@ def load_vectors(db: MongoClient, vector: dict, id: str) -> None:
 
 song_info = []
 
-# client = get_db_connection()
-# # Change to True if all song vector
-# dict_DB = import_tracks(client)
-
-# def main():
-#     for item in dict_DB:
-#         sentiment_analysis = import_lyrics(client, item["spotify"]["track_id"])
-#         process_data_DB(item["analysis"], item["spotify"]["track_id"], sentiment_analysis)
-
-#     for song in song_info:
-#         # print(f"Song ID: {song[1]}")
-#         # print(f"Song dimensions: {song}")
-#         # print("-----------------------------")
-#         load_vectors(client, song[0], song[1])
-
 def main():
     """Main function for processing tracks and loading vectors into the database."""
     # Establish MongoDB connection
     client = get_db_connection()
     
     # Retrieve tracks from the database
-    dict_DB = import_tracks(client, True)
+    dict_DB = import_tracks(client, False)
 
     # Iterate through each track
     for item in dict_DB:

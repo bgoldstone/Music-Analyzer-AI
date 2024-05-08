@@ -205,7 +205,7 @@ def main(group: List[str], numReturned: int = 500, playlistNum: int = 40) -> Lis
         each_track: Tuple[float, float, float, float, str, str, str] = heap.extract_max()
         track_id, track_name, artist_name = each_track[4], each_track[5], each_track[6]
         # Encode the strings as ASCII before printing
-        print(i, ") ", track_id.encode('ascii', 'ignore'), track_name.encode('ascii', 'ignore'), artist_name.encode('ascii', 'ignore'))
+        # print(i, ") ", track_id.encode('ascii', 'ignore'), track_name.encode('ascii', 'ignore'), artist_name.encode('ascii', 'ignore'))
         top_songs.append({"track_id": track_id, "track_name": track_name, "artist_name": artist_name})
     
     return random.sample(top_songs, playlistNum)
