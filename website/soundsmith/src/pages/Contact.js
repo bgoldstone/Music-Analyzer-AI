@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Loading from './Loading'; // Import the Loading component
 import '../App.css'
 import background from "../dj-background.jpg";
-import {Link} from "react-router-dom"; // Import Outlet and Link from react-router-dom
+import { Link } from "react-router-dom"; // Import Outlet and Link from react-router-dom
 
 
 
@@ -18,8 +18,8 @@ const Contact = () => {
     };
 
     const uploadPlaylist = () => {
-        fetch('http://localhost:8000/generate',{})
-        
+        fetch('http://localhost:8000/generate', {})
+
 
     }
 
@@ -27,7 +27,7 @@ const Contact = () => {
     const handleBeginClick = () => {
         // Show loading indicator
         setLoading(true);
-    
+
         fetch('http://localhost:8000/playlists/generate', {
             method: "POST",
             headers: {
@@ -41,37 +41,38 @@ const Contact = () => {
                 "mood": " " // Placeholder for mood
             })
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Extract playlist tracks from the response
-            const allTracks = data.tracks;
-    
-            // Update the playlist state with the fetched tracks
-            setPlaylist({ tracks: allTracks });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Extract playlist tracks from the response
+                const allTracks = data.tracks;
 
-            // Hide loading indicator after fetching data
-            setLoading(false);
-             setPlaylistUpload(true)
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // Hide loading indicator in case of error
-            setLoading(false);
-        });
+                // Update the playlist state with the fetched tracks
+                setPlaylist({ tracks: allTracks });
+
+                // Hide loading indicator after fetching data
+                setLoading(false);
+                setPlaylistUpload(true)
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Hide loading indicator in case of error
+                setLoading(false);
+            });
     };
 
     // JSX rendering
     return (
-        <div className="login" style={{ 
-                  backgroundImage: `url(${background})`, backgroundPosition: 'center', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', width: '100vw', height: '100vh', backgroundAttachment: 'fixed', overflowY: 'scroll'}}>
+        <div className="login" style={{
+            backgroundImage: `url(${background})`, backgroundPosition: 'center', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', width: '100vw', height: '100vh', backgroundAttachment: 'fixed', overflowY: 'scroll'
+        }}>
             <header className="Contact-header">
-                <h1 className="header-title">How are you feeling dawg</h1>
-                <label className="header-label">You may put a few words or even a few sentences</label>
+                <h1 className="header-title">How are you feeling, dawg?</h1>
+                <label className="header-label">You may put a few words or even a few sentences.</label>
                 {/* Textarea for user input */}
                 <textarea
                     id="moodinput"
@@ -102,12 +103,12 @@ const Contact = () => {
                                     </div>
                                 ))}
                                 <div>
-                                    <h3>Would you like to add this playlist to your Spotify?</h3>
+                                    <h3>Do you like the generated playlist?</h3>
                                     <button className="Clickable-text" onClick={uploadPlaylist}>
-                                    <Link to="http://localhost:3000">Yes</Link>
+                                        <Link to="http://localhost:3000">Yes</Link>
                                     </button>
                                     <div className="Clickable-text-link">
-                                    <Link to="http://localhost:3000">No</Link>
+                                        <Link to="http://localhost:3000">No</Link>
                                     </div>
                                 </div>
                             </div>

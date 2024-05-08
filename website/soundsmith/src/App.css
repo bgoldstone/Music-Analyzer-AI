@@ -2,14 +2,14 @@
   text-align: center;
 }
 
-body{
+body {
   margin: 0px;
 }
 
 .Home-logo {
   height: 40vmin;
   pointer-events: none;
-  filter:  invert(83%) sepia(43%) saturate(444%) hue-rotate(355deg) brightness(102%) contrast(91%);
+  filter: invert(83%) sepia(43%) saturate(444%) hue-rotate(355deg) brightness(102%) contrast(91%);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -49,7 +49,8 @@ body{
 .loading-message {
   color: #eed15b;
   font-size: 100xpx;
-  margin-top: 10px; /* Add margin to separate from the text box */
+  margin-top: 10px;
+  /* Add margin to separate from the text box */
 }
 
 .backgroundDJ {
@@ -71,15 +72,23 @@ body{
 
 .Clickable-text {
   cursor: pointer;
-  padding: 10px 20px; /* Adjust padding to make it look like a button */
-  background-color: #3c0047; /* Button background color */
-  color: #6f42c1; /* Darker purple font color */
-  border: none; /* Remove button border */
-  border-radius: 5px; /* Add border-radius for rounded corners */
-  font-size: 16px; /* Adjust font size */
+  padding: 10px 20px;
+  /* Adjust padding to make it look like a button */
+  background-color: #3c0047;
+  /* Button background color */
+  color: #6f42c1;
+  /* Darker purple font color */
+  border: none;
+  /* Remove button border */
+  border-radius: 5px;
+  /* Add border-radius for rounded corners */
+  font-size: 16px;
+  /* Adjust font size */
   text-decoration: none;
 
-}.login {
+}
+
+.login {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -90,15 +99,23 @@ body{
 
 .Clickable-text-link {
   cursor: pointer;
-  padding: 10px 20px; /* Adjust padding to make it look like a button */
-  background-color: #3c0047; /* Button background color */
-  color: #6f42c1; /* Darker purple font color */
-  border: none; /* Remove button border */
-  border-radius: 5px; /* Add border-radius for rounded corners */
-  font-size: 16px; /* Adjust font size */
-  text-decoration: none!important;
+  padding: 10px 20px;
+  /* Adjust padding to make it look like a button */
+  background-color: #3c0047;
+  /* Button background color */
+  color: #6f42c1;
+  /* Darker purple font color */
+  border: none;
+  /* Remove button border */
+  border-radius: 5px;
+  /* Add border-radius for rounded corners */
+  font-size: 16px;
+  /* Adjust font size */
+  text-decoration: none !important;
   width: 20px;
   margin: 0 auto;
+  margin-bottom: 20px;
+  margin-top: 20px;
 }
 
 
@@ -107,13 +124,15 @@ textarea[type="text"],
 textarea[id="moodinput"] {
   cursor: text;
   padding: 10px;
-  background-color: transparent; /* Make the background color transparent */
-  border: 1px solid #ccc; /* Add a border for clarity */
-  color: #eed15b; 
+  background-color: transparent;
+  /* Make the background color transparent */
+  border: 1px solid #ccc;
+  /* Add a border for clarity */
+  color: #eed15b;
   border-radius: 5px;
   font-size: 16px;
   font-weight: bold;
-  margin-bottom: 10px; 
+  margin-bottom: 10px;
   height: 150px;
   width: 300px;
   vertical-align: top;
@@ -122,7 +141,8 @@ textarea[id="moodinput"] {
 }
 
 .Clickable-text:hover {
-  background-color: #1f0136; /* Change background color on hover */
+  background-color: #1f0136;
+  /* Change background color on hover */
   color: #f3db7d;
 }
 
@@ -132,6 +152,7 @@ textarea[id="moodinput"] {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
