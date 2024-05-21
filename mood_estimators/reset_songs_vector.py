@@ -96,7 +96,7 @@ def scale_valence(valence: float) -> float:
     # Outliers (0.10 or 0.9) have exponentially higher outputs
     return (20 * (valence - 0.50) ** 3) * 40
 
-def import_lyrics(db: MongoClient, spotify_id: str) -> Optional[dict]:
+def import_sentiment_analysis(db: MongoClient, spotify_id: str) -> Optional[dict]:
     """Import lyrics from the database.
 
     Args:
@@ -211,7 +211,7 @@ def main():
     # Iterate through each track
     for item in dict_DB:
         # Import sentiment analysis from the database for the track
-        sentiment_analysis = import_lyrics(client, item["spotify"]["track_id"])
+        sentiment_analysis = import_sentiment_analysis(client, item["spotify"]["track_id"])
         # Process data for the track from the database
         process_data_DB(item["analysis"], item["spotify"]["track_id"], sentiment_analysis)
 
