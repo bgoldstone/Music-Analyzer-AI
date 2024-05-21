@@ -140,7 +140,6 @@ def create_playlist(songs_dict: List[Dict[str, str]]) -> None:
 
     Args:
         songs_dict (List[Dict[str, str]]): List of dictionaries containing song information.
-
     Returns:
         None
     """
